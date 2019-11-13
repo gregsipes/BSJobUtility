@@ -1,0 +1,7 @@
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\Commissions.DAL\bin\Debug\Commissions.DAL.dll.config
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\Commissions.DAL\bin\Debug\Commissions.DAL.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\Commissions.DAL\bin\Debug\Commissions.DAL.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\Commissions.DAL\obj\Debug\Commissions.DAL.csprojAssemblyReference.cache
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\Commissions.DAL\obj\Debug\Commissions.DAL.csproj.CoreCompileInputs.cache
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\Commissions.DAL\obj\Debug\Commissions.DAL.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\Commissions.DAL\obj\Debug\Commissions.DAL.pdb

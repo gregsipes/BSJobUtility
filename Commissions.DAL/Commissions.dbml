@@ -1,0 +1,911 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Commissions" Class="CommissionsDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=BWDB\BW;Initial Catalog=Commissions;User ID=CommissionsCreate" SettingsObjectName="Commissions.DAL.Properties.Settings" SettingsPropertyName="CommissionsConnectionString" Provider="System.Data.SqlClient" />
+  <Function Name="dbo.Proc_Copy_Between_Snapshots" Method="Proc_Copy_Between_Snapshots">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrTableName" Type="System.String" DbType="VarChar(200)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Salespersons_Performance_Goal_Percentage" Method="Proc_Update_Snapshots_Salespersons_Performance_Goal_Percentage">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Delete_Commissions" Method="Proc_Delete_Commissions">
+    <Parameter Name="pintCommissionsID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Delete_Commissions_Attachments_Auto_Attachment" Method="Proc_Delete_Commissions_Attachments_Auto_Attachment">
+    <Parameter Name="pintCommissionsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Delete_Commissions_Recreate" Method="Proc_Delete_Commissions_Recreate">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pflgDeleteLatestSnapshots" Type="System.Boolean" DbType="Bit" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Delete_CommissionsCreate_Requested" Method="Proc_Delete_CommissionsCreate_Requested">
+    <Parameter Name="pintCommissionsCreateRequestedID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Delete_Since_Last_Created" Method="Proc_Delete_Since_Last_Created">
+    <Parameter Name="pintCommissionsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Delete_Snapshots" Method="Proc_Delete_Snapshots">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Delete_Statuses_Creating" Method="Proc_Delete_Statuses_Creating">
+    <Parameter Name="pintCommissionsID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_BARC" Method="Proc_Insert_BARC">
+    <Parameter Name="pvchrBuffNewsForBWServerInstance" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="pvchrBuffNewsForBWDatabase" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="pvchrUserName" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="pvchrPassword" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="pintCommissionsInquiriesID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrStoredProcedure" Type="System.String" DbType="VarChar(200)" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Commissions" Method="Proc_Insert_Commissions">
+    <Parameter Name="pintStructuresID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsYTDStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsPriorYTDStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsPriorMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsPriorEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pintGainsLossesTopCount" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrUserName" Type="System.String" DbType="VarChar(50)" />
+    <ElementType Name="Proc_Insert_CommissionsResult">
+      <Column Name="commissions_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="snapshots_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="structure" Type="System.String" DbType="VarChar(30)" CanBeNull="true" />
+      <Column Name="spreadsheet_style" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_for_barc_insert_stored_procedure" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_for_barc_update_stored_procedure" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="performance_for_barc_insert_stored_procedure" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Insert_Commissions_Recreate" Method="Proc_Insert_Commissions_Recreate">
+    <Parameter Name="pintStructuresID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionYTDStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintNewSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrRecreateBy" Type="System.String" DbType="VarChar(50)" />
+    <Parameter Name="pvchrRecreateComputerName" Type="System.String" DbType="VarChar(50)" />
+    <ElementType Name="Proc_Insert_Commissions_RecreateResult">
+      <Column Name="commissions_recreate_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="message" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Insert_Commissions_Statuses_Created" Method="Proc_Insert_Commissions_Statuses_Created">
+    <Parameter Name="pintCommissionsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrStatusBy" Type="System.String" DbType="VarChar(50)" />
+    <Parameter Name="pdateBARCDateTime" Type="System.DateTime" DbType="DateTime" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Commissions_Statuses_Creating" Method="Proc_Insert_Commissions_Statuses_Creating">
+    <Parameter Name="pintCommissionsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalespersonName" Type="System.String" DbType="VarChar(40)" />
+    <Parameter Name="pvchrStatusBy" Type="System.String" DbType="VarChar(50)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Data_Mining" Method="Proc_Insert_Data_Mining">
+    <Parameter Name="pvchrBrainworksServerInstance" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="pvchrBrainworksDatabase" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="pvchrUserName" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="pvchrPassword" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="pintCommissionsInquiriesID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrStoredProcedure" Type="System.String" DbType="VarChar(200)" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_For_Commissions_Recreate" Method="Proc_Insert_For_Commissions_Recreate">
+    <Parameter Name="pintCommissionsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrUserName" Type="System.String" DbType="VarChar(50)" />
+    <ElementType Name="Proc_Insert_For_Commissions_RecreateResult">
+      <Column Name="exists_date_time" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="creating_flag" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="paid_processing_exists_flag" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="recreate_already_exists_flag" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="snapshots_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="exists_by" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="exists_computer_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Insert_Sessions" Method="Proc_Insert_Sessions">
+    <Parameter Name="pvchrUserName" Type="System.String" DbType="VarChar(50)" />
+    <Parameter Name="pvchrComputerName" Type="System.String" DbType="VarChar(50)" />
+    <ElementType Name="Proc_Insert_SessionsResult">
+      <Column Name="sessions_id" Type="System.Decimal" DbType="Decimal(38,0)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots" Method="Proc_Insert_Snapshots">
+    <ElementType Name="Proc_Insert_SnapshotsResult">
+      <Column Name="snapshots_id" Type="System.Decimal" DbType="Decimal(38,0)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Accounts" Method="Proc_Insert_Snapshots_Accounts">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Chargebacks" Method="Proc_Insert_Snapshots_Chargebacks">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Draw_Per_Days" Method="Proc_Insert_Snapshots_Draw_Per_Days">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Noncommissions" Method="Proc_Insert_Snapshots_Noncommissions">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Playbook_Groups" Method="Proc_Insert_Snapshots_Playbook_Groups">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Nonworking_Dates" Method="Proc_Insert_Snapshots_Nonworking_Dates">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Playbook_Print_Division_Descriptions" Method="Proc_Insert_Snapshots_Playbook_Print_Division_Descriptions">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Product_Data_Mining_Descriptions" Method="Proc_Insert_Snapshots_Product_Data_Mining_Descriptions">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Product_Groups" Method="Proc_Insert_Snapshots_Product_Groups">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Salespersons" Method="Proc_Insert_Snapshots_Salespersons">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Salespersons_Groups" Method="Proc_Insert_Snapshots_Salespersons_Groups">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Strategies" Method="Proc_Insert_Snapshots_Strategies">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Insert_Snapshots_Territories" Method="Proc_Insert_Snapshots_Territories">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintStructuresID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Detail_Outside_Real_Estate" Method="Proc_Select_BARC_Detail_Outside_Real_Estate">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrCommissionsMonthYear" Type="System.String" DbType="VarChar(7)" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_BARC_Detail_Outside_Real_EstateResult">
+      <Column Name="commissions_month_year" Type="System.String" DbType="VarChar(7)" CanBeNull="true" />
+      <Column Name="commissions_month_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_end_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="playbook_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="revenue_without_taxes" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="insertions" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="inches" Type="System.Single" DbType="Real NOT NULL" CanBeNull="false" />
+      <Column Name="lines" Type="System.Single" DbType="Real NOT NULL" CanBeNull="false" />
+      <Column Name="account" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="clientname" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="client_region" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="client_team" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="client_salesperson" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="category_major_group" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="category" Type="System.String" DbType="VarChar(70) NOT NULL" CanBeNull="false" />
+      <Column Name="subcategory" Type="System.String" DbType="VarChar(70) NOT NULL" CanBeNull="false" />
+      <Column Name="division_description" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="trantype" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
+      <Column Name="trancode" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="transaction_description" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="select_source" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="invoice_header_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="serialno_or_insertid" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="insseq" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="class" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="insval2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="pubid" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="pub" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+      <Column Name="pubmaster_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="revenuecode" Type="System.String" DbType="VarChar(2) NOT NULL" CanBeNull="false" />
+      <Column Name="revenuecode_description" Type="System.String" DbType="VarChar(255) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Insert_Update_Snapshots_Latest" Method="Proc_Insert_Update_Snapshots_Latest">
+    <Parameter Name="pintStructuresID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Detail_Outside_Auto" Method="Proc_Select_BARC_Detail_Outside_Auto">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrCommissionsMonthYear" Type="System.String" DbType="VarChar(7)" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_BARC_Detail_Outside_AutoResult">
+      <Column Name="commissions_month_year" Type="System.String" DbType="VarChar(7)" CanBeNull="true" />
+      <Column Name="commissions_month_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_end_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="playbook_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="revenue_without_taxes" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="insertions" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="inches" Type="System.Single" DbType="Real NOT NULL" CanBeNull="false" />
+      <Column Name="lines" Type="System.Single" DbType="Real NOT NULL" CanBeNull="false" />
+      <Column Name="account" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="clientname" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="client_region" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="client_team" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="client_salesperson" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="category_major_group" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="category" Type="System.String" DbType="VarChar(70) NOT NULL" CanBeNull="false" />
+      <Column Name="subcategory" Type="System.String" DbType="VarChar(70) NOT NULL" CanBeNull="false" />
+      <Column Name="division_description" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="trantype" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
+      <Column Name="trancode" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="transaction_description" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="select_source" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="invoice_header_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="serialno_or_insertid" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="insseq" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="class" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="insval2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="pubid" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="pub" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+      <Column Name="pubmaster_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="revenuecode" Type="System.String" DbType="VarChar(2) NOT NULL" CanBeNull="false" />
+      <Column Name="revenuecode_description" Type="System.String" DbType="VarChar(255) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Detail_Retail" Method="Proc_Select_BARC_Detail_Retail">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrCommissionsMonthYear" Type="System.String" DbType="VarChar(7)" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_BARC_Detail_RetailResult">
+      <Column Name="commissions_month_year" Type="System.String" DbType="VarChar(7)" CanBeNull="true" />
+      <Column Name="commissions_month_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_end_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="playbook_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="revenue_without_taxes" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="insertions" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="inches" Type="System.Single" DbType="Real NOT NULL" CanBeNull="false" />
+      <Column Name="lines" Type="System.Single" DbType="Real NOT NULL" CanBeNull="false" />
+      <Column Name="account" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="clientname" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="client_region" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="client_team" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="client_salesperson" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="category_major_group" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="category" Type="System.String" DbType="VarChar(70) NOT NULL" CanBeNull="false" />
+      <Column Name="subcategory" Type="System.String" DbType="VarChar(70) NOT NULL" CanBeNull="false" />
+      <Column Name="division_description" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="trantype" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
+      <Column Name="trancode" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="transaction_description" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="select_source" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="invoice_header_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="serialno_or_insertid" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="insseq" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="class" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="insval2" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="pubid" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="pub" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+      <Column Name="pubmaster_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="revenuecode" Type="System.String" DbType="VarChar(2) NOT NULL" CanBeNull="false" />
+      <Column Name="revenuecode_description" Type="System.String" DbType="VarChar(255) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Gains" Method="Proc_Select_BARC_Gains">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrCurrentMonthStartDate" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="pvchrCurrentEndDate" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="pvchrPriorMonthStartDate" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="pvchrPriorEndDate" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="pintGainsLossesTopCount" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Outside_Auto_For_Excel" Method="Proc_Select_BARC_Outside_Auto_For_Excel">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_BARC_Outside_Auto_For_ExcelResult">
+      <Column Name="marker_flag_name" Type="System.String" DbType="VarChar(21) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="playbook_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_print_division_description" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="revenue_without_taxes" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="pub" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+      <Column Name="trancode" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="trantype" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
+      <Column Name="account" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="clientname" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="select_source" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Losses" Method="Proc_Select_BARC_Losses">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrCurrentMonthStartDate" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="pvchrCurrentEndDate" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="pvchrPriorMonthStartDate" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="pvchrPriorEndDate" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="pintGainsLossesTopCount" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Outside_Real_Estate_For_Excel" Method="Proc_Select_BARC_Outside_Real_Estate_For_Excel">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_BARC_Outside_Real_Estate_For_ExcelResult">
+      <Column Name="marker_flag_name" Type="System.String" DbType="VarChar(21) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="playbook_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_print_division_description" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="revenue_without_taxes" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="pub" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+      <Column Name="trancode" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="trantype" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
+      <Column Name="account" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="clientname" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="select_source" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Performance" Method="Proc_Select_BARC_Performance">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCurrentYTDStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCurrentMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCurrentEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatPriorYTDStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatPriorMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatPriorEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_BARC_PerformanceResult">
+      <Column Name="month_active_accounts_current" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="month_active_accounts_prior" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="month_revenue_current" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="month_revenue_prior" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="ytd_revenue_current" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="ytd_revenue_prior" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_BARC_Retail_For_Excel" Method="Proc_Select_BARC_Retail_For_Excel">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_BARC_Retail_For_ExcelResult">
+      <Column Name="marker_flag_name" Type="System.String" DbType="VarChar(27) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="playbook_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_print_division_description" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="revenue_without_taxes" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="pub" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+      <Column Name="trancode" Type="System.String" DbType="VarChar(5) NOT NULL" CanBeNull="false" />
+      <Column Name="trantype" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
+      <Column Name="account" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="clientname" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="select_source" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Commissions_Paid_Processing" Method="Proc_Select_Commissions_Paid_Processing">
+    <Parameter Name="pintStructuresID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Commissions_Paid_ProcessingResult">
+      <Column Name="processing_date_time" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="processing_by" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="processing_computer_name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Commissions_Recreate" Method="Proc_Select_Commissions_Recreate">
+    <Parameter Name="pintStructuresID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYear" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonth" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Commissions_RecreateResult">
+      <Column Name="recreate_date_time" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="recreate_by" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="recreate_computer_name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Data_Mining_Menu_Mania_For_Excel" Method="Proc_Select_Data_Mining_Menu_Mania_For_Excel">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Data_Mining_Menu_Mania_For_ExcelResult">
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="product_commissions_menu_mania_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="amount_pretax" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="history_core_account" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="clientsdata_clientname" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="history_core_ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Commissions_Related" Method="Proc_Select_Commissions_Related">
+    <Parameter Name="pintCommissionsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Commissions_RelatedResult">
+      <Column Name="structures_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="commissions_year" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="commissions_month" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="commissions_ytd_start_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
+      <Column Name="commissions_month_start_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
+      <Column Name="commissions_end_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
+      <Column Name="commissions_prior_ytd_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_prior_month_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_prior_end_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="gains_losses_top_count" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="spreadsheet_style" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="performance_for_barc_insert_stored_procedure" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_for_barc_insert_stored_procedure" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_for_barc_update_stored_procedure" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Data_Mining_New_Business_For_Excel" Method="Proc_Select_Data_Mining_New_Business_For_Excel">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Data_Mining_New_Business_For_ExcelResult">
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="product_commissions_new_business_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="amount_pretax" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="history_core_account" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="clientsdata_clientname" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="history_core_ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="tblcustomfieldsvalues_new_bus_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Data_Mining_Product_For_Excel" Method="Proc_Select_Data_Mining_Product_For_Excel">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Data_Mining_Product_For_ExcelResult">
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6)" CanBeNull="true" />
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="tbleditions_ednnumber" Type="System.String" DbType="VarChar(4)" CanBeNull="true" />
+      <Column Name="tbleditions_descript" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="trandate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="amount_pretax" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="history_core_account" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="clientsdata_clientname" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="history_core_ticket" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Product_Data_Mining_Descriptions" Method="Proc_Select_Product_Data_Mining_Descriptions">
+    <Parameter Name="pvchrtblEditionsEdnNumber" Type="System.String" DbType="VarChar(4)" />
+    <ElementType Name="Proc_Select_Product_Data_Mining_DescriptionsResult">
+      <Column Name="product_data_mining_descriptions_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="tbleditions_ednnumber" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+      <Column Name="product_commissions_groups_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(30)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Salespersons_Recreate" Method="Proc_Select_Salespersons_Recreate">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Salespersons_RecreateResult">
+      <Column Name="salesperson_name" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Accounts_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Accounts_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Accounts_For_Salespersons_Groups_IDResult">
+      <Column Name="account_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="sequence" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="show_zero_amount_flag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Salespersons" Method="Proc_Select_Salespersons">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_SalespersonsResult">
+      <Column Name="salesperson_name" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Accounts_For_Salesperson" Method="Proc_Select_Snapshots_Accounts_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Accounts_For_SalespersonResult">
+      <Column Name="account_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="percentage" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Salespersons_Groups_Embedded_Date_Time" Method="Proc_Update_Snapshots_Salespersons_Groups_Embedded_Date_Time">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pdatEmbeddedDateTime" Type="System.DateTime" DbType="DateTime" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Salespersons_Groups_Amounts" Method="Proc_Update_Snapshots_Salespersons_Groups_Amounts">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pmnyCurrentMonthCommissionsCarryover" Type="System.Decimal" DbType="Money" />
+    <Parameter Name="pmnyCurrentMonthNoncommissionsCarryover" Type="System.Decimal" DbType="Money" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Salespersons_Amounts" Method="Proc_Update_Snapshots_Salespersons_Amounts">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Parameter Name="pmnyCurrentMonthCommissionsAmount" Type="System.Decimal" DbType="Money" />
+    <Parameter Name="pmnyCurrentMonthNoncommissionsAmount" Type="System.Decimal" DbType="Money" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Product_Groups_Product" Method="Proc_Update_Snapshots_Product_Groups_Product">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Product_Groups_New_Business" Method="Proc_Update_Snapshots_Product_Groups_New_Business">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Product_Groups_Menu_Mania" Method="Proc_Update_Snapshots_Product_Groups_Menu_Mania">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Playbook_Groups_Retail" Method="Proc_Update_Snapshots_Playbook_Groups_Retail">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Playbook_Groups_Outside_Real_Estate" Method="Proc_Update_Snapshots_Playbook_Groups_Outside_Real_Estate">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Update_Snapshots_Playbook_Groups_Outside_Auto" Method="Proc_Update_Snapshots_Playbook_Groups_Outside_Auto">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="psdatCommissionsMonthStartDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="psdatCommissionsEndDate" Type="System.DateTime" DbType="SmallDateTime" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.Proc_Select_Structures" Method="Proc_Select_Structures">
+    <Parameter Name="pintStructuresID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_StructuresResult">
+      <Column Name="structures_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="structure" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="verified_flag" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Update_CommissionsCreate_Requested" Method="Proc_Update_CommissionsCreate_Requested">
+    <ElementType Name="Proc_Update_CommissionsCreate_RequestedResult">
+      <Column Name="commissionscreate_requested_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="requested_date_time" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="requested_user_name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="new_commissions_flag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="structures_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="structure" Type="System.String" DbType="VarChar(30)" CanBeNull="true" />
+      <Column Name="commissions_year" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="commissions_month" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="commissions_ytd_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_month_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_end_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_prior_ytd_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_prior_month_start_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="commissions_prior_end_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="gains_losses_top_count" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="commissions_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="salespersons_groups_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="salesperson_name" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Strategies" Method="Proc_Select_Snapshots_Strategies">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <Parameter Name="pflgGains" Type="System.Boolean" DbType="Bit" />
+    <ElementType Name="Proc_Select_Snapshots_StrategiesResult">
+      <Column Name="strategy" Type="System.String" DbType="VarChar(MAX) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Salespersons_Groups_Recreate" Method="Proc_Select_Snapshots_Salespersons_Groups_Recreate">
+    <Parameter Name="pintCommissionsRecreateID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Salespersons_Groups_RecreateResult">
+      <Column Name="salespersons_groups_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="worksheet_name" Type="System.String" DbType="VarChar(31) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson_name" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="territories_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="territory" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="barc_for_excel_stored_procedure" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson_count" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Salespersons_Groups" Method="Proc_Select_Snapshots_Salespersons_Groups">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="plngTerritoriesID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Salespersons_GroupsResult">
+      <Column Name="salespersons_groups_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="worksheet_name" Type="System.String" DbType="VarChar(31) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson_name" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="employee_number" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="territories_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="territory" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="manager" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="barc_for_excel_stored_procedure" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson_count" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Salespersons_For_Territory_Spreadsheets" Method="Proc_Select_Snapshots_Salespersons_For_Territory_Spreadsheets">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Salespersons_For_Territory_SpreadsheetsResult">
+      <Column Name="salespersons_groups_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="territories_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson_name" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Salespersons_Carryover_Summary" Method="Proc_Select_Snapshots_Salespersons_Carryover_Summary">
+    <Parameter Name="pintSalespersonGroupsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintStructuresID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsYearCurrent" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintCommissionsMonthCurrent" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Salespersons_Carryover_SummaryResult">
+      <Column Name="prior_month_commissions_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="prior_month_noncommissions_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Salespersons" Method="Proc_Select_Snapshots_Salespersons">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_SalespersonsResult">
+      <Column Name="salesperson_name" Type="System.String" DbType="VarChar(40) NOT NULL" CanBeNull="false" />
+      <Column Name="salesperson" Type="System.String" DbType="VarChar(6) NOT NULL" CanBeNull="false" />
+      <Column Name="performance_goal_percentage" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Groups_Product_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Product_Groups_Product_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Groups_Product_For_Salespersons_Groups_IDResult">
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="product_commissions_groups_sequence" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="show_zero_amount_flag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Groups_Product_For_Salesperson" Method="Proc_Select_Snapshots_Product_Groups_Product_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Groups_Product_For_SalespersonResult">
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="percentage" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons_Groups_IDResult">
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="product_commissions_groups_sequence" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="show_zero_amount_flag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salesperson" Method="Proc_Select_Snapshots_Product_Groups_Other_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Groups_Other_For_SalespersonResult">
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="percentage" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons_Groups_IDResult">
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="product_commissions_groups_sequence" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="show_zero_amount_flag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salesperson" Method="Proc_Select_Snapshots_Product_Groups_New_Business_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Groups_New_Business_For_SalespersonResult">
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="percentage" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons_Groups_IDResult">
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="product_commissions_groups_sequence" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="show_zero_amount_flag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salesperson" Method="Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_SalespersonResult">
+      <Column Name="product_commissions_groups_description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="percentage" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Playbook_Groups_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Playbook_Groups_For_Salespersons_Groups_IDResult">
+      <Column Name="playbook_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_commissions_groups_sequence" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="show_zero_amount_flag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Product_Data_Mining_Descriptions" Method="Proc_Select_Snapshots_Product_Data_Mining_Descriptions">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Product_Data_Mining_DescriptionsResult">
+      <Column Name="tbleditions_ednnumber" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salesperson" Method="Proc_Select_Snapshots_Playbook_Groups_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Playbook_Groups_For_SalespersonResult">
+      <Column Name="playbook_commissions_groups_description" Type="System.String" DbType="VarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="percentage" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="playbook_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Noncommissions_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Noncommissions_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Noncommissions_For_Salespersons_Groups_IDResult">
+      <Column Name="description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="sequence" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="show_zero_amount_flag" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson" Method="Proc_Select_Snapshots_Noncommissions_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Noncommissions_For_SalespersonResult">
+      <Column Name="description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Draw_Per_Days_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Draw_Per_Days_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Draw_Per_Days_For_Salespersons_Groups_IDResult">
+      <Column Name="draw_per_day_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="number_of_working_days" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Draw_Per_Days_For_Salesperson" Method="Proc_Select_Snapshots_Draw_Per_Days_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Draw_Per_Days_For_SalespersonResult">
+      <Column Name="number_of_working_days" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="draw_per_day_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Chargebacks_For_Salespersons_Groups_ID" Method="Proc_Select_Snapshots_Chargebacks_For_Salespersons_Groups_ID">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pintSalespersonsGroupsID" Type="System.Int32" DbType="Int" />
+    <ElementType Name="Proc_Select_Snapshots_Chargebacks_For_Salespersons_Groups_IDResult">
+      <Column Name="description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.Proc_Select_Snapshots_Chargebacks_For_Salesperson" Method="Proc_Select_Snapshots_Chargebacks_For_Salesperson">
+    <Parameter Name="pintSnapshotsID" Type="System.Int32" DbType="Int" />
+    <Parameter Name="pvchrSalesperson" Type="System.String" DbType="VarChar(6)" />
+    <ElementType Name="Proc_Select_Snapshots_Chargebacks_For_SalespersonResult">
+      <Column Name="description" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="percentage" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+      <Column Name="commission_amount" Type="System.Decimal" DbType="Money NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+</Database>

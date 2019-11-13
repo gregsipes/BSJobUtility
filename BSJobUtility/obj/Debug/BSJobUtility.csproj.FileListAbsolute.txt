@@ -1,0 +1,32 @@
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csprojAssemblyReference.cache
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csproj.CoreCompileInputs.cache
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.exe.config
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.exe
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.pdb
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.dll
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\ParkingPayroll.dll
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\PBSMacrosLoad.dll
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.pdb
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.dll.config
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\ParkingPayroll.pdb
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\PBSMacrosLoad.pdb
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csproj.CopyComplete
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.exe
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.exe.config
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.exe
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\ParkingPayroll.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\PBSMacrosLoad.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.dll.config
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\ParkingPayroll.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\PBSMacrosLoad.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csprojAssemblyReference.cache
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csproj.CoreCompileInputs.cache
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csproj.CopyComplete
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.exe
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\CommissionsCreate.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\BSJobUtility\bin\Debug\CommissionsCreate.pdb

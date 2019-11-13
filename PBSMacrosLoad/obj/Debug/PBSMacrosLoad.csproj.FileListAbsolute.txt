@@ -1,0 +1,20 @@
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\PBSMacrosLoad.dll
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\PBSMacrosLoad.pdb
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.pdb
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll.config
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csprojAssemblyReference.cache
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CoreCompileInputs.cache
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CopyComplete
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.dll
+C:\projects\Buffalo News\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\PBSMacrosLoad.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\PBSMacrosLoad.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.pdb
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll.config
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csprojAssemblyReference.cache
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CoreCompileInputs.cache
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CopyComplete
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.dll
+C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.pdb
