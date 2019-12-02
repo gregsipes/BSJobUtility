@@ -41,5 +41,16 @@ namespace BSJobBase
         SingleUnderline = 2
     }
 
+    public enum ExcelColor
+    {
+        Black = 0,
+        LightOrange = 1,
+        LightGray5 = 2,
+        LightGray15 = 3,
+        LightGray25 = 4,
+        LightGray35 = 5,
+        White = 6
+    }
+
     #endregion
 }
