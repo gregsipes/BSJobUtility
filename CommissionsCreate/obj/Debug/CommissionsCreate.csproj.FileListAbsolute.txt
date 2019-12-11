@@ -8,3 +8,7 @@ C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\CommissionsCreate\bin\Debu
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.csproj.CopyComplete
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.dll
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.pdb
+C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.dll
+C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.pdb
