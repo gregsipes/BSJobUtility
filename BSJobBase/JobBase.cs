@@ -217,7 +217,7 @@ namespace BSJobBase
 
             List<Dictionary<string, object>> rowsToReturn = new List<Dictionary<string, object>>();
 
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson", parameters))
+            using (SqlDataReader reader = ExecuteQuery(connectionStringName, commandType, commandText, parameters))
             {
                 while (reader.Read())
                 {

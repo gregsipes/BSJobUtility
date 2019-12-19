@@ -51,18 +51,18 @@ namespace CommissionsCreate
                         }
 
                         //set the commissions id
-                        commissionsId = (Int64)result["commissionscreate_requested_id"];
+                       commissionsId = Int64.Parse(result["commissionscreate_requested_id"].ToString());
 
                         //build log mesage
                         string message = "Processing commissions create request by " + result["requested_user_name"] + " on " +
-                                     String.Format("{0:MM/dd/yyyy hh:mm tt}", (DateTime)result["requested_date_time"]);
+                                     String.Format("{0:MM/dd/yyyy hh:mm tt}", DateTime.Parse(result["requested_date_time"].ToString()));
 
                         //todo: do we need the emailsubset process?
 
                         WriteToJobLog(JobLogMessageType.INFO, message);
 
                         int month = (Int32)result["commissions_month"];
-                        int year = (Int32)result["commission_year"];
+                        int year = (Int32)result["commissions_year"];
                         Int64 salespersonGroupId = -1;
 
                         if ((bool)result["new_commissions_flag"])
@@ -92,10 +92,10 @@ namespace CommissionsCreate
                         commissionRecord.PriorYearStartDate = (DateTime)result["commissions_prior_ytd_start_date"];
                         commissionRecord.YearStartDate = (DateTime)result["commissions_ytd_start_date"];
                         commissionRecord.GainsLossesTopCount = result["gains_losses_top_count"].ToString();
-                        commissionRecord.StructuresId = (Int64)result["structures_id"];
+                        commissionRecord.StructuresId = Int64.Parse(result["structures_id"].ToString());
                         commissionRecord.RequestedUserName = result["requested_user_name"].ToString();
                         commissionRecord.SalespersonName = result["salesperson_name"].ToString();
-                        commissionRecord.SalespersonGroupId = (Int32)result["salesperson_groups_id"];
+                        commissionRecord.SalespersonGroupId = String.IsNullOrEmpty(result["salespersons_groups_id"].ToString())? -1 :  Int32.Parse(result["salespersons_groups_id"].ToString());
                     }
 
                     //process commission request
@@ -124,7 +124,7 @@ namespace CommissionsCreate
         {
             JobName = "Commissions Create";
             JobDescription = "Creates monthly employee commission statements";
-            AppConfigSectionName = "ParkingPayroll";
+            AppConfigSectionName = "CommissionsCreate";
         }
 
         private void ProcessCommissions(CommissionCreateTypes createType, CommissionRecord commissionsRecord)
@@ -150,12 +150,17 @@ namespace CommissionsCreate
                                                 new SqlParameter("@pintCommissionsMonth", commissionsRecord.Month),
                                                 new SqlParameter("@psdatCommissionsYTDStartDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.YearStartDate)),
                                                 new SqlParameter("@psdatCommissionsMonthStartDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.MonthStartDate)),
-                                                new SqlParameter("@psdatCommissionsEndDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.EndDate))).FirstOrDefault();
+                                                new SqlParameter("@psdatCommissionsEndDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.EndDate)),
+                                                new SqlParameter("@psdatCommissionsPriorYTDStartDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.PriorYearStartDate)),
+                                                new SqlParameter("@psdatCommissionsPriorMonthStartDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.PriorMonthStartDate)),
+                                                new SqlParameter("@psdatCommissionsPriorEndDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.PriorEndDate)),
+                                                new SqlParameter("@pintGainsLossesTopCount", String.Format("{0:MM/dd/yyyy}", commissionsRecord.GainsLossesTopCount)),
+                                                new SqlParameter("@pvchrUserName", String.Format("{0:MM/dd/yyyy}", commissionsRecord.RequestedUserName))).FirstOrDefault();
 
             {
-                commissionsRecord.SpreadsheetStyle = (Int32)result["spreadsheet_style"];
+                commissionsRecord.SpreadsheetStyle = Int32.Parse(result["spreadsheet_style"].ToString());
                 //commissionsRecord.CommissionsId = reader.GetInt64(reader.GetOrdinal("commissions_id"));
-                commissionsRecord.SnapshotId = (Int64)result["snapshots_id"];
+                commissionsRecord.SnapshotId = Int64.Parse(result["snapshots_id"].ToString());
                 commissionsRecord.PerformanceForBARCInsertStoredProcedure = result["performance_for_barc_insert_stored_procedure"].ToString();
                 commissionsRecord.PlaybookForBARCInsertStoredProcedure = result["playbook_for_barc_insert_stored_procedure"].ToString();
                 commissionsRecord.PlaybookForBARCUpdateStoredProcedure = result["playbook_for_barc_update_stored_procedure"].ToString();
@@ -375,7 +380,7 @@ namespace CommissionsCreate
                                                                 new SqlParameter("@psdatCommissionsPriorMonthStartDate", commissionRecord.PriorMonthStartDate),
                                                                 new SqlParameter("@psdatCommissionsPriorEndDate", commissionRecord.PriorEndDate),
                                                                 new SqlParameter("@pintGainsLossesTopCount", commissionRecord.GainsLossesTopCount)).FirstOrDefault();
-            commissionsInquiriesId = (Int64)result["commissions_inquiries_id"];
+            commissionsInquiriesId = Int64.Parse(result["commissions_inquiries_id"].ToString());
 
             List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Product_Data_Mining_Descriptions",
                                                      new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId));
