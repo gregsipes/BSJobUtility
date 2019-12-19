@@ -16,13 +16,11 @@ namespace ParkingPayroll
             try
             {
                 string sproc = "dbo.Proc_Insert_Update_People_From_Payroll";
-                ExecuteNonQuery(DatabaseConnectionStringNames.Parking, CommandType.StoredProcedure, sproc, 
-                                new Dictionary<string, object>() {
-                                        { "@pvchrServerInstance", GetConfigurationKeyValue("RemoteServerInstance") },
-                                        { "@pvchrDatabase", GetConfigurationKeyValue("RemoteDatabaseName") },
-                                        { "@pvchrUserName", GetConfigurationKeyValue("RemoteUserName") },
-                                        { "@pvchrPassword", GetConfigurationKeyValue("RemotePassword") }
-                                    });
+                ExecuteNonQuery(DatabaseConnectionStringNames.Parking, sproc, 
+                                new SqlParameter("@pvchrServerInstance", GetConfigurationKeyValue("RemoteServerInstance")),
+                                new SqlParameter("@pvchrDatabase", GetConfigurationKeyValue("RemoteDatabaseName")),
+                                new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("RemoteUserName")),
+                                new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemotePassword")));
 
                 WriteToJobLog(JobLogMessageType.INFO, "Executed " + sproc + " on " + DatabaseConnectionStringNames.Parking.ToString());
             }

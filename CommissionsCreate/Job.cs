@@ -42,36 +42,36 @@ namespace CommissionsCreate
                 {
                     // Checks the CommissionsCreate_Requested table for a record with a null session_uid and add set the session_uid if on is found.
                     //This record gets created by the Commissions interface
-                    using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Update_CommissionsCreate_Requested", null))
+                    Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Update_CommissionsCreate_Requested").FirstOrDefault();
                     {
-                        if (!reader.HasRows)
+                        if (result == null)
                         {
                             WriteToJobLog(JobLogMessageType.INFO, "No commissions create requests exist");
                             return;
                         }
 
                         //set the commissions id
-                        commissionsId = reader.GetInt64(reader.GetOrdinal("commissionscreate_requested_id"));
+                        commissionsId = (Int64)result["commissionscreate_requested_id"];
 
                         //build log mesage
-                        string message = "Processing commissions create request by " + reader.GetString(reader.GetOrdinal("requested_user_name")) + " on " +
-                                     String.Format("{0:MM/dd/yyyy hh:mm tt}", reader.GetDateTime(reader.GetOrdinal("requested_date_time")));
+                        string message = "Processing commissions create request by " + result["requested_user_name"] + " on " +
+                                     String.Format("{0:MM/dd/yyyy hh:mm tt}", (DateTime)result["requested_date_time"]);
 
                         //todo: do we need the emailsubset process?
 
                         WriteToJobLog(JobLogMessageType.INFO, message);
 
-                        int month = reader.GetInt32(reader.GetOrdinal("commissions_month"));
-                        int year = reader.GetInt32(reader.GetOrdinal("commission_year"));
+                        int month = (Int32)result["commissions_month"];
+                        int year = (Int32)result["commission_year"];
                         Int64 salespersonGroupId = -1;
 
-                        if (reader.GetBoolean(reader.GetOrdinal("new_commissions_flag")))
+                        if ((bool)result["new_commissions_flag"])
                         {
                             //this is a new commissions run
                             createType = CommissionCreateTypes.Create;
                             commissionsId = -1;
                         }
-                        else if (String.IsNullOrEmpty(reader.GetString(reader.GetOrdinal("salespersons_groups_id"))))
+                        else if (String.IsNullOrEmpty(result["salespersons_groups_id"].ToString()))
                         {
                             //this is a recreate for structure request
                             createType = CommissionCreateTypes.RecreateForStructure;
@@ -80,22 +80,22 @@ namespace CommissionsCreate
                         {
                             //this is a recreate for salesperson request
                             createType = CommissionCreateTypes.RecreateForSalesperson;
-                            salespersonGroupId = reader.GetInt64(reader.GetOrdinal("salespersons_groups_id"));
+                            salespersonGroupId = (Int64)result["salespersons_groups_id"];
                         }
 
                         //create commissions object
                         commissionRecord = new CommissionRecord() { Month = month, Year = year, CommissionsId = commissionsId };
-                        commissionRecord.EndDate = reader.GetDateTime(reader.GetOrdinal("commissions_end_date"));
-                        commissionRecord.MonthStartDate = reader.GetDateTime(reader.GetOrdinal("commissions_month_start_date"));
-                        commissionRecord.PriorEndDate = reader.GetDateTime(reader.GetOrdinal("commissions_prior_end_date"));
-                        commissionRecord.PriorMonthStartDate = reader.GetDateTime(reader.GetOrdinal("commissions_prior_month_start_date"));
-                        commissionRecord.PriorYearStartDate = reader.GetDateTime(reader.GetOrdinal("commissions_prior_ytd_start_date"));
-                        commissionRecord.YearStartDate = reader.GetDateTime(reader.GetOrdinal("commissions_ytd_start_date"));
-                        commissionRecord.GainsLossesTopCount = reader.GetString(reader.GetOrdinal("gains_losses_top_count"));
-                        commissionRecord.StructuresId = reader.GetInt64(reader.GetOrdinal("structures_id"));
-                        commissionRecord.RequestedUserName = reader.GetString(reader.GetOrdinal("requested_user_name"));
-                        commissionRecord.SalespersonName = reader.GetString(reader.GetOrdinal("salesperson_name"));
-                        commissionRecord.SalespersonGroupId = reader.GetInt32(reader.GetOrdinal("salesperson_groups_id"));
+                        commissionRecord.EndDate = (DateTime)result["commissions_end_date"];
+                        commissionRecord.MonthStartDate = (DateTime)result["commissions_month_start_date"];
+                        commissionRecord.PriorEndDate = (DateTime)result["commissions_prior_end_date"];
+                        commissionRecord.PriorMonthStartDate = (DateTime)result["commissions_prior_month_start_date"];
+                        commissionRecord.PriorYearStartDate = (DateTime)result["commissions_prior_ytd_start_date"];
+                        commissionRecord.YearStartDate = (DateTime)result["commissions_ytd_start_date"];
+                        commissionRecord.GainsLossesTopCount = result["gains_losses_top_count"].ToString();
+                        commissionRecord.StructuresId = (Int64)result["structures_id"];
+                        commissionRecord.RequestedUserName = result["requested_user_name"].ToString();
+                        commissionRecord.SalespersonName = result["salesperson_name"].ToString();
+                        commissionRecord.SalespersonGroupId = (Int32)result["salesperson_groups_id"];
                     }
 
                     //process commission request
@@ -106,11 +106,7 @@ namespace CommissionsCreate
 
 
                     //delete request
-                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Delete_CommissionsCreate_Requested",
-                                            new Dictionary<string, object>()
-                                            {
-                                                { "@pintCommissionsCreateRequestedID", commissionsId }
-                                            });
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_CommissionsCreate_Requested", new SqlParameter("@pintCommissionsCreateRequestedID", commissionsId));
                 }
                 catch (Exception)
                 {
@@ -139,8 +135,8 @@ namespace CommissionsCreate
                 RecreateCommission(createType, commissionsRecord);   //recreate a commissions request
 
 
-
-            DeleteAutoAttachments();
+            //todo:
+            //DeleteAutoAttachments();
         }
 
         private void CreateNewCommission(CommissionRecord commissionsRecord)
@@ -148,23 +144,21 @@ namespace CommissionsCreate
             WriteToJobLog(JobLogMessageType.INFO, "New commissions for " + commissionsRecord.StructuresId.ToString() + " " + commissionsRecord.Month.ToString() + "/" + commissionsRecord.Year);
 
             //Inserts a new record in the Commissions table and returns a new commissionId (unique value for this run)
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions",
-                                                new Dictionary<string, object>()
-                                                {
-                                                    { "@pintStructuresID", commissionsRecord.StructuresId },
-                                                    { "@pintCommissionsYear", commissionsRecord.Year },
-                                                    { "@pintCommissionsMonth", commissionsRecord.Month },
-                                                    { "@psdatCommissionsYTDStartDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.YearStartDate) },
-                                                    { "@psdatCommissionsMonthStartDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.MonthStartDate) },
-                                                    { "@psdatCommissionsEndDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.EndDate) }
-                                                }))
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Commissions",
+                                                new SqlParameter("@pintStructuresID", commissionsRecord.StructuresId),
+                                                new SqlParameter("@pintCommissionsYear", commissionsRecord.Year),
+                                                new SqlParameter("@pintCommissionsMonth", commissionsRecord.Month),
+                                                new SqlParameter("@psdatCommissionsYTDStartDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.YearStartDate)),
+                                                new SqlParameter("@psdatCommissionsMonthStartDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.MonthStartDate)),
+                                                new SqlParameter("@psdatCommissionsEndDate", String.Format("{0:MM/dd/yyyy}", commissionsRecord.EndDate))).FirstOrDefault();
+
             {
-                commissionsRecord.SpreadsheetStyle = reader.GetInt32(reader.GetOrdinal("spreadsheet_style"));
+                commissionsRecord.SpreadsheetStyle = (Int32)result["spreadsheet_style"];
                 //commissionsRecord.CommissionsId = reader.GetInt64(reader.GetOrdinal("commissions_id"));
-                commissionsRecord.SnapshotId = reader.GetInt64(reader.GetOrdinal("snapshots_id"));
-                commissionsRecord.PerformanceForBARCInsertStoredProcedure = reader.GetString(reader.GetOrdinal("performance_for_barc_insert_stored_procedure"));
-                commissionsRecord.PlaybookForBARCInsertStoredProcedure = reader.GetString(reader.GetOrdinal("playbook_for_barc_insert_stored_procedure"));
-                commissionsRecord.PlaybookForBARCUpdateStoredProcedure = reader.GetString(reader.GetOrdinal("playbook_for_barc_update_stored_procedure"));
+                commissionsRecord.SnapshotId = (Int64)result["snapshots_id"];
+                commissionsRecord.PerformanceForBARCInsertStoredProcedure = result["performance_for_barc_insert_stored_procedure"].ToString();
+                commissionsRecord.PlaybookForBARCInsertStoredProcedure = result["playbook_for_barc_insert_stored_procedure"].ToString();
+                commissionsRecord.PlaybookForBARCUpdateStoredProcedure = result["playbook_for_barc_update_stored_procedure"].ToString();
 
             }
 
@@ -191,71 +185,52 @@ namespace CommissionsCreate
 
             WriteToJobLog(JobLogMessageType.INFO, message);
 
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Commissions_Recreate",
-                                                        new Dictionary<string, object>()
-                                                        {
-                                                            { "@pintStructuresID", commissionsRecord.StructuresId },
-                                                            { "@pintCommissionsYear", commissionsRecord.Year },
-                                                            { "@pintCommissionsMonth", commissionsRecord.Month }
-                                                        }))
-            {
-                if (ValidateProcedure(reader, "Commissions cannot be recreated because other commissions are currently being recreated for this structure"))
-                    return;
-            }
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Commissions_Recreate",
+                                                        new SqlParameter("@pintStructuresID", commissionsRecord.StructuresId),
+                                                        new SqlParameter("@pintCommissionsYear", commissionsRecord.Year),
+                                                        new SqlParameter("@pintCommissionsMonth", commissionsRecord.Month)).FirstOrDefault();
 
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Commissions_Paid_Processing",
-                                            new Dictionary<string, object>()
-                                            {
-                                                            { "@pintStructuresID", commissionsRecord.StructuresId },
-                                                            { "@pintCommissionsYear", commissionsRecord.Year },
-                                                            { "@pintCommissionsMonth", commissionsRecord.Month }
-                                            }))
-            {
-                if (ValidateProcedure(reader, "Commissions cannot be recreated because they are in the process of being paid by Payroll"))
-                    return;
-            }
+            if (ValidateProcedure(result, "Commissions cannot be recreated because other commissions are currently being recreated for this structure"))
+                return;
 
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Structures",
-                                            new Dictionary<string, object>()
-                                            {
-                                                            { "@pintStructuresID", commissionsRecord.StructuresId }
-                                            }))
+            result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Commissions_Paid_Processing",
+                                            new SqlParameter("@pintStructuresID", commissionsRecord.StructuresId),
+                                            new SqlParameter("@pintCommissionsYear", commissionsRecord.Year),
+                                            new SqlParameter("@pintCommissionsMonth", commissionsRecord.Month)).FirstOrDefault();
+
+            if (ValidateProcedure(result, "Commissions cannot be recreated because they are in the process of being paid by Payroll"))
+                return;
+
+            result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Structures",
+                                            new SqlParameter("@pintStructuresID", commissionsRecord.StructuresId)).FirstOrDefault();
+
+            if (!(bool)result["verified_flag"])
             {
-                if (!reader.GetBoolean(reader.GetOrdinal("verified_flag")))
-                {
-                    WriteToJobLog(JobLogMessageType.WARNING, "Structure (" + commissionsRecord.StructuresId + ") must be verified before salesperson's commissions can be recreated");
-                    return;
-                }
+                WriteToJobLog(JobLogMessageType.WARNING, "Structure (" + commissionsRecord.StructuresId + ") must be verified before salesperson's commissions can be recreated");
+                return;
             }
 
             if (createType == CommissionCreateTypes.RecreateForSalesperson)
             {
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions_Statuses_Creating",
-                                            new Dictionary<string, object>()
-                                            {
-                                                { "@pintStructuresID", commissionsRecord.StructuresId },
-                                                { "@pintSalespersonsGroupsID", commissionsRecord.SalespersonGroupId },
-                                                { "@pvchrSalespersonName", commissionsRecord.SalespersonName },
-                                                { "@pvchrStatusBy", commissionsRecord.RequestedUserName }
-                                            });
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Commissions_Statuses_Creating",
+                                            new SqlParameter("@pintStructuresID", commissionsRecord.StructuresId),
+                                            new SqlParameter("@pintSalespersonsGroupsID", commissionsRecord.SalespersonGroupId),
+                                            new SqlParameter("@pvchrSalespersonName", commissionsRecord.SalespersonName),
+                                            new SqlParameter("@pvchrStatusBy", commissionsRecord.RequestedUserName));
             }
             else
             {
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_For_Commissions_Recreate",
-                                                              new Dictionary<string, object>()
-                                                              {
-                                                                                { "@pintCommissionsID", commissionsRecord.CommissionsId },
-                                                                                { "@pvchrUserName", commissionsRecord.RequestedUserName }
-                                                              }))
-                {
-                    if (!reader.GetBoolean(reader.GetOrdinal("creating_flag")))
-                    {
-                        WriteToJobLog(JobLogMessageType.WARNING, "Recreate not creating");
-                        return;
-                    }
+                result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_For_Commissions_Recreate",
+                                                              new SqlParameter("@pintCommissionsID", commissionsRecord.CommissionsId),
+                                                              new SqlParameter("@pvchrUserName", commissionsRecord.RequestedUserName)).FirstOrDefault();
 
-                    commissionsRecord.SnapshotId = reader.GetInt64(reader.GetOrdinal("snapshots_id"));
+                if (!(bool)result["creating_flag"])
+                {
+                    WriteToJobLog(JobLogMessageType.WARNING, "Recreate not creating");
+                    return;
                 }
+
+                commissionsRecord.SnapshotId = (Int64)result["snapshots_id"];
             }
 
 
@@ -276,15 +251,15 @@ namespace CommissionsCreate
 
             //ResetForExcel - is this needed?
 
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.BuffNewsForBW, CommandType.StoredProcedure, "dbo.Proc_Select_Commissions_BuffNews_BARC_Populated", null))
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.BuffNewsForBW, "dbo.Proc_Select_Commissions_BuffNews_BARC_Populated").FirstOrDefault();
             {
-                if (!reader.HasRows)
+                if (result == null)
                 {
                     WriteToJobLog(JobLogMessageType.WARNING, "No BARC data is available for selection");
                     return false;
                 }
                 else
-                    BARCDatetime = reader.GetDateTime(reader.GetOrdinal("end_date_time"));
+                    BARCDatetime = (DateTime)result["end_date_time"];
             }
 
 
@@ -292,66 +267,57 @@ namespace CommissionsCreate
             {
 
                 //build commission object
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Commissions_Related",
-                                                    new Dictionary<string, object>()
-                                                    {
-                                                        { "@pintCommissionsID", commissionRecord.CommissionsId }
-                                                    }))
-                {
-                    commissionRecord.EndDate = reader.GetDateTime(reader.GetOrdinal("commissions_end_date"));
-                    commissionRecord.MonthStartDate = reader.GetDateTime(reader.GetOrdinal("commissions_month_start_date"));
-                    commissionRecord.PriorEndDate = reader.GetDateTime(reader.GetOrdinal("commissions_prior_end_date"));
-                    commissionRecord.PriorMonthStartDate = reader.GetDateTime(reader.GetOrdinal("commissions_prior_month_start_date"));
-                    commissionRecord.PriorYearStartDate = reader.GetDateTime(reader.GetOrdinal("commissions_prior_ytd_start_date"));
-                    commissionRecord.YearStartDate = reader.GetDateTime(reader.GetOrdinal("commissions_ytd_start_date"));
-                    commissionRecord.Month = reader.GetInt32(reader.GetOrdinal("commissions_month"));
-                    commissionRecord.Year = reader.GetInt32(reader.GetOrdinal("commissions_year"));
+                result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Commissions_Related",
+                                                    new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId)).FirstOrDefault();
 
-                    commissionRecord.GainsLossesTopCount = reader.GetString(reader.GetOrdinal("gains_losses_top_count"));
-                    commissionRecord.SpreadsheetStyle = reader.GetInt32(reader.GetOrdinal("spreadsheet_style"));
-                    commissionRecord.StructuresId = reader.GetInt64(reader.GetOrdinal("structures_id"));
-                    commissionRecord.PerformanceForBARCInsertStoredProcedure = reader.GetString(reader.GetOrdinal("performance_for_barc_insert_stored_procedure"));
-                    commissionRecord.PlaybookForBARCInsertStoredProcedure = reader.GetString(reader.GetOrdinal("playbook_for_barc_insert_stored_procedure"));
-                    commissionRecord.PlaybookForBARCUpdateStoredProcedure = reader.GetString(reader.GetOrdinal("playbook_for_barc_update_stored_procedure"));
-                }
+                commissionRecord.EndDate = (DateTime)result["commissions_end_date"];
+                commissionRecord.MonthStartDate = (DateTime)result["commissions_month_start_date"];
+                commissionRecord.PriorEndDate = (DateTime)result["commissions_prior_end_date"];
+                commissionRecord.PriorMonthStartDate = (DateTime)result["commissions_prior_month_start_date"];
+                commissionRecord.PriorYearStartDate = (DateTime)result["commissions_prior_ytd_start_date"];
+                commissionRecord.YearStartDate = (DateTime)result["commissions_ytd_start_date"];
+                commissionRecord.Month = (Int32)result["commissions_month"];
+                commissionRecord.Year = (Int32)result["commissions_year"];
 
+                commissionRecord.GainsLossesTopCount = result["gains_losses_top_count"].ToString();
+                commissionRecord.SpreadsheetStyle = (Int32)result["spreadsheet_style"];
+                commissionRecord.StructuresId = (Int64)result["structures_id"];
+                commissionRecord.PerformanceForBARCInsertStoredProcedure = result["performance_for_barc_insert_stored_procedure"].ToString();
+                commissionRecord.PlaybookForBARCInsertStoredProcedure = result["playbook_for_barc_insert_stored_procedure"].ToString();
+                commissionRecord.PlaybookForBARCUpdateStoredProcedure = result["playbook_for_barc_update_stored_procedure"].ToString();
 
             }
 
             if (createType == CommissionCreateTypes.RecreateForSalesperson)
             {
                 //set snapshot id (unique id for the run)
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots", null))
+                result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots").FirstOrDefault();
                 {
-                    commissionRecord.SnapshotId = reader.GetInt64(reader.GetOrdinal("snapshots_id"));
+                    commissionRecord.SnapshotId = (Int64)result["snapshots_id"];
                 }
 
 
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions_Recreate",
-                                                                    new Dictionary<string, object>()
-                                                                    {
-                                                                        { "@pintStructuresID", commissionRecord.StructuresId },
-                                                                        { "@pintCommissionsYear", commissionRecord.Year },
-                                                                        { "@pintCommissionsMonth", commissionRecord.Month },
-                                                                        { "@psdatCommissionYTDStartDate", commissionRecord.YearStartDate },
-                                                                        { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                                                        { "@psdatCommissionsEndDate", commissionRecord.EndDate },
-                                                                        { "@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId },
-                                                                        { "@pintNewSnapshotsID", commissionRecord.SnapshotId },
-                                                                        { "@pvchrRecreateBy", commissionRecord.RequestedUserName },
-                                                                        { "@pvchrRecreateComputerName", "" }
-                                                                    }))
+                result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Commissions_Recreate",
+                                                                    new SqlParameter("@pintStructuresID", commissionRecord.StructuresId),
+                                                                    new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                                                    new SqlParameter("@pintCommissionsMonth", commissionRecord.Month),
+                                                                    new SqlParameter("@psdatCommissionYTDStartDate", commissionRecord.YearStartDate),
+                                                                    new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                                                    new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                                                    new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId),
+                                                                    new SqlParameter("@pintNewSnapshotsID", commissionRecord.SnapshotId),
+                                                                    new SqlParameter("@pvchrRecreateBy", commissionRecord.RequestedUserName),
+                                                                    new SqlParameter("@pvchrRecreateComputerName", "")).FirstOrDefault();
+
+                string message = result["message"].ToString();
+
+                if (!String.IsNullOrEmpty(message))
                 {
-                    string message = reader.GetString(reader.GetOrdinal("message"));
-
-                    if (!String.IsNullOrEmpty(message))
-                    {
-                        WriteToJobLog(JobLogMessageType.WARNING, message);
-                        return false;
-                    }
-
-                    commissionsRecreateId = reader.GetInt64(reader.GetOrdinal("commissions_recreate_id"));
+                    WriteToJobLog(JobLogMessageType.WARNING, message);
+                    return false;
                 }
+
+                commissionsRecreateId = (Int64)result["commissions_recreate_id"];
 
                 //take a snapshot of each table
                 TakeSnapshot(commissionsRecreateId, "BARC");
@@ -378,198 +344,143 @@ namespace CommissionsCreate
             Dictionary<string, string> salespersons = new Dictionary<string, string>();
             if (createType == CommissionCreateTypes.Create | createType == CommissionCreateTypes.RecreateForStructure)
             {
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Salespersons",
-                                                        new Dictionary<string, object>()
-                                                        {
-                                                            { "@pintSnapshotsID", commissionRecord.SnapshotId }
-                                                        }))
+                List<Dictionary<string, object>> salespersonResult = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Salespersons",
+                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId));
+
+                foreach (Dictionary<string, object> record in salespersonResult)
                 {
-                    while (reader.Read())
-                    {
-                        salespersons.Add(reader.GetString(reader.GetOrdinal("salesperson")), reader.GetString(reader.GetOrdinal("salesperson_name")));
-                    }
+                    salespersons.Add(record["salesperson"].ToString(), record["salesperson_name"].ToString());
                 }
             }
             else
             {
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Salespersons_Recreate",
-                                                            new Dictionary<string, object>()
-                                                            {
-                                                                { "@pintCommissionsRecreateID", commissionRecord.CommissionsId }
-                                                             }))
+                List<Dictionary<string, object>> salespersonResult = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Salespersons_Recreate",
+                                                            new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId));
+                foreach (Dictionary<string, object> record in salespersonResult)
                 {
-                    while (reader.Read())
-                    {
-                        salespersons.Add(reader.GetString(reader.GetOrdinal("salesperson")), reader.GetString(reader.GetOrdinal("salesperson_name")));
-                    }
+                    salespersons.Add(record["salesperson"].ToString(), record["salesperson_name"].ToString());
                 }
             }
 
             //get commissions inquiry id
             Int64 commissionsInquiriesId = 0;
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.CommissionsRelated, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions_Inquiries",
-                                                                new Dictionary<string, object>()
-                                                                {
-                                                                    { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                    { "@pintCommissionsYear",commissionRecord.Year },
-                                                                    { "@pintCommissionsMonth", commissionRecord.Month },
-                                                                    { "@psdatCommissionsYTDStartDate", commissionRecord.YearStartDate },
-                                                                    { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                                                    { "@psdatCommissionsEndDate", commissionRecord.EndDate },
-                                                                    { "@psdatCommissionsPriorYTDStartDate", commissionRecord.PriorYearStartDate },
-                                                                    { "@psdatCommissionsPriorMonthStartDate", commissionRecord.PriorMonthStartDate },
-                                                                    { "@psdatCommissionsPriorEndDate", commissionRecord.PriorEndDate },
-                                                                    { "@pintGainsLossesTopCount", commissionRecord.GainsLossesTopCount }
-                                                                }))
+            result = ExecuteSQL(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Insert_Commissions_Inquiries",
+                                                                new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                                                new SqlParameter("@pintCommissionsMonth", commissionRecord.Month),
+                                                                new SqlParameter("@psdatCommissionsYTDStartDate", commissionRecord.YearStartDate),
+                                                                new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                                                new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                                                new SqlParameter("@psdatCommissionsPriorYTDStartDate", commissionRecord.PriorYearStartDate),
+                                                                new SqlParameter("@psdatCommissionsPriorMonthStartDate", commissionRecord.PriorMonthStartDate),
+                                                                new SqlParameter("@psdatCommissionsPriorEndDate", commissionRecord.PriorEndDate),
+                                                                new SqlParameter("@pintGainsLossesTopCount", commissionRecord.GainsLossesTopCount)).FirstOrDefault();
+            commissionsInquiriesId = (Int64)result["commissions_inquiries_id"];
+
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Product_Data_Mining_Descriptions",
+                                                     new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId));
+
+            foreach (Dictionary<string, object> record in results)
             {
-                commissionsInquiriesId = reader.GetInt64(reader.GetOrdinal("commissions_inquiries_id"));
+                ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Insert_Commissions_Inquiries_Data_Mining",
+                                            new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                            new SqlParameter("@pvchrtblEditionsEdnNumber", record["tbleditions_ednnumber"].ToString()));
             }
 
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Product_Data_Mining_Descriptions",
-                                                    new Dictionary<string, object>()
-                                                    {
-                                                                    { "@pintCommissionsInquiriesID", commissionsInquiriesId }
-                                                    }))
-            {
-                while (reader.Read())
-                {
-                    ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions_Inquiries_Data_Mining",
-                                                    new Dictionary<string, object>()
-                                                    {
-                                                         { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                         {  "@pvchrtblEditionsEdnNumber", reader.GetString(reader.GetOrdinal("tbleditions_ednnumber")) }
-                                                    });
-                }
-            }
-
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.BuffNewsForBW, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions_Inquiries",
-                                                    new Dictionary<string, object>()
-                                                    {
-                                                        { "@pvchrCommissionsRelatedServerInstance", GetConfigurationKeyValue("CommissionsRelatedServerName") },
-                                                        { "@pvchrCommissionsRelatedDatabase", GetConfigurationKeyValue("CommissionsRelatedDatabaseName") },
-                                                        { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                                        { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword") },
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId }
-                                                    });
+            ExecuteNonQuery(DatabaseConnectionStringNames.BuffNewsForBW, "dbo.Proc_Insert_Commissions_Inquiries",
+                                                    new SqlParameter("@pvchrCommissionsRelatedServerInstance", GetConfigurationKeyValue("CommissionsRelatedServerName")),
+                                                    new SqlParameter("@pvchrCommissionsRelatedDatabase", GetConfigurationKeyValue("CommissionsRelatedDatabaseName")),
+                                                    new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                                    new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                                    new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId));
 
             foreach (var salesperson in salespersons)
             {
-                ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions_Inquiries_Responsible_Salespersons",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                        { "@pvchrSalesperson", salesperson.Key }
-                                        });
-                ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions_Inquiries_Performance_Salespersons",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                        { "@pvchrSalesperson", salesperson.Key }
-                                        });
+                ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Insert_Commissions_Inquiries_Responsible_Salespersons",
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pvchrSalesperson", salesperson.Key));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Insert_Commissions_Inquiries_Performance_Salespersons",
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pvchrSalesperson", salesperson.Key));
             }
 
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, CommandType.StoredProcedure, "dbo.Proc_Insert_Commissions_Inquiries_Responsible_Salespersons",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pvchrCommissionsRelatedServerInstance", GetConfigurationKeyValue("CommissionsRelatedServerName") },
-                                                        { "@pvchrCommissionsRelatedDatabase", GetConfigurationKeyValue("CommissionsRelatedDatabaseName") },
-                                                        { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                                        { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword") },
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId }
-                                        });
+            ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Insert_Commissions_Inquiries_Responsible_Salespersons",
+                                        new SqlParameter("@pvchrCommissionsRelatedServerInstance", GetConfigurationKeyValue("CommissionsRelatedServerName")),
+                                        new SqlParameter("@pvchrCommissionsRelatedDatabase", GetConfigurationKeyValue("CommissionsRelatedDatabaseName")),
+                                        new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting menu mania data mining data from Brainworks");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Data_Mining",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pvchrBrainworksServerInstance", GetConfigurationKeyValue("BrainworksServerName") },
-                                                        { "@pvchrBrainworksRelatedDatabase", GetConfigurationKeyValue("BrainworksDatabaseName") },
-                                                        { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                                        { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword") },
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                        { "@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_Menu_Mania" }
-                                        });
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Data_Mining",
+                                        new SqlParameter("@pvchrBrainworksServerInstance", GetConfigurationKeyValue("BrainworksServerName")),
+                                        new SqlParameter("@pvchrBrainworksRelatedDatabase", GetConfigurationKeyValue("BrainworksDatabaseName")),
+                                        new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_Menu_Mania"));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting new business data mining data from Brainworks");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Data_Mining",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pvchrBrainworksServerInstance", GetConfigurationKeyValue("BrainworksServerName") },
-                                                        { "@pvchrBrainworksRelatedDatabase", GetConfigurationKeyValue("BrainworksDatabaseName") },
-                                                        { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                                        { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword") },
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                        { "@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_New_Business" }
-                                        });
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Data_Mining",
+                                        new SqlParameter("@pvchrBrainworksServerInstance", GetConfigurationKeyValue("BrainworksServerName")),
+                                        new SqlParameter("@pvchrBrainworksRelatedDatabase", GetConfigurationKeyValue("BrainworksDatabaseName")),
+                                        new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_New_Business"));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting product data mining data from Brainworks");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Data_Mining",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pvchrBrainworksServerInstance", GetConfigurationKeyValue("BrainworksServerName") },
-                                                        { "@pvchrBrainworksRelatedDatabase", GetConfigurationKeyValue("BrainworksDatabaseName") },
-                                                        { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                                        { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword") },
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                        { "@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_Product" }
-                                        });
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Data_Mining",
+                                        new SqlParameter("@pvchrBrainworksServerInstance", GetConfigurationKeyValue("BrainworksServerName")),
+                                        new SqlParameter("@pvchrBrainworksRelatedDatabase", GetConfigurationKeyValue("BrainworksDatabaseName")),
+                                        new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_Product"));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting playbook data from BARC");
             //this is pulling in a snapshot of the BuffNewsForBW.BuffNews_BARC_Brainworks table depending which sproc is passed in
             //Does not create any new records
             //'Proc_Insert_BARC “BWDB\BW,50884', 'BuffNewsForBW', 'CommissionsCreate', '<Cr#@t0rUs3r>', 2607, 'Proc_Select_Commissions_Outside_Auto_Playbook_Detail'
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_BARC",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pvchrBuffNewsForBWServerInstance", GetConfigurationKeyValue("BuffNewsForBWServerName") },
-                                                        { "@pvchrBuffNewsForBWRelatedDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName") },
-                                                        { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                                        { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword") },
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                        { "@pvchrStoredProcedure", commissionRecord.PlaybookForBARCInsertStoredProcedure }
-                                        });
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_BARC",
+                                        new SqlParameter("@pvchrBuffNewsForBWServerInstance", GetConfigurationKeyValue("BuffNewsForBWServerName")),
+                                        new SqlParameter("@pvchrBuffNewsForBWRelatedDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName")),
+                                        new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pvchrStoredProcedure", commissionRecord.PlaybookForBARCInsertStoredProcedure));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting performance data from BARC");
             //Does not create any new records
             //Proc_Insert_BARC “BWDB\BW,50884', 'BuffNewsForBW', 'CommissionsCreate', '<Cr#@t0rUs3r>', 2607, 'Proc_Select_Commissions_Outside_Auto_Performance_Detail'
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_BARC",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pvchrBuffNewsForBWServerInstance", GetConfigurationKeyValue("BuffNewsForBWServerName") },
-                                                        { "@pvchrBuffNewsForBWRelatedDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName") },
-                                                        { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                                        { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword") },
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                        { "@pvchrStoredProcedure", commissionRecord.PerformanceForBARCInsertStoredProcedure }
-                                        });
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_BARC",
+                                        new SqlParameter("@pvchrBuffNewsForBWServerInstance", GetConfigurationKeyValue("BuffNewsForBWServerName")),
+                                        new SqlParameter("@pvchrBuffNewsForBWRelatedDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName")),
+                                        new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pvchrStoredProcedure", commissionRecord.PerformanceForBARCInsertStoredProcedure));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting gains/losses data from BARC");
             //Creates 631 new records with new snapshots_id.  HOW DID THE SNAPSHOTS ID GET INTO HERE???????
             //Proc_Insert_BARC “BWDB\BW,50884', 'BuffNewsForBW', 'CommissionsCreate', '<Cr#@t0rUs3r>', 2607, 'Proc_Select_Commissions_Gains_Losses_Detail ‘”
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_BARC",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pvchrBuffNewsForBWServerInstance", GetConfigurationKeyValue("BuffNewsForBWServerName") },
-                                                        { "@pvchrBuffNewsForBWRelatedDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName") },
-                                                        { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                                        { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword") },
-                                                        { "@pintCommissionsInquiriesID", commissionsInquiriesId },
-                                                        { "@pvchrStoredProcedure", "Proc_Select_Commissions_Gains_Losses_Detail" }
-                                        });
-
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_BARC",
+                                        new SqlParameter("@pvchrBuffNewsForBWServerInstance", GetConfigurationKeyValue("BuffNewsForBWServerName")),
+                                        new SqlParameter("@pvchrBuffNewsForBWRelatedDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName")),
+                                        new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pvchrStoredProcedure", "Proc_Select_Commissions_Gains_Losses_Detail"));
 
             WriteToJobLog(JobLogMessageType.INFO, "Initializing snapshots");
             RunSnapshotSprocs(commissionRecord, createType, commissionsRecreateId, commissionRecord.SnapshotId, salespersons);
 
-            bool isSuccessful = CreateCommissionsSpreadsheets(createType, commissionRecord);
-
-
-
+            bool isSuccessful = CreateCommissionsSpeadsheets(createType, commissionRecord);
 
             return true;
 
@@ -579,41 +490,28 @@ namespace CommissionsCreate
         {
             //insert session
             Int64 sessionId = 0;
-            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Sessions",
-                                                    new Dictionary<string, object>()
-                                                    {
-                                                          { "@pvchrUserName", commissionRecord.RequestedUserName }
-                                                    }))
-            {
-                sessionId = reader.GetInt64(reader.GetOrdinal("sessions_id"));
-            }
-
+            Dictionary<string, object> sessionResult = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Sessions",
+                                                    new SqlParameter("@pvchrUserName", commissionRecord.RequestedUserName)).FirstOrDefault();
+            sessionId = (Int64)sessionResult["sessions_id"];
 
             //build salesperson groups
             List<SalespersonGroup> salespersonGroups = new List<SalespersonGroup>();
 
             if (createTypes == CommissionCreateTypes.Create)
             {
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Salespersons_Groups",
-                                        new Dictionary<string, object>()
-                                        {
-                                               { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                               { "@plngTerritoriesID", -1 }
-                                        }))
-                {
-                    salespersonGroups = BuildSalespersonGroup(reader);
-                }
+                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons_Groups",
+                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                        new SqlParameter("@plngTerritoriesID", -1));
+
+                salespersonGroups = BuildSalespersonGroup(results);
             }
             else
             {
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Salespersons_Groups_Recreate",
-                        new Dictionary<string, object>()
-                        {
-                                               { "@pintCommissionsRecreateID", commissionRecord.CommissionsId }
-                        }))
-                {
-                    salespersonGroups = BuildSalespersonGroup(reader);
-                }
+                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons_Groups_Recreate",
+                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId));
+
+                salespersonGroups = BuildSalespersonGroup(results);
+
             }
 
             //iterate groups and create commissions statements for each
@@ -637,745 +535,1009 @@ namespace CommissionsCreate
 
                 excel.Application.DisplayAlerts = true;
 
-                using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Salespersons",
-                                            new Dictionary<string, object>()
-                                            {
-                                               { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                               { "@pintSalespersonGroupsID", commissionRecord.SalespersonGroupId }
-                                            }))
+                List<Dictionary<string, object>> salespersonsResults = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons",
+                                            new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                            new SqlParameter("@pintSalespersonGroupsID", commissionRecord.SalespersonGroupId));
+
+                bool isSummaryRecord = false;
+                Int64 rowCounter = 0;
+                Int64 rowFirstForGroupTotal = 0;
+                Int64 rowLastForGroupTotal = 0;
+                string currentMonthCommissionsFormula = "";
+
+                foreach(Dictionary<string, object> salespersonResult in salespersonsResults) //while (true) //iterate salespersons 
                 {
-                    bool isSummaryRecord = false;
-                    Int64 rowCounter = 0;
-                    Int64 rowFirstForGroupTotal = 0;
-                    Int64 rowLastForGroupTotal = 0;
-                    string currentMonthCommissionsFormula = "";
-
-                    while (true) //iterate salespersons 
+                    string salesperson = "";
+                    string salespersonGroupName = "";
+                    if (isSummaryRecord)
+                        salesperson = "Summary For " + salespersonGroup;
+                    else
                     {
-                        string salesperson = "";
-                        string salespersonGroupName = "";
-                        if (isSummaryRecord)
-                            salesperson = "Summary For " + salespersonGroup;
-                        else
+                        salesperson = salespersonResult["salesperson"].ToString();
+
+                        if (!String.IsNullOrEmpty(salespersonGroupName))
+                            salespersonGroupName += ", ";
+
+                        salespersonGroupName += salesperson;
+
+                        CreateAutoAttachments(AutoAttachmentTypes.MenuMania, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], salespersonGroupName, sessionId);
+                        CreateAutoAttachments(AutoAttachmentTypes.NewBusiness, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], salespersonGroupName, sessionId);
+                        CreateAutoAttachments(AutoAttachmentTypes.Products, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], salespersonGroupName, sessionId);
+                        CreateAutoAttachments(AutoAttachmentTypes.Playbook, excel, salespersonGroup.BARCForExcelStoredProcedure, commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], salespersonGroupName, sessionId);
+                    }
+
+                    if (rowCounter != 0)
+                        excel.Sheets.Add(After: workbook.Sheets[workbook.Sheets.Count]);
+
+                    activeWorksheet = workbook.Sheets[workbook.Sheets.Count];
+                    activeWorksheet.Select();
+
+                    activeWorksheet.Name = salespersonGroup.WorksheetName + " " + (isSummaryRecord ? "Summary" : salesperson);
+                    //todo: do we need the column width array?
+
+                    rowCounter = 1;
+
+                    activeWorksheet.VPageBreaks.Add(activeWorksheet.Range["G1"]);
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(6) + rowCounter],
+                                            new ExcelFormatOption()
+                                            {
+                                                FillColor = ExcelColor.LightGray15,
+                                                BorderBottomLineStyle = 1,
+                                                BorderLeftLineStyle = 1,
+                                                BorderRightLineStyle = 1,
+                                                BorderTopLineStyle = 1,
+                                                MergeCells = true,
+                                                IsBold = true
+                                            });
+                    activeWorksheet.Cells[rowCounter, 1] = "TBN Salesperson Commissions For " + new DateTime(commissionRecord.Month).ToString("MMM", CultureInfo.InvariantCulture) + " " + commissionRecord.Year;
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(6) + rowCounter], new ExcelFormatOption() { NumberFormat = "@", FillColor = ExcelColor.LightGray15, IsBold = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+
+                    activeWorksheet.Cells[rowCounter, 1] = salespersonGroupName + " (" + salesperson + ")";
+
+                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1, BorderLeftLineStyle = 1 });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1 });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1 });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1 });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 6], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1, BorderRightLineStyle = 1 });
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(2) + rowCounter + ":" + ConvertToColumn(6) + rowCounter], new ExcelFormatOption() { MergeCells = true });
+
+                    activeWorksheet.Cells[rowCounter, 2] = "Created " + DateTime.Now.ToString("{0:MM/dd/yyyy hh:mm tt}");
+
+                    rowCounter++;
+
+                    SetupWorksheet(excel, activeWorksheet, rowCounter);
+
+                    //todo: store row height?
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(6) + rowCounter], new ExcelFormatOption() { IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+
+                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1 });
+                    activeWorksheet.Cells[rowCounter, 1] = "Playbook Commissions";
+
+                    FormatCells(activeWorksheet.Cells[rowCounter, 6], new ExcelFormatOption() { HorizontalAlignment = ExcelHorizontalAlignment.Center });
+                    activeWorksheet.Cells[rowCounter, 6] = "Goal";
+
+                    rowFirstForGroupTotal = 0;
+                    rowLastForGroupTotal = 0;
+
+                    if (isSummaryRecord)
+                    {
+                        //get playbook groups
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salespersons_Groups_ID",
+                                                                                    new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                                     new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+                        foreach (Dictionary<string, object> result in results)
                         {
-                            salesperson = reader.GetString(reader.GetOrdinal("salesperson"));
+                            rowCounter++;
 
-                            if (!String.IsNullOrEmpty(salespersonGroupName))
-                                salespersonGroupName += ", ";
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
 
-                            salespersonGroupName += salesperson;
+                            rowLastForGroupTotal = rowCounter;
 
-                            CreateAutoAttachments(AutoAttachmentTypes.MenuMania, excel, "", commissionRecord, salesperson, salespersonGroupName, sessionId);
-                            CreateAutoAttachments(AutoAttachmentTypes.NewBusiness, excel, "", commissionRecord, salesperson, salespersonGroupName, sessionId);
-                            CreateAutoAttachments(AutoAttachmentTypes.Products, excel, "", commissionRecord, salesperson, salespersonGroupName, sessionId);
-                            CreateAutoAttachments(AutoAttachmentTypes.Playbook, excel, salespersonGroup.BARCForExcelStoredProcedure, commissionRecord, salesperson, salespersonGroupName, sessionId);
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["playbook_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = (decimal)result["percentage"] / 100;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["playbook_amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+                        }
+                    }
+                    else
+                    {
+                        //get playbook groups 
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salesperson",
+                                                                                new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                                new SqlParameter("@pvchrSalesperson", salesperson));
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["playbook_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["playbook_amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+                        }
+                    }
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    activeWorksheet.Cells[rowCounter, 1] = "Total Playbook Commissions";
+
+                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+
+                    if (rowFirstForGroupTotal == 0)
+                    {
+                        activeWorksheet.Cells[rowCounter, 3] = 0;
+                        activeWorksheet.Cells[rowCounter, 4] = 0;
+                    }
+                    else
+                    {
+                        string formula1 = "";
+                        string formula2 = "";
+                        Int64 loopCounter = rowFirstForGroupTotal;
+                        while (loopCounter < rowLastForGroupTotal)
+                        {
+                            if (String.IsNullOrEmpty(formula1))
+                                formula1 = "=";
+                            else
+                                formula1 += formula2 + "+";
+
+                            formula1 = formula1 + "ROUND(" + ConvertToColumn(3) + loopCounter + ",2)";
+                            formula2 = formula2 + "ROUND(" + ConvertToColumn(4) + loopCounter + ",2)";
+
+                            loopCounter++;
                         }
 
-                        if (rowCounter != 0)
-                            excel.Sheets.Add(After: workbook.Sheets[workbook.Sheets.Count]);
+                        activeWorksheet.Cells[rowCounter, 3] = formula1;
+                        activeWorksheet.Cells[rowCounter, 4] = formula2;
+                    }
 
-                        activeWorksheet = workbook.Sheets[workbook.Sheets.Count];
-                        activeWorksheet.Select();
+                    currentMonthCommissionsFormula = "=" + ConvertToColumn(4) + rowCounter;
 
-                        activeWorksheet.Name = salespersonGroup.WorksheetName + " " + (isSummaryRecord ? "Summary" : salesperson);
-                        //todo: do we need the column width array?
+                    rowCounter++;
 
-                        rowCounter = 1;
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+                    activeWorksheet.Cells[rowCounter, 1] = "Product/Goal Based Commissions";
 
-                        activeWorksheet.VPageBreaks.Add(activeWorksheet.Range["G1"]);
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(6) + rowCounter],
-                                                new ExcelFormatOption()
-                                                {
-                                                    FillColor = ExcelColor.LightGray15,
-                                                    BorderBottomLineStyle = 1,
-                                                    BorderLeftLineStyle = 1,
-                                                    BorderRightLineStyle = 1,
-                                                    BorderTopLineStyle = 1,
-                                                    MergeCells = true,
-                                                    IsBold = true
-                                                });
-                        activeWorksheet.Cells[rowCounter, 1] = "TBN Salesperson Commissions For " + new DateTime(commissionRecord.Month).ToString("MMM", CultureInfo.InvariantCulture) + " " + commissionRecord.Year;
+                    rowFirstForGroupTotal = 0;
+                    rowLastForGroupTotal = 0;
+
+                    //get products
+                    if (isSummaryRecord)
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_For_Salespersons_Groups_ID",
+                                    new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                    new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+
+                        }
+                    }
+                    else
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Product_For_Salesperson",
+                                                                            new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                            new SqlParameter("@pvchrSalesperson", salesperson));
+
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = (decimal)result["percentage"] / 100;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+
+                        }
+                    }
+
+                    //build new business
+                    if (isSummaryRecord)
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons_Group_ID",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+
+                        }
+                    }
+                    else
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pvchrSalesperson", salesperson));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = (decimal)result["percentage"] / 100;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+                        }
+                    }
+
+                    //build menu mania
+                    if (isSummaryRecord)
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons_Group_ID",
+                                                                       new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                       new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+                        }
+                    }
+                    else
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pvchrSalesperson", salesperson));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = (decimal)result["percentage"] / 100;
+
+                            FormatCells(activeWorksheet.Cells[3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+                        }
+                    }
+
+                    //build product groups other
+                    if (isSummaryRecord)
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons_Group_ID",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+
+                        }
+                    }
+                    else
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pvchrSalesperson", salesperson));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = (decimal)result["percentage"] / 100;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+                        }
+                    }
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    activeWorksheet.Cells[rowCounter, 1] = "Total Product/Goal Based Commissions";
+
+                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+
+                    if (rowFirstForGroupTotal == 0)
+                    {
+                        activeWorksheet.Cells[rowCounter, 3] = 0;
+                        activeWorksheet.Cells[rowCounter, 4] = 0;
+                    }
+                    else
+                    {
+                        string formula1 = "";
+                        string formula2 = "";
+                        Int64 loopCounter = rowFirstForGroupTotal;
+                        while (loopCounter < rowLastForGroupTotal)
+                        {
+                            if (String.IsNullOrEmpty(formula1))
+                                formula1 = "=";
+                            else
+                                formula1 += formula2 + "+";
+
+                            formula1 = formula1 + "ROUND(" + ConvertToColumn(3) + loopCounter + ",2)";
+                            formula2 = formula2 + "ROUND(" + ConvertToColumn(4) + loopCounter + ",2)";
+
+                            loopCounter++;
+                        }
+
+                        activeWorksheet.Cells[rowCounter, 3] = formula1;
+                        activeWorksheet.Cells[rowCounter, 4] = formula2;
+                    }
+
+                    currentMonthCommissionsFormula = "=" + ConvertToColumn(4) + rowCounter.ToString();
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { FillColor = ExcelColor.Black, TextColor = ExcelColor.White, BorderLeftLineStyle = 1, IsBold = true });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    activeWorksheet.Cells[rowCounter, 1] = "Account Based Commissions";
+
+                    rowFirstForGroupTotal = 0;
+                    rowLastForGroupTotal = 0;
+
+                    //get accounts
+                    if (isSummaryRecord)
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Accounts_For_Salespersons_Groups_ID",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["account_description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+                        }
+                    }
+                    else
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Accounts_For_Salesperson",
+                                            new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                            new SqlParameter("@pvchrSalesperson", salesperson));
+
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["account_description"];
+
+                            FormatCells(activeWorksheet.Cells[2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = (decimal)result["percentage"] / 100;
+
+                            FormatCells(activeWorksheet.Cells[3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+                        }
+                    }
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, BorderLeftLineStyle = 1, IsBold = true, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    activeWorksheet.Cells[rowCounter, 1] = "Total Account Based Commissions";
+
+                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+
+                    if (rowFirstForGroupTotal == 0)
+                    {
+                        activeWorksheet.Cells[rowCounter, 3] = 0;
+                        activeWorksheet.Cells[rowCounter, 4] = 0;
+                    }
+                    else
+                    {
+                        string formula1 = "";
+                        string formula2 = "";
+                        Int64 loopCounter = rowFirstForGroupTotal;
+                        while (loopCounter < rowLastForGroupTotal)
+                        {
+                            if (String.IsNullOrEmpty(formula1))
+                                formula1 = "=";
+                            else
+                                formula1 += formula2 + "+";
+
+                            formula1 = formula1 + "ROUND(" + ConvertToColumn(3) + loopCounter + ",2)";
+                            formula2 = formula2 + "ROUND(" + ConvertToColumn(4) + loopCounter + ",2)";
+
+                            loopCounter++;
+                        }
+
+                        activeWorksheet.Cells[rowCounter, 3] = formula1;
+                        activeWorksheet.Cells[rowCounter, 4] = formula2;
+                    }
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = 1 });
+
+                    currentMonthCommissionsFormula = "=" + ConvertToColumn(4) + rowCounter.ToString();
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, MergeCells = true, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    activeWorksheet.Cells[rowCounter, 3] = "Total Sales" + "/r/n" + "Commissions";
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    activeWorksheet.Cells[rowCounter, 4] = currentMonthCommissionsFormula;
+                    currentMonthCommissionsFormula = "=" + ConvertToColumn(4) + rowCounter.ToString();
+                    FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, FillColor = ExcelColor.Black });
+
+                    rowCounter++;
+
+                    //todo: row heights?
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true });
+                    activeWorksheet.Cells[rowCounter, 1] = "Misc. Non-Commission Cash Payments";
+
+                    rowFirstForGroupTotal = 0;
+                    rowLastForGroupTotal = 0;
+
+                    //get non-commissions
+                    if (isSummaryRecord)
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salespersons_Groups_ID",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["amount"];
+                        }
+                    }
+                    else
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson",
+                                                                                new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                                new SqlParameter("@pvchrSalesperson", salesperson));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["amount"];
+                        }
+                    }
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    activeWorksheet.Cells[rowCounter, 1] = "Total Misc. Non-Commission Cash Payments";
+                    FormatCells(activeWorksheet.Range[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+
+                    if (rowFirstForGroupTotal == 0)
+                        activeWorksheet.Cells[rowCounter, 4] = 0;
+                    else
+                        activeWorksheet.Cells[rowCounter, 4] = "=SUM(" + ConvertToColumn(4) + rowFirstForGroupTotal + ":" + ConvertToColumn(4) + rowLastForGroupTotal + ")";
+
+
+                    currentMonthCommissionsFormula = "=" + ConvertToColumn(4) + rowCounter.ToString();
+
+                    rowCounter++;
+
+                    //todo: row heights?
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true });
+                    activeWorksheet.Cells[rowCounter, 1] = "Chargebacks";
+
+                    rowFirstForGroupTotal = 0;
+                    rowLastForGroupTotal = 0;
+
+
+                    //get chargebacks
+                    if (isSummaryRecord)
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Chargebacks_For_Salespersons_Groups_ID",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["description"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+
+                        }
+                    }
+                    else
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson",
+                                                                                new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                                new SqlParameter("@pvchrSalesperson", salesperson));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 1] = result["description"];
+
+                            FormatCells(activeWorksheet.Cells[2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = (decimal)result["percentage"] / 100;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 3] = (decimal)result["amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+
+                        }
+                    }
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    activeWorksheet.Cells[rowCounter, 1] = "Total Chargebacks";
+                    FormatCells(activeWorksheet.Range[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+
+                    if (rowFirstForGroupTotal == 0)
+                        activeWorksheet.Cells[rowCounter, 4] = 0;
+                    else
+                    {
+                        string formula1 = "";
+                        Int64 loopCounter = rowFirstForGroupTotal;
+                        while (loopCounter < rowLastForGroupTotal)
+                        {
+                            if (String.IsNullOrEmpty(formula1))
+                                formula1 = "=";
+                            else
+                                formula1 += "+";
+
+                            formula1 = formula1 + "ROUND(" + ConvertToColumn(3) + loopCounter + ",2)";
+
+                            loopCounter++;
+                        }
+
+                        activeWorksheet.Cells[rowCounter, 4] = formula1;
+                    }
+
+                    currentMonthCommissionsFormula = "=" + ConvertToColumn(4) + rowCounter.ToString();
+
+                    rowCounter++;
+
+                    //todo: rowheights
+
+                    rowCounter++;
+
+                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+                    activeWorksheet.Cells[rowCounter, 1] = "Draw Per Day";
+                    FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                    activeWorksheet.Cells[rowCounter, 2] = "Number Of Days";
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+                    activeWorksheet.Cells[rowCounter, 1] = "Monthly Draw";
+
+                    //get draws per day
+                    if (isSummaryRecord)
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Draw_Per_Days_For_Salespersons_Groups_ID",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Left });
+                            activeWorksheet.Cells[rowCounter, 1] = (decimal)result["draw_per_day_amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = result["number_of_working_days"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+
+                            //todo:
+                            //if (String.IsNullOrEmpty(strCurrentMonthCommissionFormula))
+                            //    strCurrentMonthCommissionFormula = "=";
+                            //else
+                            //    strCurrentMonthCommissionFormula = strCurrentMonthCommissionFormula + "-"
+
+                            // strCurrentMonthCommissionFormula = strCurrentMonthCommissionFormula & ConvertToColumn(4) & lngRow
+                        }
+                    }
+                    else
+                    {
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Draw_Per_Days_For_Salesperson",
+                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                        new SqlParameter("@pvchrSalesperson", salesperson));
+
+                        foreach (Dictionary<string, object> result in results)
+                        {
+                            rowCounter++;
+
+                            if (rowFirstForGroupTotal == 0)
+                                rowFirstForGroupTotal = rowCounter;
+
+                            rowLastForGroupTotal = rowCounter;
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Left });
+                            activeWorksheet.Cells[rowCounter, 1] = (decimal)result["draw_per_day_amount"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 2] = result["number_of_working_days"];
+
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                            activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
+
+                            //todo:
+                            //if (String.IsNullOrEmpty(strCurrentMonthCommissionFormula))
+                            //    strCurrentMonthCommissionFormula = "=";
+                            //else
+                            //    strCurrentMonthCommissionFormula = strCurrentMonthCommissionFormula + "-"
+
+                            // strCurrentMonthCommissionFormula = strCurrentMonthCommissionFormula & ConvertToColumn(4) & lngRow
+
+                        }
+                    }
+
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = 1 });
+
+                    if (isSummaryRecord || salespersonGroups.Count() == 1)
+                    {
+                        Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons_Carryover_Summary",
+                                                                        new SqlParameter("@pintSalespersonGroupsID", commissionRecord.SalespersonGroupId),
+                                                                        new SqlParameter("@pintStructuresID", commissionRecord.StructuresId),
+                                                                        new SqlParameter("@pintCommissionsYearCurrent", commissionRecord.Year),
+                                                                        new SqlParameter("@pintCommissionsMonthCurrent", commissionRecord.Month)).FirstOrDefault();
+
+                        if (result != null && result.Count() > 0)
+                        {
+                            decimal priorMonthCommissionAmount = (decimal)result["prior_month_commissions_amount"];
+                            decimal priorMonthNonCommissionAmount = (decimal)result["prior_month_noncommissions_amount"];
+
+                            if (priorMonthCommissionAmount < 0 | priorMonthNonCommissionAmount < 0)
+                            {
+                                rowCounter++;
+
+                                //todo: column heights
+
+                                rowCounter++;
+
+                                FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true});
+                                activeWorksheet.Cells[rowCounter, 1] = "Carryover From Prior Month";
+
+                                if (priorMonthCommissionAmount < 0)
+                                {
+                                    rowCounter++;
+
+                                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true,  BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                                    activeWorksheet.Cells[rowCounter, 1] = "Commissions Carryover From " + (commissionRecord.Month == 1 ? "12/" + (commissionRecord.Year - 1) : (commissionRecord.Month - 1) + "/" + commissionRecord.Year);
+
+                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                                    activeWorksheet.Cells[rowCounter, 4] = priorMonthCommissionAmount;
+
+                                    if (String.IsNullOrEmpty(currentMonthCommissionsFormula))
+                                        currentMonthCommissionsFormula = "=";
+                                    else
+                                        currentMonthCommissionsFormula += "+";
+
+                                    currentMonthCommissionsFormula += ConvertToColumn(4) + rowCounter;
+                                }
+
+                                if (priorMonthNonCommissionAmount < 0)
+                                {
+                                    rowCounter++;
+
+                                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
+                                    activeWorksheet.Cells[rowCounter, 1] = "Misc. Noncommissions Carryover From " + (commissionRecord.Month == 1 ? "12/" + (commissionRecord.Year - 1) : (commissionRecord.Month - 1) + "/" + commissionRecord.Year);
+
+                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                                    activeWorksheet.Cells[rowCounter, 4] = priorMonthCommissionAmount;
+
+                                    if (String.IsNullOrEmpty(currentMonthCommissionsFormula))
+                                        currentMonthCommissionsFormula = "=";
+                                    else
+                                        currentMonthCommissionsFormula += "+";
+
+                                    currentMonthCommissionsFormula += ConvertToColumn(4) + rowCounter;
+                                }
+
+                            }
+                        }
 
                         rowCounter++;
 
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(6) + rowCounter], new ExcelFormatOption() { NumberFormat = "@", FillColor = ExcelColor.LightGray15, IsBold = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-
-                        activeWorksheet.Cells[rowCounter, 1] = salespersonGroupName + " (" + salesperson + ")";
-
-                        FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1, BorderLeftLineStyle = 1 });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1 });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1 });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1 });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 6], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderTopLineStyle = 1, BorderRightLineStyle = 1 });
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(2) + rowCounter + ":" + ConvertToColumn(6) + rowCounter], new ExcelFormatOption() { MergeCells = true });
-
-                        activeWorksheet.Cells[rowCounter, 2] = "Created " + DateTime.Now.ToString("{0:MM/dd/yyyy hh:mm tt}");
+                        //todo: column widths
 
                         rowCounter++;
 
-                        SetupWorksheet(excel, activeWorksheet, rowCounter);
+                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true });
 
-                        //todo: store row height?
+                        if (isSummaryRecord || (Int32)salespersonGroup.SalespersonCount == 1)
+                            activeWorksheet.Cells[rowCounter, 1] = "Total Compensation This Month";
+                        else
+                            activeWorksheet.Cells[rowCounter, 1] = "Total Compensation This Month (refer to Summary for totals";
 
                         rowCounter++;
 
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(6) + rowCounter], new ExcelFormatOption() { IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
 
-                        FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1 });
-                        activeWorksheet.Cells[rowCounter, 1] = "Playbook Commissions";
-
-                        FormatCells(activeWorksheet.Cells[rowCounter, 6], new ExcelFormatOption() { HorizontalAlignment = ExcelHorizontalAlignment.Center });
-                        activeWorksheet.Cells[rowCounter, 6] = "Goal";
-
-                        rowFirstForGroupTotal = 0;
-                        rowLastForGroupTotal = 0;
-
-                        if (isSummaryRecord)
-                        {
-                            //get playbook groups
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salespersons_Groups_ID",
-                                        new Dictionary<string, object>()
-                                        {
-                                                                   { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                   { "@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId }
-                                        }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("playbook_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 2] = reader.GetDecimal(reader.GetOrdinal("percentage") / 100);
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("playbook_amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-
-
-                        }
+                        if (isSummaryRecord || (Int32)salespersonGroup.SalespersonCount == 1)
+                            activeWorksheet.Cells[rowCounter, 1] = "=" + "\"\"" + "Commissions (MINUS Chargebacks, Draw Per Day & Carryover) " + "\"\"" + "&IF(" + ConvertToColumn(4) + rowCounter + "<0," + "\"\"" + "Owed" + "\"\"" + "," + "\"\"" + "Paid By Payroll" + "\"\"" + ")";
                         else
-                        {
-                            //get playbook groups 
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salesperson",
-                                new Dictionary<string, object>()
-                                {
-                                                                   { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                   { "@pvchrSalesperson", salesperson }
-                                }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
+                            activeWorksheet.Cells[rowCounter, 1] = "Commissions (MINUS Chargebacks, Draw Per Day & Carryover) Subtotal";
 
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("playbook_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("playbook_amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-
-                        rowCounter++;
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                        activeWorksheet.Cells[rowCounter, 1] = "Total Playbook Commissions";
-
-                        FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-
-                        if (rowFirstForGroupTotal == 0)
-                        {
-                            activeWorksheet.Cells[rowCounter, 3] = 0;
-                            activeWorksheet.Cells[rowCounter, 4] = 0;
-                        }
-                        else
-                        {
-                            string formula1 = "";
-                            string formula2 = "";
-                            Int64 loopCounter = rowFirstForGroupTotal;
-                            while (loopCounter < rowLastForGroupTotal)
-                            {
-                                if (String.IsNullOrEmpty(formula1))
-                                    formula1 = "=";
-                                else
-                                    formula1 += formula2 + "+";
-
-                                formula1 = formula1 + "ROUND(" + ConvertToColumn(3) + loopCounter + ",2)";
-                                formula2 = formula2 + "ROUND(" + ConvertToColumn(4) + loopCounter + ",2)";
-
-                                loopCounter++;
-                            }
-
-                            activeWorksheet.Cells[rowCounter, 3] = formula1;
-                            activeWorksheet.Cells[rowCounter, 4] = formula2;
-                        }
-
-
-
-                        if (String.IsNullOrEmpty(currentMonthCommissionsFormula))
-                            currentMonthCommissionsFormula = "";
-                        else
-                            currentMonthCommissionsFormula += "+";
-
-                        currentMonthCommissionsFormula += ConvertToColumn(4) + rowCounter;
-
-                        rowCounter++;
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
-                        activeWorksheet.Cells[rowCounter, 1] = "Product/Goal Based Commissions";
-
-                        rowFirstForGroupTotal = 0;
-                        rowLastForGroupTotal = 0;
-
-                        //get products
-                        if (isSummaryRecord)
-                        {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_For_Salespersons_Groups_ID",
-                                        new Dictionary<string, object>()
-                                        {
-                                                                   { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                   { "@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId }
-                                        }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-                        else
-                        {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_Groups_Product_For_Salesperson",
-                                        new Dictionary<string, object>()
-                                        {
-                                                                   { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                   { "@pvchrSalesperson", salesperson }
-                                        }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 2] = reader.GetDecimal(reader.GetOrdinal("percentage") / 100);
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-
-                        //build new business
-                        if (isSummaryRecord)
-                        {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons_Group_ID",
-                                                                            new Dictionary<string, object>()
-                                                                            {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId }
-                                                                            }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-                        else
-                        {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons",
-                                                                            new Dictionary<string, object>()
-                                                                            {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pvchrSalesperson", salesperson }
-                                                                            }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 2] = reader.GetDecimal(reader.GetOrdinal("percentage") / 100);
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-
-                        //build menu mania
-                        if (isSummaryRecord)
-                        {
-                             using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons_Group_ID",
-                                                                            new Dictionary<string, object>()
-                                                                            {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId }
-                                                                            }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        } else
-                        {                           
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons",
-                                                                            new Dictionary<string, object>()
-                                                                            {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pvchrSalesperson", salesperson }
-                                                                            }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 2] = reader.GetDecimal(reader.GetOrdinal("percentage") / 100);
-
-                                    FormatCells(activeWorksheet.Cells[3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-
-                        //build product groups other
-                        if (isSummaryRecord)
-                        {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons_Group_ID",
-                                                                            new Dictionary<string, object>()
-                                                                            {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId }
-                                                                            }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-                        else
-                        {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons",
-                                                                            new Dictionary<string, object>()
-                                                                            {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pvchrSalesperson", salesperson }
-                                                                            }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 2] = reader.GetDecimal(reader.GetOrdinal("percentage") / 100);
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-
-                        rowCounter++;
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                        activeWorksheet.Cells[rowCounter, 1] = "Total Product/Goal Based Commissions";
-
-                        FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-
-                        if (rowFirstForGroupTotal == 0)
-                        {
-                            activeWorksheet.Cells[rowCounter, 3] = 0;
-                            activeWorksheet.Cells[rowCounter, 4] = 0;
-                        } else
-                        {
-                            string formula1 = "";
-                            string formula2 = "";
-                            Int64 loopCounter = rowFirstForGroupTotal;
-                            while (loopCounter < rowLastForGroupTotal)
-                            {
-                                if (String.IsNullOrEmpty(formula1))
-                                    formula1 = "=";
-                                else
-                                    formula1 += formula2 + "+";
-
-                                formula1 = formula1 + "ROUND(" + ConvertToColumn(3) + loopCounter + ",2)";
-                                formula2 = formula2 + "ROUND(" + ConvertToColumn(4) + loopCounter + ",2)";
-
-                                loopCounter++;
-                            }
-
-                            activeWorksheet.Cells[rowCounter, 3] = formula1;
-                            activeWorksheet.Cells[rowCounter, 4] = formula2;
-                        }
-
-                        if (String.IsNullOrEmpty(currentMonthCommissionsFormula))
-                            currentMonthCommissionsFormula = "=";
-                        else
-                            currentMonthCommissionsFormula += "+";
-
-                        currentMonthCommissionsFormula += ConvertToColumn(4) + rowCounter.ToString();
-
-                        rowCounter++;
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { FillColor = ExcelColor.Black, TextColor = ExcelColor.White, BorderLeftLineStyle = 1, IsBold = true  });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-                        activeWorksheet.Cells[rowCounter, 1] = "Account Based Commissions";
-
-                        rowFirstForGroupTotal = 0;
-                        rowLastForGroupTotal = 0;
-
-                        //get accounts
-                        if (isSummaryRecord)
-                        {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Accounts_For_Salespersons_Groups_ID",
-                                                                            new Dictionary<string, object>()
-                                                                            {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId }
-                                                                            }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("account_description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        } else
-                        {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Accounts_For_Salesperson",
-                                                new Dictionary<string, object>()
-                                                {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pvchrSalesperson", salesperson }
-                                                }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("account_description"));
-
-                                    FormatCells(activeWorksheet.Cells[2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 2] = reader.GetDecimal(reader.GetOrdinal("percentage") / 100);
-
-                                    FormatCells(activeWorksheet.Cells[3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                    FormatCells(activeWorksheet.Cells[4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("commission_amount"));
-
-                                }
-                            }
-                        }
-
-                        rowCounter++;
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, BorderLeftLineStyle = 1, IsBold = true, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                        activeWorksheet.Cells[rowCounter, 1] = "Total Account Based Commissions";
-
-                        FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-
-                        if (rowFirstForGroupTotal == 0)
-                        {
-                            activeWorksheet.Cells[rowCounter, 3] = 0;
-                            activeWorksheet.Cells[rowCounter, 4] = 0;
-                        }
-                        else
-                        {
-                            string formula1 = "";
-                            string formula2 = "";
-                            Int64 loopCounter = rowFirstForGroupTotal;
-                            while (loopCounter < rowLastForGroupTotal)
-                            {
-                                if (String.IsNullOrEmpty(formula1))
-                                    formula1 = "=";
-                                else
-                                    formula1 += formula2 + "+";
-
-                                formula1 = formula1 + "ROUND(" + ConvertToColumn(3) + loopCounter + ",2)";
-                                formula2 = formula2 + "ROUND(" + ConvertToColumn(4) + loopCounter + ",2)";
-
-                                loopCounter++;
-                            }
-
-                            activeWorksheet.Cells[rowCounter, 3] = formula1;
-                            activeWorksheet.Cells[rowCounter, 4] = formula2;
-                        }
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() {  BorderTopLineStyle = 1 });
-
-                        if (String.IsNullOrEmpty(currentMonthCommissionsFormula))
-                            currentMonthCommissionsFormula = "=";
-                        else
-                            currentMonthCommissionsFormula += "+";
-
-                        currentMonthCommissionsFormula = ConvertToColumn(4) + rowCounter.ToString();
-
-                        rowCounter++;
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, MergeCells = true, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right  });
-                        FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                        activeWorksheet.Cells[rowCounter, 3] = "Total Sales" + "/r/n" + "Commissions";
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
                         activeWorksheet.Cells[rowCounter, 4] = currentMonthCommissionsFormula;
-                        currentMonthCommissionsFormula = "=" + ConvertToColumn(4) + rowCounter.ToString();
-                        FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, FillColor = ExcelColor.Black });
 
                         rowCounter++;
 
-                        //todo: row heights?
+                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderRightLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, MergeCells = true });
+
+                        if (isSummaryRecord || (Int32)salespersonGroup.SalespersonCount == 1)
+                            activeWorksheet.Cells[rowCounter, 1] = "=" + "\"\"" + "Misc. Non-Commission Cash Payments " + "\"\"" + "&IF(" + ConvertToColumn(4) + rowCounter + "<0," + "\"\"" + "Owed" + "\"\"" + "," + "\"\"" + "Paid By Payroll" + "\"\"" + ")";
+                        else
+                            activeWorksheet.Cells[rowCounter, 1] = "Misc. Non-Commission Cash Payments Subtotal";
+
+                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                        activeWorksheet.Cells[rowCounter, 4] = currentMonthCommissionsFormula;
 
                         rowCounter++;
 
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true});
-                        activeWorksheet.Cells[rowCounter, 1] = "Misc. Non-Commission Cash Payments";
+                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderRightLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, MergeCells = true });
 
-                        rowFirstForGroupTotal = 0;
-                        rowLastForGroupTotal = 0;
+                        if (isSummaryRecord || (Int32)salespersonGroup.SalespersonCount == 1)
+                            activeWorksheet.Cells[rowCounter, 1] = "Total Paid By Payroll";
+                        else
+                            activeWorksheet.Cells[rowCounter, 1] = "Subtotal";
 
-                        //get non-commissions
+                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = ExcelHorizontalAlignment.Right, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                        activeWorksheet.Cells[rowCounter, 4] = "=IF(" + ConvertToColumn(4) + rowCounter + ">0," + ConvertToColumn(4) + rowCounter + ",0)+IF(" + ConvertToColumn(4) + rowCounter + ">0," + ConvertToColumn(4) + rowCounter + ",0)";
+
+                        activeWorksheet.Columns[4].Autofit();
+                        activeWorksheet.HPageBreaks.Add(activeWorksheet.Cells["A" + (rowCounter + 1)]);
+
                         if (isSummaryRecord)
                         {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salespersons_Groups_ID",
-                                                                            new Dictionary<string, object>()
-                                                                            {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId }
-                                                                            }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                }
-                            }
+                            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Update_Snapshots_Salespersons_Groups_Amounts",
+                                                new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId),
+                                                new SqlParameter("@pmnyCurrentMonthCommissionsCarryover", (decimal)(activeWorksheet.Range[ConvertToColumn(4) + rowCounter]).Text()),
+                                                new SqlParameter("@pmnyCurrentMonthNoncommissionsCarryover", (decimal)(activeWorksheet.Range[ConvertToColumn(4) + rowCounter]).Text()));
                         }
                         else
                         {
-                            using (SqlDataReader reader2 = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson",
-                                                new Dictionary<string, object>()
-                                                {
-                                                                                                       { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                                                                                       { "@pvchrSalesperson", salesperson }
-                                                }))
-                            {
-                                while (reader.Read())
-                                {
-                                    rowCounter++;
-
-                                    if (rowFirstForGroupTotal == 0)
-                                        rowFirstForGroupTotal = rowCounter;
-
-                                    rowLastForGroupTotal = rowCounter;
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("description"));
-
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                                    activeWorksheet.Cells[rowCounter, 4] = reader.GetDecimal(reader.GetOrdinal("amount"));
-
-                                }
-                            }
+                            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Update_Snapshots_Salespersons_Amounts",
+                                                new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                new SqlParameter("@pvchrSalesperson",salesperson),
+                                                new SqlParameter("@pmnyCurrentMonthCommissionsCarryover", (decimal)(activeWorksheet.Range[ConvertToColumn(4) + rowCounter]).Text()),
+                                                new SqlParameter("@pmnyCurrentMonthNoncommissionsCarryover", (decimal)(activeWorksheet.Range[ConvertToColumn(4) + rowCounter]).Text()));
                         }
-
-                        rowCounter++;
-
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right });
-                        activeWorksheet.Cells[rowCounter, 1] = "Total Misc. Non-Commission Cash Payments";
-                        FormatCells(activeWorksheet.Range[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = ExcelHorizontalAlignment.Right, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-
-                        if (rowFirstForGroupTotal == 0)
-                            activeWorksheet.Cells[rowCounter, 4] = 0;
-                        else
-                            activeWorksheet.Cells[rowCounter, 4] = "=SUM(" + ConvertToColumn(4) + rowFirstForGroupTotal + ":" + ConvertToColumn(4) + rowLastForGroupTotal + ")" ;
-
-
-                        if (String.IsNullOrEmpty(currentMonthCommissionsFormula))
-                            currentMonthCommissionsFormula = "=";
-                        else
-                            currentMonthCommissionsFormula += "+";
-
-
-
 
                     }
 
+                    //todo: do we need this?
+                    //objExcelColumn = .Columns
+                    //objExcelColumn.ColumnWidth = 100
+                    //objExcelColumn.AutoFit()
+                    //objExcelColumn = .Columns(1)
+                    //objExcelColumn.ColumnWidth = 40
+                    //objExcelColumn = .Columns(2)
+                    //objExcelColumn.ColumnWidth = 15
+                    //objExcelColumn = .Columns(3)
+                    //objExcelColumn.ColumnWidth = 15
+                    //objExcelRow = .Rows
+                    //objExcelRow.AutoFit()
+
+       //             If intColumnWidthsIndex<> -1 Then
+       //             For intColumnWidthsIndex = 0 To audfColumnWidths.GetUpperBound(0)
+       //                     objExcelColumn = .Columns(audfColumnWidths(intColumnWidthsIndex).intColumn)
+       //                     objExcelColumn.ColumnWidth = audfColumnWidths(intColumnWidthsIndex).decColumnWidth
+       //                 Next
+       //             End If
+
+       //             If intRowHeightsIndex <> -1 Then
+       //                 For intRowHeightsIndex = 0 To audfRowHeights.GetUpperBound(0)
+       //                     objExcelRow = .Rows(audfRowHeights(intRowHeightsIndex).lngRow)
+       //                     objExcelRow.RowHeight = audfRowHeights(intRowHeightsIndex).decRowHeight
+       //                     objExcelRow.VerticalAlignment = mcintCenterVertical
+       //                 Next
+       //             End If
+
                 }
 
+                if (!isSummaryRecord)
+                {
+                    //todo: build performance summary
+                }
+
+                activeWorksheet = workbook.Sheets[1];
+                activeWorksheet.Activate();
+
+                string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + commissionRecord.SalespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+                workbook.SaveAs(FileFormat: 51, Filename: fileName);
+                workbook.Close(SaveChanges: false);
             }
-
-
-
 
             return true;
 
@@ -1411,7 +1573,8 @@ namespace CommissionsCreate
             excel.PrintCommunication = true;
         }
 
-        private Attachment CreateAutoAttachments(AutoAttachmentTypes autoAttachmentType, Microsoft.Office.Interop.Excel.Application excel, string sprocName, CommissionRecord commissionRecord, string salesperson, string salespersonGroup, Int64 sessionId)
+        private Attachment CreateAutoAttachments(AutoAttachmentTypes autoAttachmentType, Microsoft.Office.Interop.Excel.Application excel, string sprocName, CommissionRecord commissionRecord, string salesperson, 
+                                                   Int32 salespersonGroupId, string salespersonGroup, Int64 sessionId)
         {
             string separator = "'============";
             string initialValue = "~Initial~";
@@ -1507,43 +1670,39 @@ namespace CommissionsCreate
                     FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(7) + rowCounter], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
 
                     //get related commission data
-                    using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Data_Mining_Menu_Mania_For_Excel",
-                                        new Dictionary<string, object>()
-                                        {
-                                               { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                               { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                               { "@psdatCommissionsEndDate", commissionRecord.EndDate },
-                                               { "@pvchrSalesperson", salesperson },
-                                        }))
+                    List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Data_Mining_Menu_Mania_For_Excel",
+                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                        new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                        new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                        new SqlParameter("@pvchrSalesperson", salesperson));
+
+                    if (results == null || results.Count <= 0)
+                        return null;
+
+                    decimal groupTotalCommissions = 0;
+
+                    foreach (Dictionary<string, object> result in results)
                     {
-                        if (!reader.HasRows)
-                            return null;
-
-                        decimal groupTotalCommissions = 0;
-
-                        while (reader.Read())
-                        {
-                            rowCounter++;
-                            worksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("salesperson"));
-                            worksheet.Cells[rowCounter, 2] = reader.GetString(reader.GetOrdinal("product_commissions_menu_mania_description"));
-                            worksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount_pretax"));
-                            worksheet.Cells[rowCounter, 4] = reader.GetDateTime(reader.GetOrdinal("trandate"));
-                            worksheet.Cells[rowCounter, 5] = reader.GetInt32(reader.GetOrdinal("history_core_account"));
-                            worksheet.Cells[rowCounter, 6] = reader.GetString(reader.GetOrdinal("clientsdata_clientname"));
-                            worksheet.Cells[rowCounter, 7] = reader.GetString(reader.GetOrdinal("history_core_ticket"));
-                            groupTotalCommissions += reader.GetDecimal(reader.GetOrdinal("amount_pretax"));
-                        }
-
                         rowCounter++;
-
-                        worksheet.Cells[rowCounter, 3] = separator;
-
-                        rowCounter++;
-
-                        worksheet.Cells[rowCounter, 1] = "TOTALS FOR";
-                        worksheet.Cells[rowCounter, 2] = worksheet.Cells[rowCounter - 2, 2].Value;
-                        worksheet.Cells[rowCounter, 3] = groupTotalCommissions;
+                        worksheet.Cells[rowCounter, 1] = result["salesperson"].ToString();
+                        worksheet.Cells[rowCounter, 2] = result["product_commissions_menu_mania_description"].ToString();
+                        worksheet.Cells[rowCounter, 3] = (decimal)result["amount_pretax"];
+                        worksheet.Cells[rowCounter, 4] = (DateTime)result["trandate"];
+                        worksheet.Cells[rowCounter, 5] = (Int32)result["history_core_account"];
+                        worksheet.Cells[rowCounter, 6] = result["clientsdata_clientname"].ToString();
+                        worksheet.Cells[rowCounter, 7] = result["history_core_ticket"].ToString();
+                        groupTotalCommissions += (decimal)result["amount_pretax"];
                     }
+
+                    rowCounter++;
+
+                    worksheet.Cells[rowCounter, 3] = separator;
+
+                    rowCounter++;
+
+                    worksheet.Cells[rowCounter, 1] = "TOTALS FOR";
+                    worksheet.Cells[rowCounter, 2] = worksheet.Cells[rowCounter - 2, 2].Value;
+                    worksheet.Cells[rowCounter, 3] = groupTotalCommissions;
 
                     break;
                 case AutoAttachmentTypes.NewBusiness:
@@ -1603,33 +1762,29 @@ namespace CommissionsCreate
                     FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(8) + rowCounter], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
 
                     //get related commission data
-                    using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Data_Mining_New_Business_For_Excel",
-                                        new Dictionary<string, object>()
-                                        {
-                                               { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                               { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                               { "@psdatCommissionsEndDate", commissionRecord.EndDate },
-                                               { "@pvchrSalesperson", salesperson },
-                                        }))
+                    results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Data_Mining_New_Business_For_Excel",
+                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                        new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                        new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                        new SqlParameter("@pvchrSalesperson", salesperson));
+
+                    if (results != null || results.Count <= 0)
+                        return null;
+
+                    groupTotalCommissions = 0;
+
+                    foreach (Dictionary<string, object> result in results)
                     {
-                        if (!reader.HasRows)
-                            return null;
-
-                        decimal groupTotalCommissions = 0;
-
-                        while (reader.Read())
-                        {
-                            rowCounter++;
-                            worksheet.Cells[rowCounter, 1] = reader.GetString(reader.GetOrdinal("salesperson"));
-                            worksheet.Cells[rowCounter, 2] = reader.GetString(reader.GetOrdinal("product_commissions_new_business_description"));
-                            worksheet.Cells[rowCounter, 3] = reader.GetDecimal(reader.GetOrdinal("amount_pretax"));
-                            worksheet.Cells[rowCounter, 4] = reader.GetDateTime(reader.GetOrdinal("trandate"));
-                            worksheet.Cells[rowCounter, 4] = reader.GetString(reader.GetOrdinal("tblcustomfieldsvalues_new_bus_date"));
-                            worksheet.Cells[rowCounter, 5] = reader.GetInt32(reader.GetOrdinal("history_core_account"));
-                            worksheet.Cells[rowCounter, 6] = reader.GetString(reader.GetOrdinal("clientsdata_clientname"));
-                            worksheet.Cells[rowCounter, 7] = reader.GetString(reader.GetOrdinal("history_core_ticket"));
-                            groupTotalCommissions += reader.GetDecimal(reader.GetOrdinal("amount_pretax"));
-                        }
+                        rowCounter++;
+                        worksheet.Cells[rowCounter, 1] = result["salesperson"].ToString();
+                        worksheet.Cells[rowCounter, 2] = result["product_commissions_new_business_description"].ToString();
+                        worksheet.Cells[rowCounter, 3] = result["amount_pretax"].ToString();
+                        worksheet.Cells[rowCounter, 4] = (DateTime)result["trandate"];
+                        worksheet.Cells[rowCounter, 4] = result["tblcustomfieldsvalues_new_bus_date"].ToString();
+                        worksheet.Cells[rowCounter, 5] = (Int32)result["history_core_account"];
+                        worksheet.Cells[rowCounter, 6] = result["clientsdata_clientname"].ToString();
+                        worksheet.Cells[rowCounter, 7] = result["history_core_ticket"].ToString();
+                        groupTotalCommissions += (decimal)result["amount_pretax"];
                     }
 
                     rowCounter++;
@@ -1671,60 +1826,54 @@ namespace CommissionsCreate
 
 
                     //possible options: Proc_Select_BARC_Retail_For_Excel, Proc_Select_BARC_Outside_Real_Estate_For_Excel,Proc_Select_BARC_Outside_Auto_For_Excel 
-                    using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo." + sprocName,
-                    new Dictionary<string, object>()
+                    results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo." + sprocName,
+                                               new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                               new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                               new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                               new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                               new SqlParameter("@pvchrSalesperson", salesperson));
+
+                    if (results == null || results.Count() <= 0)
+                        return null;
+
+
+                    foreach (Dictionary<string, object> result in results)
                     {
-                                               { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                               { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                               { "@psdatCommissionsEndDate", commissionRecord.EndDate},
-                                               { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")},
-                                               { "@pvchrSalesperson", salesperson },
-                    }))
-                    {
-                        if (!reader.HasRows)
-                            return null;
+                        BarcForExcelRecord barcForExcelRecord = new BarcForExcelRecord();
 
+                        barcForExcelRecord.MarkerFlagName = result["marker_flag_name"].ToString();
+                        barcForExcelRecord.GroupDescription = result["playbook_commissions_groups_description"].ToString();
+                        barcForExcelRecord.PrintDivisionDescription = result["playbook_print_division_description"].ToString();
+                        barcForExcelRecord.RevenueWithoutTaxes = (decimal)result["revenue_without_taxes"];
+                        barcForExcelRecord.TranDate = (DateTime)result["trandate"];
+                        barcForExcelRecord.Account = (Int32)result["account"];
+                        barcForExcelRecord.ClientName = result["clientname"].ToString();
+                        barcForExcelRecord.Pub = result["pub"].ToString();
+                        barcForExcelRecord.TranCode = result["trancode"].ToString();
+                        barcForExcelRecord.TranType = result["trantype"].ToString();
+                        barcForExcelRecord.Ticket = (Int32)result["ticket"];
+                        barcForExcelRecord.SelectSource = result["select_source"].ToString();
 
-                        while (reader.Read())
-                        {
-                            BarcForExcelRecord barcForExcelRecord = new BarcForExcelRecord();
-
-                            barcForExcelRecord.MarkerFlagName = reader.GetString(reader.GetOrdinal("marker_flag_name"));
-                            barcForExcelRecord.GroupDescription = reader.GetString(reader.GetOrdinal("playbook_commissions_groups_description"));
-                            barcForExcelRecord.PrintDivisionDescription = reader.GetString(reader.GetOrdinal("playbook_print_division_description"));
-                            barcForExcelRecord.RevenueWithoutTaxes = reader.GetDecimal(reader.GetOrdinal("revenue_without_taxes"));
-                            barcForExcelRecord.TranDate = reader.GetDateTime(reader.GetOrdinal("trandate"));
-                            barcForExcelRecord.Account = reader.GetInt32(reader.GetOrdinal("account"));
-                            barcForExcelRecord.ClientName = reader.GetString(reader.GetOrdinal("clientname"));
-                            barcForExcelRecord.Pub = reader.GetString(reader.GetOrdinal("pub"));
-                            barcForExcelRecord.TranCode = reader.GetString(reader.GetOrdinal("trancode"));
-                            barcForExcelRecord.TranType = reader.GetString(reader.GetOrdinal("trantype"));
-                            barcForExcelRecord.Ticket = reader.GetInt32(reader.GetOrdinal("ticket"));
-                            barcForExcelRecord.SelectSource = reader.GetString(reader.GetOrdinal("select_source"));
-
-                            barcForExcelRecords.Add(barcForExcelRecord);
-                        }
+                        barcForExcelRecords.Add(barcForExcelRecord);
                     }
 
-                    using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Marker_Flags",
-                                        new Dictionary<string, object>()
-                                        {
-                                               { "@pvchrBuffNewsForBWServerInstance", GetConfigurationKeyValue("BuffNewsForBWServerName") },
-                                               { "@pvchrBuffNewsForBWDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName") },
-                                               { "@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName") },
-                                               { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")},
-                                               { "@pvchrMarkerFlagName", barcForExcelRecords[0].MarkerFlagName }, //this value can't be null, it's hardcoded in the sproc
-                                        }))
+
+                    results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Marker_Flags",
+                                        new SqlParameter("@pvchrBuffNewsForBWServerInstance", GetConfigurationKeyValue("BuffNewsForBWServerName")),
+                                        new SqlParameter("@pvchrBuffNewsForBWDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName")),
+                                        new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
+                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                        new SqlParameter("@pvchrMarkerFlagName", barcForExcelRecords[0].MarkerFlagName)); //this value can't be null, it's hardcoded in the sproc
+
+                    if (results == null || results.Count() <= 0)
+                        return null;
+
+
+                    foreach (Dictionary<string, object> result in results)
                     {
-                        if (!reader.HasRows)
-                            return null;
-
-
-                        while (reader.Read())
-                        {
-                            worksheet.Cells[rowCounter, 1] = "Criteria: " + reader.GetString(reader.GetOrdinal("description"));
-                        }
+                        worksheet.Cells[rowCounter, 1] = "Criteria: " + result["description"].ToString();
                     }
+
 
                     FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(12) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = 1 });
 
@@ -1839,38 +1988,34 @@ namespace CommissionsCreate
                     //get data
                     List<DataMiningProductForExcel> dataMiningProductForExcels = new List<DataMiningProductForExcel>();
 
-                    using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Data_Mining_Product_For_Excel",
-                    new Dictionary<string, object>()
+                    results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Data_Mining_Product_For_Excel",
+                                            new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                            new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                            new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                            new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
+                                            new SqlParameter("@pvchrSalesperson", salesperson));
+
+                    if (results == null || results.Count() <= 0)
+                        return null;
+
+
+                    foreach (Dictionary<string, object> result in results)
                     {
-                                               { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                               { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                               { "@psdatCommissionsEndDate", commissionRecord.EndDate},
-                                               { "@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")},
-                                               { "@pvchrSalesperson", salesperson },
-                    }))
-                    {
-                        if (!reader.HasRows)
-                            return null;
+                        DataMiningProductForExcel dataMiningProductForExcelRecord = new DataMiningProductForExcel();
 
+                        dataMiningProductForExcelRecord.Salesperson = result["salesperson"].ToString();
+                        dataMiningProductForExcelRecord.GroupDescription = result["product_commissions_groups_description"].ToString();
+                        dataMiningProductForExcelRecord.EDNNumber = result["tbleditions_ednnumber"].ToString();
+                        dataMiningProductForExcelRecord.Description = result["tbleditions_descript"].ToString();
+                        dataMiningProductForExcelRecord.TranDate = (DateTime)result["trandate"];
+                        dataMiningProductForExcelRecord.AmountPreTax = (decimal)result["amount_pretax"];
+                        dataMiningProductForExcelRecord.HistoryCoreAccount = (Int32)result["history_core_account"];
+                        dataMiningProductForExcelRecord.ClientName = result["clientsdata_clientname"].ToString();
+                        dataMiningProductForExcelRecord.HistoryCoreTicket = (Int32)result["history_core_ticket"];
 
-                        while (reader.Read())
-                        {
-                            DataMiningProductForExcel dataMiningProductForExcelRecord = new DataMiningProductForExcel();
+                        commissionGroupDescriptionTotal = (decimal)result["amount_pretax"];
 
-                            dataMiningProductForExcelRecord.Salesperson = reader.GetString(reader.GetOrdinal("salesperson"));
-                            dataMiningProductForExcelRecord.GroupDescription = reader.GetString(reader.GetOrdinal("product_commissions_groups_description"));
-                            dataMiningProductForExcelRecord.EDNNumber = reader.GetString(reader.GetOrdinal("tbleditions_ednnumber"));
-                            dataMiningProductForExcelRecord.Description = reader.GetString(reader.GetOrdinal("tbleditions_descript"));
-                            dataMiningProductForExcelRecord.TranDate = reader.GetDateTime(reader.GetOrdinal("trandate"));
-                            dataMiningProductForExcelRecord.AmountPreTax = reader.GetDecimal(reader.GetOrdinal("amount_pretax"));
-                            dataMiningProductForExcelRecord.HistoryCoreAccount = reader.GetInt32(reader.GetOrdinal("history_core_account"));
-                            dataMiningProductForExcelRecord.ClientName = reader.GetString(reader.GetOrdinal("clientsdata_clientname"));
-                            dataMiningProductForExcelRecord.HistoryCoreTicket = reader.GetInt32(reader.GetOrdinal("history_core_ticket"));
-
-                            commissionGroupDescriptionTotal = reader.GetDecimal(reader.GetOrdinal("amount_pretax"));
-
-                            dataMiningProductForExcels.Add(dataMiningProductForExcelRecord);
-                        }
+                        dataMiningProductForExcels.Add(dataMiningProductForExcelRecord);
                     }
 
 
@@ -1896,20 +2041,14 @@ namespace CommissionsCreate
 
                     //get descriptions
                     List<string> descriptions = new List<string>();
-                    using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Product_Data_Mining_Descriptions",
-                                        new Dictionary<string, object>()
-                                        {
-                                               { "@pintSnapshotsID", commissionRecord.SnapshotId },
-                                               { "@pvchrSalesperson", salesperson }
-                                        }))
+                    results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Data_Mining_Descriptions",
+                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                        new SqlParameter("@pvchrSalesperson", salesperson));
+
+                    foreach (Dictionary<string, object> result in results)
                     {
-
-                        while (reader.Read())
-                        {
-                            descriptions.Add(reader.GetString(reader.GetOrdinal("tbleditions_ednnumber")));
-                        }
+                        descriptions.Add(result["tbleditions_ednnumber"].ToString());
                     }
-
 
                     worksheet.Cells[rowCounter, 1] = "Selected Data Mining Editions: " + String.Join(", ", descriptions);
 
@@ -2080,7 +2219,7 @@ namespace CommissionsCreate
                 FileNamePrefix = fileNamePrefix,
                 PlaybookFlag = hasPlaybook,
                 Salesperson = salesperson,
-                SalespersonGroupId = salespersonGroup
+                SalespersonGroupId = salespersonGroupId
             };
 
         }
@@ -2170,9 +2309,7 @@ namespace CommissionsCreate
 
 
         }
-
-
-
+               
         private string ConvertToColumn(Int32 columnNumber)
         {
             Int32 offset = 64;
@@ -2201,20 +2338,20 @@ namespace CommissionsCreate
                 return "I" + ((char)((columnNumber - 234) + offset)).ToString();
         }
 
-        private List<SalespersonGroup> BuildSalespersonGroup(SqlDataReader reader)
+        private List<SalespersonGroup> BuildSalespersonGroup(List<Dictionary<string, object>> results)
         {
             List<SalespersonGroup> salespersonGroups = new List<SalespersonGroup>();
 
-            while (reader.Read())
+            foreach (Dictionary<string, object> result in results)
             {
                 SalespersonGroup salespersonGroup = new SalespersonGroup();
 
-                salespersonGroup.SalespersonGroupsId = reader.GetInt32(reader.GetOrdinal("salespersons_groups_id"));
-                salespersonGroup.WorksheetName = reader.GetString(reader.GetOrdinal("worksheet_name"));
-                salespersonGroup.SalespersonName = reader.GetString(reader.GetOrdinal("salesperson_name"));
-                salespersonGroup.TerritoriesId = reader.GetInt32(reader.GetOrdinal("territories_id"));
-                salespersonGroup.BARCForExcelStoredProcedure = reader.GetString(reader.GetOrdinal("territory"));
-                salespersonGroup.SalespersonCount = reader.GetInt32(reader.GetOrdinal("salesperson_count"));
+                salespersonGroup.SalespersonGroupsId = (Int32)result["salespersons_groups_id"];
+                salespersonGroup.WorksheetName = result["worksheet_name"].ToString();
+                salespersonGroup.SalespersonName = result["salesperson_name"].ToString();
+                salespersonGroup.TerritoriesId = (Int32)result["territories_id"];
+                salespersonGroup.BARCForExcelStoredProcedure = result["territory"].ToString();
+                salespersonGroup.SalespersonCount = (Int32)result["salesperson_count"];
 
                 salespersonGroups.Add(salespersonGroup);
             }
@@ -2227,173 +2364,118 @@ namespace CommissionsCreate
             //only execute if we are recreating for a salesperson
             if (createType == CommissionCreateTypes.RecreateForSalesperson)
             {
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Territories",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pintStructuresID", commissionRecord.StructuresId }
-                                        });
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Territories",
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                        new SqlParameter("@pintSnapshotsID", snapshotId),
+                                        new SqlParameter("@pintStructuresID", commissionRecord.StructuresId));
 
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Salespersons_Groups",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId }
-                                        });
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Salespersons_Groups",
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                        new SqlParameter("@pintSnapshotsID", snapshotId));
 
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Salespersons",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId }
-                                        });
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Salespersons",
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                        new SqlParameter("@pintSnapshotsID", snapshotId));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Accounts",
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                        new SqlParameter("@pintSnapshotsID", snapshotId),
+                                        new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                        new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Noncommissions",
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                        new SqlParameter("@pintSnapshotsID", snapshotId),
+                                        new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                        new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Chargebacks",
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                        new SqlParameter("@pintSnapshotsID", snapshotId),
+                                        new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                        new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Nonworking_Dates",
+                                            new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                            new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate));
+
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Draw_Per_Days",
+                                            new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                            new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Update_Snapshots_Salespersons_Performance_Goal_Percentage",
+                                            new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                            new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Strategies",
+                                            new SqlParameter("@pintCommissionsRecreateID", commissionsRecreateId),
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                            new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
+
+                foreach (var salesperson in salespersons)
+                {
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Playbook_Groups",
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@pvchrSalesperson", salesperson.Key),
+                                            new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                            new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
+
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Playbook_Print_Division_Descriptions",
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@pvchrSalesperson", salesperson.Key));
+
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, commissionRecord.PlaybookForBARCUpdateStoredProcedure,
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                            new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                            new SqlParameter("@pvchrSalesperson", salesperson.Key));
+
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Product_Groups",
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@pvchrSalesperson", salesperson.Key),
+                                            new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                            new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
+
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Product_Data_Mining_Descriptions",
+                                                new SqlParameter("@pintSnapshotsID", snapshotId),
+                                                new SqlParameter("@pvchrSalesperson", salesperson.Key));
+
+
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Update_Snapshots_Product_Groups_Product",
+                                                new SqlParameter("@pintSnapshotsID", snapshotId),
+                                                new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                                new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                                new SqlParameter("@pvchrSalesperson", salesperson.Key));
+
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Update_Snapshots_Product_Groups_Menu_Mania",
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                            new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                            new SqlParameter("@pvchrSalesperson", salesperson.Key));
+
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Update_Snapshots_Product_Groups_New_Business",
+                                            new SqlParameter("@pintSnapshotsID", snapshotId),
+                                            new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
+                                            new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate),
+                                            new SqlParameter("@pvchrSalesperson", salesperson.Key));
+                }
+
             }
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Accounts",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pintCommissionsYear", commissionRecord.Year },
-                                                         { "@pintCommissionsMonth", commissionRecord.Month }
-                                        });
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Noncommissions",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pintCommissionsYear", commissionRecord.Year },
-                                                         { "@pintCommissionsMonth", commissionRecord.Month }
-                                        });
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Chargebacks",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pintCommissionsYear", commissionRecord.Year },
-                                                         { "@pintCommissionsMonth", commissionRecord.Month }
-                                        });
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Nonworking_Dates",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                                         { "@psdatCommissionsEndDate", commissionRecord.EndDate }
-                                        });
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Draw_Per_Days",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                                         { "@psdatCommissionsEndDate", commissionRecord.EndDate }
-                                        });
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Update_Snapshots_Salespersons_Performance_Goal_Percentage",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pintCommissionsYear", commissionRecord.Year },
-                                                         { "@pintCommissionsMonth", commissionRecord.Month }
-                                         });
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Strategies",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintCommissionsRecreateID", commissionsRecreateId },
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pintCommissionsYear", commissionRecord.Year },
-                                                         { "@pintCommissionsMonth", commissionRecord.Month }
-                                        });
-
-            foreach (var salesperson in salespersons)
-            {
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Playbook_Groups",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pvchrSalesperson", salesperson.Key },
-                                                         { "@pintCommissionsYear", commissionRecord.Year },
-                                                         { "@pintCommissionsMonth", commissionRecord.Month }
-                                        });
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Playbook_Print_Division_Descriptions",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pvchrSalesperson", salesperson.Key }
-                                        });
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, commissionRecord.PlaybookForBARCUpdateStoredProcedure,
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pintSnapshotsID", snapshotId },
-                                                        { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                                        { "@psdatCommissionsEndDate", commissionRecord.EndDate },
-                                                        { "@pvchrSalesperson", salesperson.Key }
-                                        });
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Product_Groups",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pvchrSalesperson", salesperson.Key },
-                                                         { "@pintCommissionsYear", commissionRecord.Year },
-                                                         { "@pintCommissionsMonth", commissionRecord.Month }
-                                        });
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Insert_Snapshots_Product_Data_Mining_Descriptions",
-                                        new Dictionary<string, object>()
-                                        {
-                                                         { "@pintSnapshotsID", snapshotId },
-                                                         { "@pvchrSalesperson", salesperson.Key }
-                                        });
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Update_Snapshots_Product_Groups_Product",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pintSnapshotsID", snapshotId },
-                                                        { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                                        { "@psdatCommissionsEndDate", commissionRecord.EndDate },
-                                                        { "@pvchrSalesperson", salesperson.Key }
-                                        });
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Update_Snapshots_Product_Groups_Menu_Mania",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pintSnapshotsID", snapshotId },
-                                                        { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                                        { "@psdatCommissionsEndDate", commissionRecord.EndDate },
-                                                        { "@pvchrSalesperson", salesperson.Key }
-                                        });
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Update_Snapshots_Product_Groups_New_Business",
-                                        new Dictionary<string, object>()
-                                        {
-                                                        { "@pintSnapshotsID", snapshotId },
-                                                        { "@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate },
-                                                        { "@psdatCommissionsEndDate", commissionRecord.EndDate },
-                                                        { "@pvchrSalesperson", salesperson.Key }
-                                        });
-            }
-
         }
 
         private void TakeSnapshot(Int64 commissisionRecreateId, string tableName)
         {
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Copy_Between_Snapshots",
-                                        new Dictionary<string, object>()
-                                        {
-                                                            { "@pintCommissionsRecreateID", commissisionRecreateId },
-                                                            { "@pvchrTableName", tableName }
-                                        });
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Copy_Between_Snapshots",
+                                        new SqlParameter("@pintCommissionsRecreateID", commissisionRecreateId),
+                                        new SqlParameter("@pvchrTableName", tableName));
         }
 
         /// <summary>
@@ -2402,12 +2484,12 @@ namespace CommissionsCreate
         /// <param name="comm">Command to be executed</param>
         /// <param name="message">Log message prefix</param>
         /// <returns></returns>
-        private bool ValidateProcedure(SqlDataReader reader, string message)
+        private bool ValidateProcedure(Dictionary<string, object> result, string message)
         {
-            if (reader.HasRows)
+            if (result != null)
             {
-                WriteToJobLog(JobLogMessageType.WARNING, message + " by " + reader.GetString(reader.GetOrdinal("processing_by")) + " at " +
-                                    String.Format("{0:MM/dd/yyyy hh:mm tt}", reader.GetDateTime(reader.GetOrdinal("processing_date_time"))));
+                WriteToJobLog(JobLogMessageType.WARNING, message + " by " + result["processing_by"].ToString() + " at " +
+                                    String.Format("{0:MM/dd/yyyy hh:mm tt}", (DateTime)result["processing_date_time"]));
                 return false;
             }
 

@@ -18,3 +18,13 @@ C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\ParkingPayroll\obj\Debug\P
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.csproj.CopyComplete
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.dll
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.pdb
+C:\projects\Applications\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.dll
+C:\projects\Applications\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.pdb
+C:\projects\Applications\BSJobUtility\ParkingPayroll\bin\Debug\ParkingPayroll.dll
+C:\projects\Applications\BSJobUtility\ParkingPayroll\bin\Debug\ParkingPayroll.pdb
+C:\projects\Applications\BSJobUtility\ParkingPayroll\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\ParkingPayroll\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\ParkingPayroll\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.csproj.CopyComplete

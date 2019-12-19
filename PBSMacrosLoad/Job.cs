@@ -28,18 +28,15 @@ namespace PBSMacrosLoad
                     string newFileName = fileInfo.Name.Replace("." + fileInfo.Extension, "") + "_" + DateTime.Now.ToString("yyyyMMddhhmmss tt") + ".txt";
 
                     //create load record
-                    SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.PBS2Macro, CommandType.StoredProcedure, "dbo.Proc_Insert_Loads",
-                                     new Dictionary<string, object>()
-                                                         {
-                                                            { "@pvchrOriginalDir", sourceDirectory },
-                                                            { "@pvchrOriginalFile", fileInfo.Name },
-                                                            { "@pdatLastModified", fileInfo.LastWriteTime },
-                                                            { "@pvchrUserName", Environment.UserName },
-                                                            { "@pvchrComputerName", Environment.MachineName } ,
-                                                            { "@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString() }
-                                                         });
-
-                    Int32? loadId = reader.GetInt32(reader.GetOrdinal("loads_id"));
+                    Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Insert_Loads",
+                                     new SqlParameter("@pvchrOriginalDir", sourceDirectory),
+                                     new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                                     new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                                     new SqlParameter("@pvchrUserName", Environment.UserName),
+                                     new SqlParameter("@pvchrComputerName", Environment.MachineName),
+                                     new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString())).FirstOrDefault();
+                
+                    Int32? loadId = (Int32)result["loads_id"];
 
                     if (loadId == null)
                     {
@@ -48,13 +45,10 @@ namespace PBSMacrosLoad
 
 
                         //update load record
-                        ExecuteNonQuery(DatabaseConnectionStringNames.PBS2Macro, CommandType.StoredProcedure, "dbo.Proc_Update_Loads",
-                                        new Dictionary<string, object>()
-                                        {
-                                            { "@pintLoadsID", loadId },
-                                            { "@pstrBackupFile", destinationDirectory + newFileName }
-                                        });
-
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Update_Loads",
+                                        new SqlParameter("@pintLoadsID", loadId),
+                                        new SqlParameter("@pstrBackupFile", destinationDirectory + newFileName));
+                    
                         WriteToJobLog(JobLogMessageType.INFO, "Copied " + file + " to " + destinationDirectory + newFileName);
                     }
                 }

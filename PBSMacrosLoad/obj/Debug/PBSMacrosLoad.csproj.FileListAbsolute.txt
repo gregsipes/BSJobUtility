@@ -18,3 +18,13 @@ C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PB
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CopyComplete
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.dll
 C:\Users\dhencinski\Desktop\BSJobUtility\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.pdb
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.dll
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.pdb
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\PBSMacrosLoad.dll
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\PBSMacrosLoad.pdb
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CopyComplete

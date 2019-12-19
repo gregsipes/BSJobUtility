@@ -169,21 +169,21 @@ namespace BSJobBase
             }
         }
 
-        protected void ExecuteNonQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, Dictionary<string, object> parameters)
+        protected void ExecuteNonQuery(DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
         {
             using (SqlCommand command = new SqlCommand())
             {
                 try
                 {
                     command.Connection = new SqlConnection(GetConnectionStringTo(connectionStringName));
-                    command.CommandType = commandType;
+                    command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = commandText;
 
                     if (parameters != null)
                     {
                         foreach (var param in parameters)
                         {
-                            command.Parameters.Add(new SqlParameter(param.Key, param.Value));
+                            command.Parameters.Add(param);
                         }
                     }
 
@@ -206,7 +206,36 @@ namespace BSJobBase
 
         #region Functions
 
-        protected SqlDataReader ExecuteQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, Dictionary<string, object> parameters)
+        protected List<Dictionary<string, object>> ExecuteSQL(DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
+        {
+            return ExecuteSQL(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
+        }
+
+        //Change to protected if we ever need to overload. In other words, if we need to pass in something besides a sproc
+        private List<Dictionary<string, object>> ExecuteSQL(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        {
+
+            List<Dictionary<string, object>> rowsToReturn = new List<Dictionary<string, object>>();
+
+            using (SqlDataReader reader = ExecuteQuery(DatabaseConnectionStringNames.Commissions, CommandType.StoredProcedure, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson", parameters))
+            {
+                while (reader.Read())
+                {
+                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        dictionary.Add(reader.GetName(i), reader.GetValue(i));
+                    }
+
+                    rowsToReturn.Add(dictionary);
+                }
+            }
+
+            return rowsToReturn;
+        }
+
+        private SqlDataReader ExecuteQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
         {
             using (SqlCommand command = new SqlCommand())
             {
@@ -218,7 +247,7 @@ namespace BSJobBase
                 {
                     foreach (var param in parameters)
                     {
-                        command.Parameters.Add(new SqlParameter(param.Key, param.Value));
+                        command.Parameters.Add(param);  //new SqlParameter(param.Key, param.Value)
                     }
                 }
                 command.Connection.Open();

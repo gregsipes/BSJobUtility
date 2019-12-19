@@ -12,3 +12,9 @@ C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCre
 C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.csproj.CoreCompileInputs.cache
 C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.dll
 C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.pdb
+C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\CommissionsCreate.dll
+C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\CommissionsCreate.pdb
+C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.csproj.CopyComplete
