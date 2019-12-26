@@ -178,6 +178,7 @@ namespace BSJobBase
                     command.Connection = new SqlConnection(GetConnectionStringTo(connectionStringName));
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = commandText;
+                    command.CommandTimeout = 0;
 
                     if (parameters != null)
                     {

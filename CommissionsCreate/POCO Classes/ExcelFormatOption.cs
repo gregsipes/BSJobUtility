@@ -21,7 +21,7 @@ namespace CommissionsCreate
             BorderTopLineStyle = 0; 
             BorderLeftLineStyle = 0; 
             BorderRightLineStyle = 0; 
-            HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
             FillColor = ExcelColor.White;
         }
 
@@ -45,7 +45,7 @@ namespace CommissionsCreate
 
         public bool CenterText { get; set; }
 
-        public  ExcelHorizontalAlignment HorizontalAlignment { get; set; }
+        public Microsoft.Office.Interop.Excel.XlHAlign HorizontalAlignment { get; set; }
 
         public string NumberFormat { get; set; }
 
