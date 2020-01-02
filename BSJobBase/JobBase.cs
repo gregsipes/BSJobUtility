@@ -171,6 +171,16 @@ namespace BSJobBase
 
         protected void ExecuteNonQuery(DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
         {
+            RunQuery(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
+        }
+
+        protected void ExecuteNonQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        {
+            RunQuery(connectionStringName, commandType, commandText, parameters);
+        }
+
+        private void RunQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        {
             using (SqlCommand command = new SqlCommand())
             {
                 try
@@ -209,11 +219,16 @@ namespace BSJobBase
 
         protected List<Dictionary<string, object>> ExecuteSQL(DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
         {
-            return ExecuteSQL(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
+            return RunSQLCommand(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
+        }
+
+        protected List<Dictionary<string, object>> ExecuteSQL(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        {
+            return RunSQLCommand(connectionStringName, commandType, commandText, parameters);
         }
 
         //Change to protected if we ever need to overload. In other words, if we need to pass in something besides a sproc
-        private List<Dictionary<string, object>> ExecuteSQL(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        private List<Dictionary<string, object>> RunSQLCommand(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
         {
 
             List<Dictionary<string, object>> rowsToReturn = new List<Dictionary<string, object>>();

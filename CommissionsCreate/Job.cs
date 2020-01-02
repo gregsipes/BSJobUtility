@@ -1539,22 +1539,37 @@ namespace CommissionsCreate
 
                     //build performance summary
                     if (!isSummaryRecord)
-                        BuildPerformanceSummary(excel, activeWorksheet, commissionRecord, salespersonGroup.SalespersonGroupsId, salesperson, salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()));
-                
+                        BuildPerformanceSummary(excel, workbook, activeWorksheet, commissionRecord, salespersonGroup.SalespersonGroupsId, salesperson, salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()), sessionId);
+
+                    if (Int32.Parse(salespersonResult["salesperson_count"].ToString()) == 1)
+                        break;
+                    //else
+                    //    isSummaryRecord = true;
                 }
+
                 activeWorksheet = workbook.Sheets[1];
                 activeWorksheet.Activate();
 
                 string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroup.SalespersonGroupsId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
                 workbook.SaveAs(FileFormat: 51, Filename: fileName);
                 workbook.Close(SaveChanges: false);
+
+                Byte[] attachmentBytes = System.IO.File.ReadAllBytes(fileName);
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "UPDATE Snapshots_Salespersons_Groups SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + commissionRecord.SnapshotId + " AND salespersons_groups_id = " + salespersonGroup.SalespersonGroupsId,
+                                                                    new SqlParameter("@pvbinEmbeddedFile", attachmentBytes));
+
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "Proc_Update_Snapshots_Salespersons_Groups_Embedded_Date_Time",
+                                                                    new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                                    new SqlParameter("@pintSalespersonsGroupsID", salespersonGroup.SalespersonGroupsId),
+                                                                    new SqlParameter("@pdatEmbeddedDateTime", DateTime.Now));
             }
 
             return true;
 
         }
 
-        private void BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel, Microsoft.Office.Interop.Excel.Worksheet activeWorksheet, CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage)
+        private void BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel, Microsoft.Office.Interop.Excel.Workbook workbook, Microsoft.Office.Interop.Excel.Worksheet activeWorksheet, CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
         {
             WriteToJobLog(JobLogMessageType.INFO,  "Creating performance summary attachement for " + salespersonName + " (" + salesperson + ")");
 
@@ -1714,8 +1729,95 @@ namespace CommissionsCreate
 
             rowCounter++;
 
+            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+            activeWorksheet.Cells[rowCounter, 1] = "Significant Gains";
+
+            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "@", IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+            activeWorksheet.Cells[rowCounter, 2] = commissionRecord.Year;
+
+            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "@", IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+            activeWorksheet.Cells[rowCounter, 3] = commissionRecord.Year - 1;
+
+            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "@", IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+            activeWorksheet.Cells[rowCounter, 4] = "Variance";
+
+            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { NumberFormat = "@", IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+            activeWorksheet.Cells[rowCounter, 5] = "%";
+
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_BARC_Gains",
+                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                                        new SqlParameter("@pvchrCurrentMonthStartDate", commissionRecord.MonthStartDate),
+                                                        new SqlParameter("@psdatCurrentEndDate", commissionRecord.EndDate),
+                                                        new SqlParameter("@psdatPriorMonthStartDate", commissionRecord.PriorMonthStartDate),
+                                                        new SqlParameter("@psdatPriorEndDate", commissionRecord.PriorEndDate),
+                                                        new SqlParameter("@pintGainsLossesTopCount" , commissionRecord.GainsLossesTopCount.ToString()),
+                                                        new SqlParameter("@pvchrSalesperson", salesperson));
+
+            int loopCounter = 0;
+            foreach (Dictionary<string, object> record in results)
+            {
+                loopCounter++;
+
+                rowCounter++;
+
+                FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                activeWorksheet.Cells[rowCounter, 1] = result["clientname"].ToString();
+
+                FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
+                activeWorksheet.Cells[rowCounter, 2] = result["revenue_current"].ToString();
+
+                FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
+                activeWorksheet.Cells[rowCounter, 3] = result["revenue_prior"].ToString();
+
+                FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
+                activeWorksheet.Cells[rowCounter, 4] = "=" + ConvertToColumn(2) + rowCounter + "-" + ConvertToColumn(3) + rowCounter;
+
+                FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
+                activeWorksheet.Cells[rowCounter, 5] = "=if(" + ConvertToColumn(3) + rowCounter + "=0,if(" + ConvertToColumn(2) + rowCounter + "=0,0,if(" + ConvertToColumn(2) + rowCounter + "<0,-1,1))," + ConvertToColumn(4) + rowCounter +
+                                                    "/abs(" + ConvertToColumn(3) + rowCounter + "))";
+
+                if (loopCounter == 10)
+                    break;
+            }
 
 
+            results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "Proc_Select_Snapshots_Strategies",
+                                     new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                     new SqlParameter("@pvchrSalesperson", salesperson));
+
+            bool hasHeader = false;
+
+            foreach (Dictionary<string, object> record in results)
+            {
+                if (!hasHeader)
+                {
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(5) + rowCounter], new ExcelFormatOption() { NumberFormat = "@", IsBold = true, MergeCells = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+                    activeWorksheet.Cells[rowCounter, 1] = "Reasons for gains and strategies to keep gains";
+
+                    hasHeader = true;
+                }
+
+                rowCounter++;
+
+                activeWorksheet.Rows[rowCounter].WrapText = true;
+
+                activeWorksheet.Cells[rowCounter, 1] = record["strategy"].ToString();
+            }
+
+            activeWorksheet.Columns.ColumnWidth = 100;
+            activeWorksheet.Columns.AutoFit();
+            activeWorksheet.Columns[2].ColumnWidth = 15;
+            activeWorksheet.Columns[3].ColumnWidth = 15;
+            activeWorksheet.Columns[4].ColumnWidth = 15;
+            activeWorksheet.Rows.AutoFit();
+
+            //todo: row heights?
+
+            SetupWorksheet(excel, activeWorksheet, rowCounter);
+
+            string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_PerfSum_" + salesperson + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+            workbook.ExportAsFixedFormat(Type: 0, Filename: fileName);
+            workbook.Close(SaveChanges: false);
         }
 
 
