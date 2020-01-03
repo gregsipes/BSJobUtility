@@ -133,10 +133,6 @@ namespace CommissionsCreate
                 CreateNewCommission(commissionsRecord); //new commissions create request
             else
                 RecreateCommission(createType, commissionsRecord);   //recreate a commissions request
-
-
-            //todo:
-            //DeleteAutoAttachments();
         }
 
         private void CreateNewCommission(CommissionRecord commissionsRecord)
@@ -492,6 +488,9 @@ namespace CommissionsCreate
         {
             //insert session
             Int64 sessionId = 0;
+            List<Attachment> autoAttachments = new List<Attachment>();
+
+
             Dictionary<string, object> sessionResult = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Sessions",
                                                     new SqlParameter("@pvchrUserName", commissionRecord.RequestedUserName),
                                                     new SqlParameter("@pvchrComputerName", "")).FirstOrDefault();
@@ -499,10 +498,11 @@ namespace CommissionsCreate
 
             //build salesperson groups
             List<SalespersonGroup> salespersonGroups = new List<SalespersonGroup>();
+            List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
             if (createTypes == CommissionCreateTypes.Create)
             {
-                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons_Groups",
+                results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons_Groups",
                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                         new SqlParameter("@plngTerritoriesID", -1));
 
@@ -510,11 +510,10 @@ namespace CommissionsCreate
             }
             else
             {
-                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons_Groups_Recreate",
+                results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons_Groups_Recreate",
                         new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId));
 
                 salespersonGroups = BuildSalespersonGroup(results);
-
             }
 
             //iterate groups and create commissions statements for each
@@ -547,7 +546,7 @@ namespace CommissionsCreate
                 Int64 rowFirstForGroupTotal = 0;
                 Int64 rowLastForGroupTotal = 0;
                 string currentMonthCommissionsFormula = "";
-
+              
                 foreach (Dictionary<string, object> salespersonResult in salespersonsResults) //while (true) //iterate salespersons 
                 {
                     string salesperson = "";
@@ -563,10 +562,10 @@ namespace CommissionsCreate
 
                         salespersonGroupName += salesperson;
 
-                        CreateAutoAttachments(AutoAttachmentTypes.MenuMania, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName);
-                        CreateAutoAttachments(AutoAttachmentTypes.NewBusiness, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName);
-                        CreateAutoAttachments(AutoAttachmentTypes.Products, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName);
-                        CreateAutoAttachments(AutoAttachmentTypes.Playbook, excel, salespersonGroup.BARCForExcelStoredProcedure, commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName);
+                        autoAttachments.Add(CreateAutoAttachments(AutoAttachmentTypes.MenuMania, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName));
+                        autoAttachments.Add(CreateAutoAttachments(AutoAttachmentTypes.NewBusiness, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName));
+                        autoAttachments.Add(CreateAutoAttachments(AutoAttachmentTypes.Products, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName));
+                        autoAttachments.Add(CreateAutoAttachments(AutoAttachmentTypes.Playbook, excel, salespersonGroup.BARCForExcelStoredProcedure, commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName));
                     }
 
                     if (rowCounter != 0)
@@ -625,7 +624,7 @@ namespace CommissionsCreate
                     if (isSummaryRecord)
                     {
                         //get playbook groups
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salespersons_Groups_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salespersons_Groups_ID",
                                                                                     new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                                      new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -651,7 +650,7 @@ namespace CommissionsCreate
                     else
                     {
                         //get playbook groups 
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Playbook_Groups_For_Salesperson",
                                                                                 new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                                 new SqlParameter("@pvchrSalesperson", salesperson));
                         foreach (Dictionary<string, object> result in results)
@@ -731,7 +730,7 @@ namespace CommissionsCreate
                     //get products
                     if (isSummaryRecord)
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_For_Salespersons_Groups_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_For_Salespersons_Groups_ID",
                                     new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                     new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -758,7 +757,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Product_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Product_For_Salesperson",
                                                                             new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                             new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -790,7 +789,7 @@ namespace CommissionsCreate
                     //build new business
                     if (isSummaryRecord)
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons_Groups_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salespersons_Groups_ID",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -817,7 +816,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_New_Business_For_Salesperson",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -847,7 +846,7 @@ namespace CommissionsCreate
                     //build menu mania
                     if (isSummaryRecord)
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons_Group_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salespersons_Group_ID",
                                                                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                        new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -872,7 +871,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Menu_Mania_For_Salesperson",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -902,7 +901,7 @@ namespace CommissionsCreate
                     //build product groups other
                     if (isSummaryRecord)
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons_Group_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salespersons_Group_ID",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -929,7 +928,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Product_Groups_Other_For_Salesperson",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -1010,7 +1009,7 @@ namespace CommissionsCreate
                     //get accounts
                     if (isSummaryRecord)
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Accounts_For_Salespersons_Groups_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Accounts_For_Salespersons_Groups_ID",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -1035,7 +1034,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Accounts_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Accounts_For_Salesperson",
                                             new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                             new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -1132,7 +1131,7 @@ namespace CommissionsCreate
                     //get non-commissions
                     if (isSummaryRecord)
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salespersons_Groups_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salespersons_Groups_ID",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -1154,7 +1153,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson",
                                                                                 new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                                 new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -1205,7 +1204,7 @@ namespace CommissionsCreate
                     //get chargebacks
                     if (isSummaryRecord)
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Chargebacks_For_Salespersons_Groups_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Chargebacks_For_Salespersons_Groups_ID",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -1231,7 +1230,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson",
                                                                                 new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                                 new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -1304,7 +1303,7 @@ namespace CommissionsCreate
                     //get draws per day
                     if (isSummaryRecord)
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Draw_Per_Days_For_Salespersons_Groups_ID",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Draw_Per_Days_For_Salespersons_Groups_ID",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
 
@@ -1337,7 +1336,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Draw_Per_Days_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Draw_Per_Days_For_Salesperson",
                                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                         new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -1541,14 +1540,14 @@ namespace CommissionsCreate
                     if (!isSummaryRecord)
                         BuildPerformanceSummary(excel, workbook, activeWorksheet, commissionRecord, salespersonGroup.SalespersonGroupsId, salesperson, salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()), sessionId);
 
-                    if (Int32.Parse(salespersonResult["salesperson_count"].ToString()) == 1)
+                    if (salespersonGroup.SalespersonCount == 1)
                         break;
                     //else
                     //    isSummaryRecord = true;
                 }
 
-                activeWorksheet = workbook.Sheets[1];
-                activeWorksheet.Activate();
+              //  activeWorksheet = workbook.Sheets[0];
+             //   activeWorksheet.Activate();
 
                 string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroup.SalespersonGroupsId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
                 workbook.SaveAs(FileFormat: 51, Filename: fileName);
@@ -1563,10 +1562,91 @@ namespace CommissionsCreate
                                                                     new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                     new SqlParameter("@pintSalespersonsGroupsID", salespersonGroup.SalespersonGroupsId),
                                                                     new SqlParameter("@pdatEmbeddedDateTime", DateTime.Now));
+
+                System.IO.File.Delete(fileName);
+
+
             }
+
+
+           List<Territory> territorySpreadsheets = new List<Territory>();
+
+           results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "Proc_Select_Snapshots_Salespersons_For_Territory_Spreadsheets",
+                                                                   new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId));
+
+
+            foreach (Dictionary<string, object> result in results)
+            {
+                string fileName = CreateSalespersonGroupsSpreadsheets(Int64.Parse(result["salespersons_groups_id"].ToString()), sessionId, commissionRecord.SnapshotId);
+
+                if (String.IsNullOrEmpty(fileName))
+                {
+                    WriteToJobLog(JobLogMessageType.WARNING, "Unable to create commissions spreadsheet for " + result["salesperson_name"].ToString());
+                    return false;
+                }
+
+                territorySpreadsheets.Add(new Territory() { FileName = fileName, TerritoryId = Int64.Parse(result["territories_id"].ToString()) });
+            }
+
+
+            if (!CreateTerritorySpreadsheets(territorySpreadsheets, commissionRecord.SnapshotId, sessionId))
+            {
+                WriteToJobLog(JobLogMessageType.WARNING, "Unable to create territory spreadsheet");
+                return false;
+            }
+
+
+            //remove the session
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "Proc_Delete_Sessions", new SqlParameter("@pintSessionID", sessionId));
+
+            //todo: save all changes
+           
+            
+            DeleteAutoAttachments(autoAttachments);
 
             return true;
 
+        }
+
+        private bool CreateTerritorySpreadsheets(List<Territory> territories, Int64 snapshotId, Int64 sessionId)
+        {
+            try
+            {
+                if (territories != null && territories.Count() > 0)
+                {
+                    foreach (Territory territory in territories)
+                    {
+                        string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_TERR_" + territory.TerritoryId.ToString() + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+
+                        System.IO.File.Copy(territory.FileName, fileName);
+
+                        Byte[] attachmentBytes = System.IO.File.ReadAllBytes(fileName);
+                        ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "UPDATE Snapshots_Territories SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + snapshotId.ToString() + " AND territories_id = " + territory.TerritoryId.ToString(),
+                                                                            new SqlParameter("@pvbinEmbeddedFile", attachmentBytes));
+                    }
+                }
+
+                return true;
+
+            } catch(Exception ex)
+            {
+                WriteToJobLog(JobLogMessageType.ERROR, ex.ToString());
+                return false;
+            }
+
+        }
+
+        private string CreateSalespersonGroupsSpreadsheets(Int64 salespersonGroupId, Int64 sessionId, Int64 snapshotId)
+        {
+           Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "SELECT embedded_file FROM Snapshots_Salespersons_Groups(NOLOCK) WHERE snapshots_id = @snapshotId AND salespersons_groups_id = @salespersonGroupId",
+                                                    new SqlParameter("@snapshotId", snapshotId.ToString()),
+                                                    new SqlParameter("@salespersonGroupId", salespersonGroupId)).FirstOrDefault();
+
+            string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+
+            System.IO.File.WriteAllText(fileName, result["embedded_file"].ToString());
+
+            return fileName;
         }
 
         private void BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel, Microsoft.Office.Interop.Excel.Workbook workbook, Microsoft.Office.Interop.Excel.Worksheet activeWorksheet, CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
@@ -1746,11 +1826,11 @@ namespace CommissionsCreate
 
             List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_BARC_Gains",
                                                         new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
-                                                        new SqlParameter("@pvchrCurrentMonthStartDate", commissionRecord.MonthStartDate),
-                                                        new SqlParameter("@psdatCurrentEndDate", commissionRecord.EndDate),
-                                                        new SqlParameter("@psdatPriorMonthStartDate", commissionRecord.PriorMonthStartDate),
-                                                        new SqlParameter("@psdatPriorEndDate", commissionRecord.PriorEndDate),
-                                                        new SqlParameter("@pintGainsLossesTopCount" , commissionRecord.GainsLossesTopCount.ToString()),
+                                                        new SqlParameter("@pvchrCurrentMonthStartDate", commissionRecord.MonthStartDate.ToShortDateString()),
+                                                        new SqlParameter("@pvchrCurrentEndDate", commissionRecord.EndDate.ToShortDateString()),
+                                                        new SqlParameter("@pvchrPriorMonthStartDate", commissionRecord.PriorMonthStartDate.ToShortDateString()),
+                                                        new SqlParameter("@pvchrPriorEndDate", commissionRecord.PriorEndDate.ToShortDateString()),
+                                                        new SqlParameter("@pintGainsLossesTopCount" , commissionRecord.GainsLossesTopCount),
                                                         new SqlParameter("@pvchrSalesperson", salesperson));
 
             int loopCounter = 0;
@@ -1761,13 +1841,13 @@ namespace CommissionsCreate
                 rowCounter++;
 
                 FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
-                activeWorksheet.Cells[rowCounter, 1] = result["clientname"].ToString();
+                activeWorksheet.Cells[rowCounter, 1] = record["clientname"].ToString();
 
                 FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
-                activeWorksheet.Cells[rowCounter, 2] = result["revenue_current"].ToString();
+                activeWorksheet.Cells[rowCounter, 2] = record["revenue_current"].ToString();
 
                 FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
-                activeWorksheet.Cells[rowCounter, 3] = result["revenue_prior"].ToString();
+                activeWorksheet.Cells[rowCounter, 3] = record["revenue_prior"].ToString();
 
                 FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
                 activeWorksheet.Cells[rowCounter, 4] = "=" + ConvertToColumn(2) + rowCounter + "-" + ConvertToColumn(3) + rowCounter;
@@ -1783,7 +1863,8 @@ namespace CommissionsCreate
 
             results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "Proc_Select_Snapshots_Strategies",
                                      new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
-                                     new SqlParameter("@pvchrSalesperson", salesperson));
+                                     new SqlParameter("@pvchrSalesperson", salesperson),
+                                     new SqlParameter("@pflgGains", true));
 
             bool hasHeader = false;
 
@@ -1819,8 +1900,7 @@ namespace CommissionsCreate
             workbook.ExportAsFixedFormat(Type: 0, Filename: fileName);
             workbook.Close(SaveChanges: false);
         }
-
-
+        
         private void SetupWorksheet(Microsoft.Office.Interop.Excel.Application excel, Microsoft.Office.Interop.Excel.Worksheet worksheet, Int64 rowCounter)
         {
             excel.PrintCommunication = false;
@@ -2773,6 +2853,17 @@ namespace CommissionsCreate
             }
 
             return true;
+        }
+
+        private void DeleteAutoAttachments(List<Attachment> attachments)
+        {
+            if (attachments != null && attachments.Count() > 0)
+            {
+                foreach (Attachment attachment in attachments)
+                {
+                    System.IO.File.Delete(attachment.FileName);
+                }
+            }
         }
 
     }
