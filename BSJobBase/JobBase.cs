@@ -140,7 +140,7 @@ namespace BSJobBase
 
         public void WriteToJobLog(JobLogMessageType type, string message)
         {
-            Console.WriteLine($"[Log] Type: {type.ToString("g"),-7}  Message: {message}");
+            Console.WriteLine($"{DateTime.Now.ToString()} {type.ToString("g"),-7}  Message: {message}");
 
 
             using (SqlCommand command = new SqlCommand())
@@ -186,7 +186,7 @@ namespace BSJobBase
                 try
                 {
                     command.Connection = new SqlConnection(GetConnectionStringTo(connectionStringName));
-                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandType = commandType;
                     command.CommandText = commandText;
                     command.CommandTimeout = 0;
 

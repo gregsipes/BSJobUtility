@@ -527,7 +527,8 @@ namespace CommissionsCreate
                 Microsoft.Office.Interop.Excel.Workbook workbook = excel.Application.ActiveWorkbook;
                 excel.Application.DisplayAlerts = false;
 
-                Microsoft.Office.Interop.Excel.Worksheet activeWorksheet;
+              Microsoft.Office.Interop.Excel.Worksheet activeWorksheet;
+
                 //remove all worksheets except the first one
                 while (workbook.Worksheets.Count > 1)
                 {
@@ -546,7 +547,7 @@ namespace CommissionsCreate
                 Int64 rowFirstForGroupTotal = 0;
                 Int64 rowLastForGroupTotal = 0;
                 string currentMonthCommissionsFormula = "";
-              
+
                 foreach (Dictionary<string, object> salespersonResult in salespersonsResults) //while (true) //iterate salespersons 
                 {
                     string salesperson = "";
@@ -1538,7 +1539,7 @@ namespace CommissionsCreate
 
                     //build performance summary
                     if (!isSummaryRecord)
-                        BuildPerformanceSummary(excel, workbook, activeWorksheet, commissionRecord, salespersonGroup.SalespersonGroupsId, salesperson, salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()), sessionId);
+                        BuildPerformanceSummary(excel,commissionRecord, salespersonGroup.SalespersonGroupsId, salesperson, salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()), sessionId);
 
                     if (salespersonGroup.SalespersonCount == 1)
                         break;
@@ -1546,15 +1547,17 @@ namespace CommissionsCreate
                     //    isSummaryRecord = true;
                 }
 
-              //  activeWorksheet = workbook.Sheets[0];
-             //   activeWorksheet.Activate();
+
+                activeWorksheet = workbook.Sheets[1];
+                activeWorksheet.Activate();
 
                 string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroup.SalespersonGroupsId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
                 workbook.SaveAs(FileFormat: 51, Filename: fileName);
                 workbook.Close(SaveChanges: false);
 
                 Byte[] attachmentBytes = System.IO.File.ReadAllBytes(fileName);
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "UPDATE Snapshots_Salespersons_Groups SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + commissionRecord.SnapshotId + " AND salespersons_groups_id = " + salespersonGroup.SalespersonGroupsId,
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text,
+                                                                    "UPDATE Snapshots_Salespersons_Groups SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + commissionRecord.SnapshotId + " AND salespersons_groups_id = " + salespersonGroup.SalespersonGroupsId, 
                                                                     new SqlParameter("@pvbinEmbeddedFile", attachmentBytes));
 
 
@@ -1562,8 +1565,8 @@ namespace CommissionsCreate
                                                                     new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                     new SqlParameter("@pintSalespersonsGroupsID", salespersonGroup.SalespersonGroupsId),
                                                                     new SqlParameter("@pdatEmbeddedDateTime", DateTime.Now));
-
-                System.IO.File.Delete(fileName);
+                //todo: testing
+             //   System.IO.File.Delete(fileName);
 
 
             }
@@ -1621,7 +1624,7 @@ namespace CommissionsCreate
                         System.IO.File.Copy(territory.FileName, fileName);
 
                         Byte[] attachmentBytes = System.IO.File.ReadAllBytes(fileName);
-                        ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "UPDATE Snapshots_Territories SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + snapshotId.ToString() + " AND territories_id = " + territory.TerritoryId.ToString(),
+                        ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text, "UPDATE Snapshots_Territories SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + snapshotId.ToString() + " AND territories_id = " + territory.TerritoryId.ToString(),
                                                                             new SqlParameter("@pvbinEmbeddedFile", attachmentBytes));
                     }
                 }
@@ -1638,7 +1641,7 @@ namespace CommissionsCreate
 
         private string CreateSalespersonGroupsSpreadsheets(Int64 salespersonGroupId, Int64 sessionId, Int64 snapshotId)
         {
-           Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "SELECT embedded_file FROM Snapshots_Salespersons_Groups(NOLOCK) WHERE snapshots_id = @snapshotId AND salespersons_groups_id = @salespersonGroupId",
+           Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, CommandType.Text, "SELECT embedded_file FROM Snapshots_Salespersons_Groups(NOLOCK) WHERE snapshots_id = @snapshotId AND salespersons_groups_id = @salespersonGroupId",
                                                     new SqlParameter("@snapshotId", snapshotId.ToString()),
                                                     new SqlParameter("@salespersonGroupId", salespersonGroupId)).FirstOrDefault();
 
@@ -1649,11 +1652,15 @@ namespace CommissionsCreate
             return fileName;
         }
 
-        private void BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel, Microsoft.Office.Interop.Excel.Workbook workbook, Microsoft.Office.Interop.Excel.Worksheet activeWorksheet, CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
+        private void BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel,  CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
         {
             WriteToJobLog(JobLogMessageType.INFO,  "Creating performance summary attachement for " + salespersonName + " (" + salesperson + ")");
 
             excel.Application.Workbooks.Add();
+
+            Microsoft.Office.Interop.Excel.Workbook workbook = excel.Application.ActiveWorkbook;
+            Microsoft.Office.Interop.Excel.Worksheet activeWorksheet = workbook.Sheets[workbook.Sheets.Count];
+
             excel.Application.DisplayAlerts = false;
 
             //todo: do we need to check the sheet count again?
@@ -1679,8 +1686,9 @@ namespace CommissionsCreate
             Decimal monthActiveAccountsCurrent = result["month_active_accounts_current"] == null ? 0 : Decimal.Parse(result["month_active_accounts_current"].ToString());
             Decimal monthActiveAccountsPrior = result["month_active_accounts_prior"] == null ? 0 : Decimal.Parse(result["month_active_accounts_prior"].ToString());
 
+            activeWorksheet.Select();
             activeWorksheet.Name = "Performance Summary";
-
+            
             int rowCounter = 1;
 
             activeWorksheet.Cells[rowCounter, 1] = "TBN Salesperson Performance Summary For " + CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(commissionRecord.Month) + " " + commissionRecord.Year;
@@ -1893,7 +1901,7 @@ namespace CommissionsCreate
             activeWorksheet.Rows.AutoFit();
 
             //todo: row heights?
-
+            
             SetupWorksheet(excel, activeWorksheet, rowCounter);
 
             string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_PerfSum_" + salesperson + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
