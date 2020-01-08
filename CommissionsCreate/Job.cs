@@ -2111,26 +2111,33 @@ namespace CommissionsCreate
                     rowCounter++;
 
                     //add column headers
+                    FormatCells(worksheet.Cells[rowCounter, 1], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
                     worksheet.Cells[rowCounter, 1] = "Commissions Salesperson";
-                    FormatCells(worksheet.Columns[1], new ExcelFormatOption() { NumberFormat = "@" });
 
-                    worksheet.Cells[rowCounter, 2] = "Commissions Data Mining";
                     FormatCells(worksheet.Columns[2], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 2], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 2] = "Commissions Data Mining";
 
-                    worksheet.Cells[rowCounter, 3] = "Amount";
                     FormatCells(worksheet.Columns[3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
+                    FormatCells(worksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 3] = "Amount";
 
-                    worksheet.Cells[rowCounter, 4] = "Tran Date";
                     FormatCells(worksheet.Columns[4], new ExcelFormatOption() { NumberFormat = "mm/dd/yyyy" });
+                    FormatCells(worksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 4] = "Tran Date";
 
-                    worksheet.Cells[rowCounter, 5] = "Account";
                     FormatCells(worksheet.Columns[5], new ExcelFormatOption() { NumberFormat = "#0;(#0)" });
+                    FormatCells(worksheet.Cells[rowCounter, 5], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 5] = "Account";
 
-                    worksheet.Cells[rowCounter, 6] = "Client Name";
                     FormatCells(worksheet.Columns[6], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 6], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 6] = "Client Name";
 
-                    worksheet.Cells[rowCounter, 7] = "Ticket";
                     FormatCells(worksheet.Columns[7], new ExcelFormatOption() { NumberFormat = "#0", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 7], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 7] = "Ticket";
+                    
 
                     rowCounter++;
 
@@ -2202,31 +2209,38 @@ namespace CommissionsCreate
                     rowCounter++;
 
                     //build column headers
+                    FormatCells(worksheet.Cells[rowCounter, 1], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
                     worksheet.Cells[rowCounter, 1] = "Commissions Salesperson";
-                    FormatCells(worksheet.Columns[1], new ExcelFormatOption() { NumberFormat = "@" });
 
-                    worksheet.Cells[rowCounter, 2] = "Commissions Data Mining";
                     FormatCells(worksheet.Columns[2], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
-
-                    worksheet.Cells[rowCounter, 3] = "Amount";
+                    FormatCells(worksheet.Cells[rowCounter, 2], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 2] = "Commissions Data Mining";
+                    
                     FormatCells(worksheet.Columns[3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
+                    FormatCells(worksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 3] = "Amount";
 
-                    worksheet.Cells[rowCounter, 4] = "Tran Date";
                     FormatCells(worksheet.Columns[4], new ExcelFormatOption() { NumberFormat = "mm/dd/yyyy" });
+                    FormatCells(worksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 4] = "Tran Date";
 
-                    worksheet.Cells[rowCounter, 5] = "New Business Expiration Date";
                     FormatCells(worksheet.Columns[5], new ExcelFormatOption() { NumberFormat = "mm/dd/yyyy" });
+                    FormatCells(worksheet.Cells[rowCounter, 5], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 5] = "New Business Expiration Date";
 
-                    worksheet.Cells[rowCounter, 6] = "Account";
                     FormatCells(worksheet.Columns[6], new ExcelFormatOption() { NumberFormat = "#0;(#0)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 6], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 6] = "Account";
 
-                    worksheet.Cells[rowCounter, 7] = "Client Name";
                     FormatCells(worksheet.Columns[7], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 7], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 7] = "Client Name";
 
-                    worksheet.Cells[rowCounter, 8] = "Ticket";
                     FormatCells(worksheet.Columns[8], new ExcelFormatOption() { NumberFormat = "#0", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 8], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 8] = "Ticket";
+                    
 
-                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(8) + rowCounter], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
 
                     //get related commission data
                     results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Data_Mining_New_Business_For_Excel",
@@ -2288,8 +2302,8 @@ namespace CommissionsCreate
 
                     rowCounter += 2;
 
-                    row = worksheet.Rows[rowCounter];
-                    rowHeights.Add((Int32)row.RowHeight * 2);
+                    //row = worksheet.Rows[rowCounter];
+                    //rowHeights.Add((Int32)row.RowHeight * 2);
 
                     List<BarcForExcelRecord> barcForExcelRecords = new List<BarcForExcelRecord>();
 
@@ -2337,58 +2351,74 @@ namespace CommissionsCreate
                     if (results == null || results.Count() <= 0)
                         return null;
 
-                   FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(12) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderBottomLineStyle = 1 });
+                   FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(12) + (rowCounter + 1)], new ExcelFormatOption() { MergeCells = true,  WrapText = true, IsBold = true});
+
 
                     foreach (Dictionary<string, object> result in results)
                     {
                         worksheet.Cells[rowCounter, 1] = "Criteria: " + result["description"].ToString();
                     }
 
-                    rowCounter+= 2;
+                    rowCounter+=2;
 
-                    //build column headers
+                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(12) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = 1 });
+                    
+
+                    rowCounter += 2;
+
+                   //build column headers
+                    FormatCells(worksheet.Cells[rowCounter, 1], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
                     worksheet.Cells[rowCounter, 1] = "Commissions Salesperson";
-                    FormatCells(worksheet.Columns[1], new ExcelFormatOption() { NumberFormat = "@" });
 
-                    worksheet.Cells[rowCounter, 2] = "Commissions Playbook";
                     FormatCells(worksheet.Columns[2], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 2], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 2] = "Commissions Playbook";
 
-                    worksheet.Cells[rowCounter, 3] = "Playbook Division";
                     FormatCells(worksheet.Columns[3], new ExcelFormatOption() { NumberFormat = "@" });
+                    FormatCells(worksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 3] = "Playbook Division";
 
+                    FormatCells(worksheet.Columns[4], new ExcelFormatOption() { StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                    FormatCells(worksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, IsUnderLine = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                     worksheet.Cells[rowCounter, 4] = "Amount";
-                    FormatCells(worksheet.Columns[4], new ExcelFormatOption() { StyleName = "Currency" });
 
-                    worksheet.Cells[rowCounter, 5] = "Tran Date";
                     FormatCells(worksheet.Columns[5], new ExcelFormatOption() { NumberFormat = "mm/dd/yyyy" });
+                    FormatCells(worksheet.Cells[rowCounter, 5], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 5] = "Tran Date";
 
-                    worksheet.Cells[rowCounter, 6] = "Account";
                     FormatCells(worksheet.Columns[6], new ExcelFormatOption() { NumberFormat = "#0;(#0)" });
+                    FormatCells(worksheet.Cells[rowCounter, 6], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 6] = "Account";
 
-                    worksheet.Cells[rowCounter, 7] = "Client Name";
                     FormatCells(worksheet.Columns[7], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 7], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 7] = "Client Name";
 
-                    worksheet.Cells[rowCounter, 8] = "Pub";
                     FormatCells(worksheet.Columns[8], new ExcelFormatOption() { NumberFormat = "@" });
+                    FormatCells(worksheet.Cells[rowCounter, 8], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 8] = "Pub";
 
-                    worksheet.Cells[rowCounter, 9] = "Tran Code";
                     FormatCells(worksheet.Columns[9], new ExcelFormatOption() { NumberFormat = "@" });
+                    FormatCells(worksheet.Cells[rowCounter, 9], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 9] = "Tran Code";
 
-                    worksheet.Cells[rowCounter, 10] = "Tran Type";
                     FormatCells(worksheet.Columns[10], new ExcelFormatOption() { NumberFormat = "@" });
+                    FormatCells(worksheet.Cells[rowCounter, 10], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 10] = "Tran Type";
 
-                    worksheet.Cells[rowCounter, 11] = "Ticket";
                     FormatCells(worksheet.Columns[11], new ExcelFormatOption() { NumberFormat = "#0", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 11], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 11] = "Ticket";
 
-                    worksheet.Cells[rowCounter, 12] = "Source";
                     FormatCells(worksheet.Columns[12], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
-
-                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(12) + rowCounter], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
-
+                    FormatCells(worksheet.Cells[rowCounter, 12], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 12] = "Source";
+                    
 
                     //iterate records
                     string commissionGroup = initialValue;
-                    foreach (BarcForExcelRecord barcForExcelRecord in barcForExcelRecords)
+                    //testing
+                    foreach (BarcForExcelRecord barcForExcelRecord in barcForExcelRecords.Take(10))
                     {
                         //add a totals record if we are starting a new group
                         if (barcForExcelRecord.GroupDescription != commissionGroup)
@@ -2528,35 +2558,42 @@ namespace CommissionsCreate
                     rowCounter++;
 
                     //build column headers
-                    worksheet.Cells[rowCounter, 1] = "Commissions Salesperson";
                     FormatCells(worksheet.Columns[1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter });
+                    FormatCells(worksheet.Cells[rowCounter, 1], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 1] = "Commissions Salesperson";
 
-                    worksheet.Cells[rowCounter, 2] = "Commissions Data Mining";
                     FormatCells(worksheet.Columns[2], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 2], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 2] = "Commissions Data Mining";
 
-                    worksheet.Cells[rowCounter, 3] = "Data Mining Edition";
                     FormatCells(worksheet.Columns[3], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter });
+                    FormatCells(worksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 3] = "Data Mining Edition";
 
-                    worksheet.Cells[rowCounter, 4] = "Data Mining Description";
                     FormatCells(worksheet.Columns[4], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 4] = "Data Mining Description";
 
-                    worksheet.Cells[rowCounter, 5] = "Amount";
                     FormatCells(worksheet.Columns[5], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
+                    FormatCells(worksheet.Cells[rowCounter, 5], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 5] = "Amount";
 
-                    worksheet.Cells[rowCounter, 6] = "Tran Date";
                     FormatCells(worksheet.Columns[6], new ExcelFormatOption() { NumberFormat = "mm/dd/yyyy", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter });
+                    FormatCells(worksheet.Cells[rowCounter, 6], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 6] = "Tran Date";
 
-                    worksheet.Cells[rowCounter, 7] = "Account";
                     FormatCells(worksheet.Columns[7], new ExcelFormatOption() { NumberFormat = "#0;(#0)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 7], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 7] = "Account";
 
-                    worksheet.Cells[rowCounter, 8] = "Client Name";
                     FormatCells(worksheet.Columns[8], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(worksheet.Cells[rowCounter, 8], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 8] = "Client Name";
 
-                    worksheet.Cells[rowCounter, 9] = "Ticket";
                     FormatCells(worksheet.Columns[9], new ExcelFormatOption() { NumberFormat = "#0", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
-
-                  ///  FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(9) + rowCounter], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
-
+                    FormatCells(worksheet.Cells[rowCounter, 9], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                    worksheet.Cells[rowCounter, 9] = "Ticket";
+                    
                     //iterate records
                     string editionDescription = "";
                     string editionNumber = initialValue;
@@ -2664,12 +2701,12 @@ namespace CommissionsCreate
             worksheet.PageSetup.FooterMargin = 18;
             worksheet.PageSetup.PrintHeadings = false;
             worksheet.PageSetup.PrintGridlines = false;
-            worksheet.PageSetup.Orientation = Microsoft.Office.Interop.Excel.XlPageOrientation.xlLandscape;
-            worksheet.PageSetup.Zoom = false;
+          //  worksheet.PageSetup.Orientation = Microsoft.Office.Interop.Excel.XlPageOrientation.xlLandscape;
+          //  worksheet.PageSetup.Zoom = 400;
             worksheet.PageSetup.FitToPagesWide = 1;
             worksheet.PageSetup.FitToPagesTall = 999;
 
-            worksheet.HPageBreaks.Add(worksheet.Cells[10, 1]);
+          //  worksheet.HPageBreaks.Add(worksheet.Cells[10, 1]);
 
             excel.PrintCommunication = true;
 
@@ -2710,7 +2747,7 @@ namespace CommissionsCreate
             range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = excelFormatOption.BorderBottomLineStyle;
             range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft].LineStyle = excelFormatOption.BorderLeftLineStyle;
             range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight].LineStyle = excelFormatOption.BorderRightLineStyle;
-
+            range.WrapText = excelFormatOption.WrapText;
             range.Interior.Pattern = 1; //solid
             range.Interior.PatternColorIndex = -4105; //automatic
             switch (excelFormatOption.FillColor)
