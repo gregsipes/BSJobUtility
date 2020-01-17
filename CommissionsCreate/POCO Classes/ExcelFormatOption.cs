@@ -43,6 +43,8 @@ namespace CommissionsCreate
 
         public Int32 BorderRightLineStyle { get; set; }
 
+
+
         public bool CenterText { get; set; }
 
         public Microsoft.Office.Interop.Excel.XlHAlign HorizontalAlignment { get; set; }
