@@ -630,7 +630,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                             activeWorksheet.Cells[rowCounter, 1] = result["playbook_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -657,7 +657,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                             activeWorksheet.Cells[rowCounter, 1] = result["playbook_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -675,7 +675,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                     activeWorksheet.Cells[rowCounter, 1] = "Total Playbook Commissions";
 
                     FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
@@ -716,7 +716,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
                     activeWorksheet.Cells[rowCounter, 1] = "Product/Goal Based Commissions";
 
                     rowFirstForGroupTotal = 0;
@@ -739,7 +739,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -766,7 +766,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -798,7 +798,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -824,7 +824,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -854,7 +854,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -879,7 +879,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -910,7 +910,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -936,7 +936,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["product_commissions_groups_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -952,7 +952,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                     activeWorksheet.Cells[rowCounter, 1] = "Total Product/Goal Based Commissions";
 
                     FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", IsBold = true });
@@ -992,7 +992,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { FillColor = ExcelColor.Black, TextColor = ExcelColor.White, BorderLeftLineStyle = 1, IsBold = true });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { FillColor = ExcelColor.Black, TextColor = ExcelColor.White, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, IsBold = true });
                     activeWorksheet.Cells[rowCounter, 1] = "Account Based Commissions";
 
                     rowFirstForGroupTotal = 0;
@@ -1014,7 +1014,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["account_description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -1040,7 +1040,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["account_description"];
 
                             FormatCells(activeWorksheet.Cells[2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -1057,11 +1057,11 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, BorderLeftLineStyle = 1, IsBold = true, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { FillColor = ExcelColor.LightGray25, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, IsBold = true, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                     activeWorksheet.Cells[rowCounter, 1] = "Total Account Based Commissions";
 
-                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
-                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
 
                     if (rowFirstForGroupTotal == 0)
                     {
@@ -1097,10 +1097,10 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, MergeCells = true, BorderRightLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
-                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, WrapText = true });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(2) + rowCounter], new ExcelFormatOption() { IsBold = true, MergeCells = true, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, WrapText = true });
                     activeWorksheet.Cells[rowCounter, 3] = "Total Sales Commissions";
-                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
                     activeWorksheet.Cells[rowCounter, 4] = commissionsTotal; 
 
                     Int32 tempCounter = 5;
@@ -1114,7 +1114,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
                     activeWorksheet.Cells[rowCounter, 1] = "Misc. Non-Commission Cash Payments";
 
                     rowFirstForGroupTotal = 0;
@@ -1138,7 +1138,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -1162,7 +1162,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -1174,9 +1174,9 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                     activeWorksheet.Cells[rowCounter, 1] = "Total Misc. Non-Commission Cash Payments";
-                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
 
                     if (rowFirstForGroupTotal == 0)
                         activeWorksheet.Cells[rowCounter, 4] = 0;
@@ -1187,7 +1187,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
                     activeWorksheet.Cells[rowCounter, 1] = "Chargebacks";
 
                     rowFirstForGroupTotal = 0;
@@ -1212,7 +1212,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["description"];
 
                             FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -1240,7 +1240,7 @@ namespace CommissionsCreate
 
                             rowLastForGroupTotal = rowCounter;
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                             activeWorksheet.Cells[rowCounter, 1] = result["description"];
 
                             FormatCells(activeWorksheet.Cells[2], new ExcelFormatOption() { NumberFormat = "0.000%;-0.000%", StyleName = "Percent", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -1259,9 +1259,9 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = 1, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                     activeWorksheet.Cells[rowCounter, 1] = "Total Chargebacks";
-                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency" });
 
                     if (rowFirstForGroupTotal == 0)
                         activeWorksheet.Cells[rowCounter, 4] = 0;
@@ -1293,7 +1293,7 @@ namespace CommissionsCreate
                     FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { IsBold = true, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                     activeWorksheet.Cells[rowCounter, 2] = "Number Of Days";
                     FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { IsBold = true,  FillColor = ExcelColor.Black, TextColor = ExcelColor.White });
-                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                     activeWorksheet.Cells[rowCounter, 4] = "Monthly Draw";
 
                     //get draws per day
@@ -1316,10 +1316,10 @@ namespace CommissionsCreate
                             FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
                             activeWorksheet.Cells[rowCounter, 1] = (decimal)result["draw_per_day_amount"];
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = 1 });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                             activeWorksheet.Cells[rowCounter, 2] = result["number_of_working_days"];
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = 1, BorderLeftLineStyle = 1 });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                             activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
 
                             monthDrawTotal += (decimal)result["commission_amount"];
@@ -1344,10 +1344,10 @@ namespace CommissionsCreate
                             FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
                             activeWorksheet.Cells[rowCounter, 1] = (decimal)result["draw_per_day_amount"];
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { BorderLeftLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = 1 });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                             activeWorksheet.Cells[rowCounter, 2] = result["number_of_working_days"];
 
-                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = 1, BorderLeftLineStyle = 1 });
+                            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "$#,##0.00;($#,##0.00)", StyleName = "Currency", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                             activeWorksheet.Cells[rowCounter, 4] = (decimal)result["commission_amount"];
 
                             monthDrawTotal += (decimal)result["commission_amount"];
@@ -1356,7 +1356,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = 1 });
+                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
 
                     decimal priorMonthCommissionAmount = 0;
                     decimal priorMonthNonCommissionAmount = 0;
@@ -1379,17 +1379,17 @@ namespace CommissionsCreate
 
                                 rowCounter++;
 
-                                FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                                FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
                                 activeWorksheet.Cells[rowCounter, 1] = "Carryover From Prior Month";
 
                                 if (priorMonthCommissionAmount < 0)
                                 {
                                     rowCounter++;
 
-                                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                                     activeWorksheet.Cells[rowCounter, 1] = "Commissions Carryover From " + (commissionRecord.Month == 1 ? "12/" + (commissionRecord.Year - 1) : (commissionRecord.Month - 1) + "/" + commissionRecord.Year);
 
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
                                     activeWorksheet.Cells[rowCounter, 4] = priorMonthCommissionAmount;
                                 }
 
@@ -1397,10 +1397,10 @@ namespace CommissionsCreate
                                 {
                                     rowCounter++;
 
-                                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                                    FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                                     activeWorksheet.Cells[rowCounter, 1] = "Misc. Noncommissions Carryover From " + (commissionRecord.Month == 1 ? "12/" + (commissionRecord.Year - 1) : (commissionRecord.Month - 1) + "/" + commissionRecord.Year);
 
-                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                                    FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
                                     activeWorksheet.Cells[rowCounter, 4] = priorMonthCommissionAmount;
                                 }
 
@@ -1411,7 +1411,7 @@ namespace CommissionsCreate
 
                         rowCounter++;
 
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
+                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(4) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.Black, TextColor = ExcelColor.White, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
 
                         if (isSummaryRecord || salespersonGroup.SalespersonCount == 1)
                             activeWorksheet.Cells[rowCounter, 1] = "Total Compensation This Month";
@@ -1420,38 +1420,38 @@ namespace CommissionsCreate
 
                         rowCounter++;
 
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = 1, BorderRightLineStyle = 1, BorderBottomLineStyle = 1, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { IsBold = true, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, MergeCells = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
 
                         if (isSummaryRecord || salespersonGroup.SalespersonCount == 1)
                             activeWorksheet.Cells[rowCounter, 1] = "=" + "\"" + "Commissions (MINUS Chargebacks, Draw Per Day & Carryover) " + "\"" + "&IF(" + ConvertToColumn(4) + rowCounter + "<0," + "\"" + "Owed" + "\"" + "," + "\"" + "Paid By Payroll" + "\"" + ")";
                         else
                             activeWorksheet.Cells[rowCounter, 1] = "Commissions (MINUS Chargebacks, Draw Per Day & Carryover) Subtotal";
 
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
                         activeWorksheet.Cells[rowCounter, 4] = commissionsTotal - chargebackTotal - monthDrawTotal + priorMonthCommissionAmount;
 
                         rowCounter++;
 
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() {IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, MergeCells = true });
+                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() {IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, MergeCells = true });
 
                         if (isSummaryRecord || salespersonGroup.SalespersonCount == 1)
                             activeWorksheet.Cells[rowCounter, 1] = "=" + "\"" + "Misc. Non-Commission Cash Payments " + "\"" + "&IF(" + ConvertToColumn(4) + rowCounter + "<0," + "\"" + "Owed" + "\"" + "," + "\"" + "Paid By Payroll" + "\"" + ")";
                         else
                             activeWorksheet.Cells[rowCounter, 1] = "Misc. Non-Commission Cash Payments Subtotal";
 
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() {IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() {IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
                         activeWorksheet.Cells[rowCounter, 4] = nonCommissionTotal;
 
                         rowCounter++;
 
-                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() {IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, BorderLeftLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, MergeCells = true });
+                        FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() {IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, MergeCells = true });
 
                         if (isSummaryRecord || salespersonGroup.SalespersonCount == 1)
                             activeWorksheet.Cells[rowCounter, 1] = "Total Paid By Payroll";
                         else
                             activeWorksheet.Cells[rowCounter, 1] = "Subtotal";
 
-                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = 1, BorderRightLineStyle = 1, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
+                        FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
                         activeWorksheet.Cells[rowCounter, 4] = "=IF(" + ConvertToColumn(4) + rowCounter + ">0," + ConvertToColumn(4) + rowCounter + ",0)+IF(" + ConvertToColumn(4) + rowCounter + ">0," + ConvertToColumn(4) + rowCounter + ",0)";
 
                         activeWorksheet.Columns[4].Autofit();
@@ -1512,7 +1512,7 @@ namespace CommissionsCreate
                 activeWorksheet = workbook.Sheets[1];
                 activeWorksheet.Activate();
 
-                excel.Windows.Application.ActiveWindow.DisplayGridlines = true;
+               // excel.Windows.Application.ActiveWindow.DisplayGridlines = true;
 
                 string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroup.SalespersonGroupsId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
                 workbook.SaveAs(FileFormat: 51, Filename: fileName);
@@ -1660,18 +1660,18 @@ namespace CommissionsCreate
                             FillColor = ExcelColor.LightGray15,
                             MergeCells = true,
                             IsBold = true,
-                            BorderTopLineStyle = 1,
-                            BorderLeftLineStyle = 1,
-                            BorderRightLineStyle = 1
+                            BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous,
+                            BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous,
+                            BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous
                         });
             activeWorksheet.Cells[rowCounter, 1] = "TBN Salesperson Commissions For " + new DateTime(commissionRecord.Month).ToString("MMM", CultureInfo.InvariantCulture) + " " + commissionRecord.Year;
 
             rowCounter++;
 
-            FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { NumberFormat = "@", FillColor = ExcelColor.LightGray15, IsBold = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft, BorderBottomLineStyle = 1, BorderTopLineStyle = 1, BorderLeftLineStyle = 1});
+            FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(3) + rowCounter], new ExcelFormatOption() { NumberFormat = "@", FillColor = ExcelColor.LightGray15, IsBold = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
              activeWorksheet.Cells[rowCounter, 1] = salespersonName + " (" + salesperson + ")";
 
-            FormatCells(activeWorksheet.Range[ConvertToColumn(4) + rowCounter + ":" + ConvertToColumn(5) + rowCounter], new ExcelFormatOption() { MergeCells = true, NumberFormat = "@", FillColor = ExcelColor.LightGray15, IsBold = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderBottomLineStyle = 1, BorderTopLineStyle = 1, BorderRightLineStyle = 1 });
+            FormatCells(activeWorksheet.Range[ConvertToColumn(4) + rowCounter + ":" + ConvertToColumn(5) + rowCounter], new ExcelFormatOption() { MergeCells = true, NumberFormat = "@", FillColor = ExcelColor.LightGray15, IsBold = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 4] = "Created " + DateTime.Now.ToString("MM/dd/yyyy hh:mm tt");
 
 
@@ -1700,7 +1700,7 @@ namespace CommissionsCreate
 
             rowCounter++;
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderLeftLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 1] = "Monthly Actual";
 
             FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
@@ -1712,13 +1712,13 @@ namespace CommissionsCreate
             FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
             activeWorksheet.Cells[rowCounter, 4] = "=" + ConvertToColumn(2) + rowCounter + "-" + ConvertToColumn(3) + rowCounter;
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() {  HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Percent", NumberFormat = "0.00%", BorderRightLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() {  HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Percent", NumberFormat = "0.00%", BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 5] = "=if(" + ConvertToColumn(3) + rowCounter + "=0,if(" + ConvertToColumn(2) + rowCounter + "=0,0,if(" + ConvertToColumn(2) + rowCounter + "<0,-1,1))," + ConvertToColumn(4) + rowCounter +
                                                     "/abs(" + ConvertToColumn(3) + rowCounter + "))";
 
             rowCounter++;
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderLeftLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 1] = "YTD Actual";
 
             FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
@@ -1730,13 +1730,13 @@ namespace CommissionsCreate
             FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
             activeWorksheet.Cells[rowCounter, 4] = "=" + ConvertToColumn(2) + rowCounter + "-" + ConvertToColumn(3) + rowCounter;
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Percent", NumberFormat = "0.00%", BorderRightLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Percent", NumberFormat = "0.00%", BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 5] = "=if(" + ConvertToColumn(3) + rowCounter + "=0,if(" + ConvertToColumn(2) + rowCounter + "=0,0,if(" + ConvertToColumn(2) + rowCounter + "<0,-1,1))," + ConvertToColumn(4) + rowCounter +
                                                     "/abs(" + ConvertToColumn(3) + rowCounter + "))";
 
             rowCounter++;
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderLeftLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 1] = "Monthly Active Accounts";
 
             FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -1748,7 +1748,7 @@ namespace CommissionsCreate
             FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency" });
             activeWorksheet.Cells[rowCounter, 4] = monthActiveAccountsCurrent - monthActiveAccountsPrior;
             
-            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Percent", NumberFormat = "0.00%", BorderRightLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Percent", NumberFormat = "0.00%", BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 5] = "=if(" + ConvertToColumn(3) + rowCounter + "=0,if(" + ConvertToColumn(2) + rowCounter + "=0,0,if(" + ConvertToColumn(2) + rowCounter + "<0,-1,1))," + ConvertToColumn(4) + rowCounter +
                                                     "/abs(" + ConvertToColumn(3) + rowCounter + "))";
 
@@ -1772,19 +1772,19 @@ namespace CommissionsCreate
             rowCounter++;
 
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderLeftLineStyle = 1, BorderBottomLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 1] = commissionRecord.Year + " YTD";
             
-            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", BorderBottomLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 2] = ytdRevenueCurrent;
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", BorderBottomLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 3], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 3] = ytdRevenuePrior + (ytdRevenuePrior * (performanceGoalPercentage / 100));
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", BorderBottomLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 4] = "=" + ConvertToColumn(2) + rowCounter + "-" + ConvertToColumn(3) + rowCounter;
 
-            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Percent", NumberFormat = "0.00%", BorderBottomLineStyle = 1, BorderRightLineStyle = 1 });
+            FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Percent", NumberFormat = "0.00%", BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 5] = "=if(" + ConvertToColumn(3) + rowCounter + "=0,if(" + ConvertToColumn(2) + rowCounter + "=0,0,if(" + ConvertToColumn(2) + rowCounter + "<0,-1,1))," + ConvertToColumn(4) + rowCounter +
                                                     "/abs(" + ConvertToColumn(3) + rowCounter + "))";
 
@@ -1825,7 +1825,7 @@ namespace CommissionsCreate
 
                 rowCounter++;
 
-                FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", BorderLeftLineStyle = 1 });
+                FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                 activeWorksheet.Cells[rowCounter, 1] = record["clientname"].ToString();
 
                 FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() { StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
@@ -1837,7 +1837,7 @@ namespace CommissionsCreate
                 FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                 activeWorksheet.Cells[rowCounter, 4] = "=" + ConvertToColumn(2) + rowCounter + "-" + ConvertToColumn(3) + rowCounter;
 
-                FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() {  StyleName = "Percent", NumberFormat = "0.00%", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = 1 });
+                FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() {  StyleName = "Percent", NumberFormat = "0.00%", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                 activeWorksheet.Cells[rowCounter, 5] = "=if(" + ConvertToColumn(3) + rowCounter + "=0,if(" + ConvertToColumn(2) + rowCounter + "=0,0,if(" + ConvertToColumn(2) + rowCounter + "<0,-1,1))," + ConvertToColumn(4) + rowCounter +
                                                     "/abs(" + ConvertToColumn(3) + rowCounter + "))";
 
@@ -1847,7 +1847,7 @@ namespace CommissionsCreate
 
             rowCounter++;
 
-            FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(5) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = 1 });
+            FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(5) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                        
             results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "Proc_Select_Snapshots_Strategies",
                                      new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
@@ -1906,7 +1906,7 @@ namespace CommissionsCreate
 
                 rowCounter++;
 
-                FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", BorderLeftLineStyle = 1});
+                FormatCells(activeWorksheet.Cells[rowCounter, 1], new ExcelFormatOption() { NumberFormat = "@", BorderLeftLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                 activeWorksheet.Cells[rowCounter, 1] = record["clientname"].ToString();
 
                 FormatCells(activeWorksheet.Cells[rowCounter, 2], new ExcelFormatOption() {  StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight});
@@ -1918,7 +1918,7 @@ namespace CommissionsCreate
                 FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                 activeWorksheet.Cells[rowCounter, 4] = "=" + ConvertToColumn(2) + rowCounter + "-" + ConvertToColumn(3) + rowCounter;
 
-                FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { StyleName = "Percent", NumberFormat = "0.00%" , BorderRightLineStyle = 1, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
+                FormatCells(activeWorksheet.Cells[rowCounter, 5], new ExcelFormatOption() { StyleName = "Percent", NumberFormat = "0.00%" , BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight });
                 activeWorksheet.Cells[rowCounter, 5] = "=if(" + ConvertToColumn(3) + rowCounter + "=0,if(" + ConvertToColumn(2) + rowCounter + "=0,0,if(" + ConvertToColumn(2) + rowCounter + "<0,-1,1))," + ConvertToColumn(4) + rowCounter +
                                                     "/abs(" + ConvertToColumn(3) + rowCounter + "))";
 
@@ -1928,7 +1928,7 @@ namespace CommissionsCreate
 
             rowCounter++;
 
-            FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(5) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = 1 });
+            FormatCells(activeWorksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(5) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
 
             rowCounter++;
 
@@ -2069,7 +2069,7 @@ namespace CommissionsCreate
 
                    // rowHeights.Add((Int32)row.RowHeight * 2);
 
-                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(7) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = 1 });
+                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(7) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
 
                     rowCounter++;
 
@@ -2167,7 +2167,7 @@ namespace CommissionsCreate
                     //row = worksheet.Rows[rowCounter];
                    // rowHeights.Add((Int32)row.RowHeight * 2);
 
-                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(8) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = 1 });
+                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(8) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
 
                     rowCounter++;
 
@@ -2324,7 +2324,7 @@ namespace CommissionsCreate
 
                     rowCounter+=2;
 
-                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(12) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = 1 });
+                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(12) + rowCounter], new ExcelFormatOption() { BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
                     
 
                     rowCounter += 2;
@@ -2493,9 +2493,6 @@ namespace CommissionsCreate
 
                     rowCounter += 2;
 
-                    //row = worksheet.Rows[rowCounter];
-                    //rowHeights.Add((Int32)row.RowHeight * 2);
-
                     FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(9) + rowCounter], new ExcelFormatOption() { MergeCells = true, IsBold = true });
 
                     //get descriptions
@@ -2513,10 +2510,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    //row = worksheet.Rows[rowCounter];
-                    //rowHeights.Add((Int32)row.RowHeight * 2);
-
-                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(9) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = 1 });
+                    FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(9) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
 
                     rowCounter++;
 
@@ -2637,15 +2631,6 @@ namespace CommissionsCreate
             worksheet.Columns.AutoFit();
             worksheet.Rows.AutoFit();
 
-            //todo: is this needed?
-            //if (rowHeights != null && rowHeights.Count() > 0)
-            //{
-            //    foreach (int rowHeight in rowHeights)
-            //    {
-            //        if ()
-            //    }
-            //}
-
             excel.PrintCommunication = false;
 
             worksheet.PageSetup.PrintTitleRows = "$1:$" + rowCounter;
@@ -2706,12 +2691,7 @@ namespace CommissionsCreate
             range.Font.Bold = excelFormatOption.IsBold;
             range.Font.Underline = excelFormatOption.IsUnderLine;
             range.HorizontalAlignment = excelFormatOption.HorizontalAlignment;
-            
-
-            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeTop].Color =      //   .LineStyle = excelFormatOption.BorderTopLineStyle;
-            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = excelFormatOption.BorderBottomLineStyle;
-            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft].LineStyle = excelFormatOption.BorderLeftLineStyle;
-            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight].LineStyle = excelFormatOption.BorderRightLineStyle;
+           
 
             range.WrapText = excelFormatOption.WrapText;
             range.Interior.Pattern = 1; //solid
@@ -2746,6 +2726,9 @@ namespace CommissionsCreate
                     range.Interior.ThemeColor = 1;
                     range.Interior.TintAndShade = 0;
                     break;
+                default:
+                    range.Interior.ColorIndex = 0;
+                    break;
             }
 
             switch (excelFormatOption.TextColor)
@@ -2779,6 +2762,11 @@ namespace CommissionsCreate
                     range.Font.TintAndShade = 0;
                     break;
             }
+
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeTop].LineStyle = excelFormatOption.BorderTopLineStyle;
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = excelFormatOption.BorderBottomLineStyle;
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft].LineStyle = excelFormatOption.BorderLeftLineStyle;
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight].LineStyle = excelFormatOption.BorderRightLineStyle;
 
             range.ApplyOutlineStyles();
 

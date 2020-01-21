@@ -43,13 +43,14 @@ namespace BSJobBase
 
     public enum ExcelColor
     {
-        Black = 0,
-        LightOrange = 1,
-        LightGray5 = 2,
-        LightGray15 = 3,
-        LightGray25 = 4,
-        LightGray35 = 5,
-        White = 6
+        NoFill = 0,
+        Black = 1,
+        LightOrange = 2,
+        LightGray5 = 3,
+        LightGray15 = 4,
+        LightGray25 = 5,
+        LightGray35 = 6,
+        White = 7
     }
 
     #endregion
