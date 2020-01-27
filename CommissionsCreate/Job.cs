@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Office.Interop;
 using System.Globalization;
 using BSJobBase.Classes;
+using System.IO;
 
 namespace CommissionsCreate
 {
@@ -516,6 +517,8 @@ namespace CommissionsCreate
                 salespersonGroups = BuildSalespersonGroup(results);
             }
 
+            List<string> generatedFiles = new List<string>();
+
             //iterate groups and create commissions statements for each
             foreach (SalespersonGroup salespersonGroup in salespersonGroups)
             {
@@ -546,7 +549,7 @@ namespace CommissionsCreate
                 Int64 rowCounter = 0;
                 Int64 rowFirstForGroupTotal = 0;
                 Int64 rowLastForGroupTotal = 0;
-                string currentMonthCommissionsFormula = "";
+               // string currentMonthCommissionsFormula = "";
 
                 foreach (Dictionary<string, object> salespersonResult in salespersonsResults) //while (true) //iterate salespersons 
                 {
@@ -1452,7 +1455,7 @@ namespace CommissionsCreate
                             activeWorksheet.Cells[rowCounter, 1] = "Subtotal";
 
                         FormatCells(activeWorksheet.Cells[rowCounter, 4], new ExcelFormatOption() { IsBold = true, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, FillColor = ExcelColor.LightGray25, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, StyleName = "Currency", NumberFormat = "$#,##0.00;($#,##0.00)" });
-                        activeWorksheet.Cells[rowCounter, 4] = "=IF(" + ConvertToColumn(4) + rowCounter + ">0," + ConvertToColumn(4) + rowCounter + ",0)+IF(" + ConvertToColumn(4) + rowCounter + ">0," + ConvertToColumn(4) + rowCounter + ",0)";
+                        activeWorksheet.Cells[rowCounter, 4] = "=IF(" + ConvertToColumn(4) + (rowCounter -2) + ">0," + ConvertToColumn(4) + (rowCounter -2) + ",0)" + "+IF(" + ConvertToColumn(4) + (rowCounter -1) + ">0," + ConvertToColumn(4) + (rowCounter - 1) + ",0)";
 
                         activeWorksheet.Columns[4].Autofit();
 
@@ -1518,6 +1521,8 @@ namespace CommissionsCreate
                 workbook.SaveAs(FileFormat: 51, Filename: fileName);
                 workbook.Close(SaveChanges: false);
 
+                generatedFiles.Add(fileName);
+
                 Byte[] attachmentBytes = System.IO.File.ReadAllBytes(fileName);
                 ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text,
                                                                     "UPDATE Snapshots_Salespersons_Groups SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + commissionRecord.SnapshotId + " AND salespersons_groups_id = " + salespersonGroup.SalespersonGroupsId, 
@@ -1543,7 +1548,10 @@ namespace CommissionsCreate
 
             foreach (Dictionary<string, object> result in results)
             {
-                string fileName = CreateSalespersonGroupsSpreadsheets(Int64.Parse(result["salespersons_groups_id"].ToString()), sessionId, commissionRecord.SnapshotId);
+                //get the previously generated file
+                string salespersonFile = generatedFiles.Where(g => g.Contains("_SPG_" + result["salespersons_groups_id"].ToString())).FirstOrDefault();
+
+                string fileName = CreateSalespersonGroupsSpreadsheets(Int64.Parse(result["salespersons_groups_id"].ToString()), sessionId, commissionRecord.SnapshotId, salespersonFile);
 
                 if (String.IsNullOrEmpty(fileName))
                 {
@@ -1602,17 +1610,24 @@ namespace CommissionsCreate
 
         }
 
-        private string CreateSalespersonGroupsSpreadsheets(Int64 salespersonGroupId, Int64 sessionId, Int64 snapshotId)
+        private string CreateSalespersonGroupsSpreadsheets(Int64 salespersonGroupId, Int64 sessionId, Int64 snapshotId, string fileName)
         {
-           Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, CommandType.Text, "SELECT embedded_file FROM Snapshots_Salespersons_Groups(NOLOCK) WHERE snapshots_id = @snapshotId AND salespersons_groups_id = @salespersonGroupId",
-                                                    new SqlParameter("@snapshotId", snapshotId.ToString()),
-                                                    new SqlParameter("@salespersonGroupId", salespersonGroupId)).FirstOrDefault();
+           //Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, CommandType.Text, "SELECT embedded_file FROM Snapshots_Salespersons_Groups(NOLOCK) WHERE snapshots_id = @snapshotId AND salespersons_groups_id = @salespersonGroupId",
+           //                                         new SqlParameter("@snapshotId", snapshotId.ToString()),
+           //                                         new SqlParameter("@salespersonGroupId", salespersonGroupId)).FirstOrDefault();
 
-            string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+          byte[] fileContents = System.IO.File.ReadAllBytes(fileName);
+          string groupFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
 
-            System.IO.File.WriteAllText(fileName, result["embedded_file"].ToString());
 
-            return fileName;
+            using (FileStream fileStream = new FileStream(groupFileName, FileMode.Append, FileAccess.Write))
+           {
+                fileStream.Write(fileContents, 0, fileContents.Length);
+
+           }
+
+           return fileName;
+
         }
 
         private void BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel,  CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
@@ -1642,12 +1657,12 @@ namespace CommissionsCreate
                                                                     new SqlParameter("@psdatPriorEndDate", commissionRecord.PriorEndDate),
                                                                     new SqlParameter("@pvchrSalesperson", salesperson)).FirstOrDefault();
 
-            Decimal monthRevenueCurrent = result["month_revenue_current"] == null ? 0 : Decimal.Parse(result["month_revenue_current"].ToString());
-            Decimal monthRevenuePrior = result["month_revenue_prior"] == null ? 0 : Decimal.Parse(result["month_revenue_prior"].ToString());
-            Decimal ytdRevenueCurrent = result["ytd_revenue_current"] == null ? 0 : Decimal.Parse(result["ytd_revenue_current"].ToString());
-            Decimal ytdRevenuePrior = result["ytd_revenue_prior"] == null ? 0 : Decimal.Parse(result["ytd_revenue_prior"].ToString());
-            Decimal monthActiveAccountsCurrent = result["month_active_accounts_current"] == null ? 0 : Decimal.Parse(result["month_active_accounts_current"].ToString());
-            Decimal monthActiveAccountsPrior = result["month_active_accounts_prior"] == null ? 0 : Decimal.Parse(result["month_active_accounts_prior"].ToString());
+            Decimal monthRevenueCurrent = String.IsNullOrEmpty(result["month_revenue_current"].ToString()) ? 0 : Decimal.Parse(result["month_revenue_current"].ToString());
+            Decimal monthRevenuePrior = String.IsNullOrEmpty(result["month_revenue_prior"].ToString()) ? 0 : Decimal.Parse(result["month_revenue_prior"].ToString());
+            Decimal ytdRevenueCurrent = String.IsNullOrEmpty(result["ytd_revenue_current"].ToString()) ? 0 : Decimal.Parse(result["ytd_revenue_current"].ToString());
+            Decimal ytdRevenuePrior = String.IsNullOrEmpty(result["ytd_revenue_prior"].ToString()) ? 0 : Decimal.Parse(result["ytd_revenue_prior"].ToString());
+            Decimal monthActiveAccountsCurrent = String.IsNullOrEmpty(result["month_active_accounts_current"].ToString()) ? 0 : Decimal.Parse(result["month_active_accounts_current"].ToString());
+            Decimal monthActiveAccountsPrior = String.IsNullOrEmpty(result["month_active_accounts_prior"].ToString()) ? 0 : Decimal.Parse(result["month_active_accounts_prior"].ToString());
 
             activeWorksheet.Select();
             activeWorksheet.Name = "Performance Summary";
