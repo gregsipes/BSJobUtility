@@ -55,6 +55,9 @@ namespace BSJobUtility
 
 
             Console.WriteLine(string.Format("Exit code: {0}", 0));
+
+            Console.ReadLine();
+
             return 0;
 
         }
