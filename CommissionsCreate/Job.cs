@@ -1611,16 +1611,44 @@ namespace CommissionsCreate
             {
                 if (territories != null && territories.Count() > 0)
                 {
+                    Int64 currentTerritoryId = territories[0].TerritoryId;
+                    string territoryFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_TERR_" + territories[0].TerritoryId.ToString() + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+
+                    Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
+                    Microsoft.Office.Interop.Excel.Workbook territoryWorkbook = excel.Workbooks.Add();
+
                     foreach (Territory territory in territories)
                     {
-                        string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_TERR_" + territory.TerritoryId.ToString() + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+                        if (currentTerritoryId != territory.TerritoryId)
+                        {
+                            territoryWorkbook.SaveAs(FileFormat: 51, Filename: territoryFileName);
+                            territoryWorkbook.Close();
+                            Byte[] bytes = System.IO.File.ReadAllBytes(territoryFileName);
+                            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text, "UPDATE Snapshots_Territories SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + snapshotId.ToString() + " AND territories_id = " + territory.TerritoryId.ToString(),
+                                                                                new SqlParameter("@pvbinEmbeddedFile", bytes));
 
-                        System.IO.File.Copy(territory.FileName, fileName);
+                            territoryFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_TERR_" + territory.TerritoryId.ToString() + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+                            territoryWorkbook = excel.Workbooks.Add();
+                            currentTerritoryId = territory.TerritoryId;
+                        }
 
-                        Byte[] attachmentBytes = System.IO.File.ReadAllBytes(fileName);
-                        ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text, "UPDATE Snapshots_Territories SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + snapshotId.ToString() + " AND territories_id = " + territory.TerritoryId.ToString(),
-                                                                            new SqlParameter("@pvbinEmbeddedFile", attachmentBytes));
+                        Microsoft.Office.Interop.Excel.Workbook salespersonWorkbook = excel.Workbooks.Open(territory.FileName);
+
+
+                        foreach (Microsoft.Office.Interop.Excel.Worksheet worksheet in salespersonWorkbook.Sheets)
+                        {
+                            worksheet.Copy(After: territoryWorkbook.Sheets[territoryWorkbook.Sheets.Count]);
+                        }
+
                     }
+
+                    //save the final workbook
+                    territoryWorkbook.SaveAs(FileFormat: 51, Filename: territoryFileName);
+
+                    Byte[] attachmentBytes = System.IO.File.ReadAllBytes(territoryFileName);
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text, "UPDATE Snapshots_Territories SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + snapshotId.ToString() + " AND territories_id = " + currentTerritoryId.ToString(),
+                                                                        new SqlParameter("@pvbinEmbeddedFile", attachmentBytes));
+
                 }
 
                 return true;
