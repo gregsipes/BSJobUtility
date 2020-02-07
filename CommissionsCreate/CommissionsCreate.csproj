@@ -50,7 +50,6 @@
     <Compile Include="POCO Classes\CommissionRecord.cs" />
     <Compile Include="Job.cs" />
     <Compile Include="POCO Classes\DataMiningProductForExcel.cs" />
-    <Compile Include="POCO Classes\ExcelFormatOption.cs" />
     <Compile Include="POCO Classes\Territory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="POCO Classes\SalespersonGroup.cs" />

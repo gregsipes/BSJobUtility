@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\ExcelFormatOption.cs" />
     <Compile Include="Classes\FTPSettings.cs" />
     <Compile Include="Classes\GeneralSettings.cs" />
     <Compile Include="Classes\MailSettings.cs" />

@@ -481,11 +481,88 @@ namespace CommissionsCreate
             WriteToJobLog(JobLogMessageType.INFO, "Initializing snapshots");
             RunSnapshotSprocs(commissionRecord, createType, commissionRecord.SnapshotId, salespersons);
 
-            return CreateCommissionsSpeadsheets(createType, commissionRecord);
+            List<Attachment> autoAttachments = CreateCommissionsSpeadsheets(createType, commissionRecord);
 
+            if (autoAttachments != null)
+            {
+                if (createType == CommissionCreateTypes.Create)
+                {
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions_Attachments_Auto_Attachment",
+                            new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId),
+                            new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+                }
+
+                foreach (Attachment attachment in autoAttachments)
+                {
+                    Byte[] bytes = System.IO.File.ReadAllBytes(attachment.FileName);
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text, "INSERT INTO Commissions_Attachments(commissions_id, " +
+                        "salespersons_groups_id,attachment_date_time,attachment_by,attachment_file_name,attachment_description," + 
+                        "auto_attachment_flag,embedded_file,last_modified_by) VALUES (@pintCommissionsID,@pintSalespersonsGroupsID,@pdatAttachmentDateTime," +
+                        "@pvchrAttachmentBy,@pvchrAttachmentFileName,@pvchrAttachmentDescription,1,@pvbinEmbeddedFile," +
+                        "@pvchrLastModifiedBy)",
+                         new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId),
+                         new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId),
+                         new SqlParameter("@pdatAttachmentDateTime", DateTime.Now),
+                         new SqlParameter("@pvchrAttachmentBy", "System"),
+                         new SqlParameter("@pvchrAttachmentFileName", attachment.FileName),
+                         new SqlParameter("@pvchrAttachmentDescription", attachment.Description),
+                         new SqlParameter("@pvbinEmbeddedFile", bytes),
+                         new SqlParameter("@pvchrLastModifiedBy", "System"));
+                }
+
+                //cleanup
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Since_Last_Created",
+                                            new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId),
+                                            new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Commissions_Statuses_Created",
+                                new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId),
+                                new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId),
+                                new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
+                                new SqlParameter("@pvchrStatusBy", commissionRecord.RequestedUserName),
+                                new SqlParameter("@pdateBARCDateTime", DateTime.Now));
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Update_Snapshots_Latest",
+                                new SqlParameter("@pintStructuresID", commissionRecord.StructuresId),
+                                new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
+                                new SqlParameter("@pintCommissionsMonth", commissionRecord.Month),
+                                new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId));
+            }
+            else
+            {
+                if (createType == CommissionCreateTypes.Create)
+                {
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions",
+                                    new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
+                }
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Snapshots",
+                                    new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId));
+            }
+
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Statuses_Creating",
+                    new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
+
+            ExecuteNonQuery(DatabaseConnectionStringNames.BuffNewsForBW, "dbo.Proc_Delete_Commissions_Inquiries",
+                    new SqlParameter("@pintCommissionsInquiriesID", commissionRecord.CommissionsId));
+
+            ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Delete_Commissions_Inquiries",
+                                new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
+
+            if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
+            {
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions_Recreate",
+                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+                                    new SqlParameter("@pflgDeleteLatestSnapshots", 1));
+            }
+
+
+            DeleteAutoAttachments(autoAttachments);
+
+            return true;
         }
 
-        private bool CreateCommissionsSpeadsheets(CommissionCreateTypes createTypes, CommissionRecord commissionRecord)
+        private List<Attachment> CreateCommissionsSpeadsheets(CommissionCreateTypes createTypes, CommissionRecord commissionRecord)
         {
             //insert session
             Int64 sessionId = 0;
@@ -524,27 +601,12 @@ namespace CommissionsCreate
             {
                 WriteToJobLog(JobLogMessageType.INFO, "Creating Commissions spreadsheet for " + salespersonGroup.SalespersonName);
 
-                //test code 
-                if (salespersonGroup.SalespersonGroupsId == 11)
-                {
-                    var x = 2 + 1;
-                }
-
-
-                //Object excelApp = CreateObject("Excel.Application");
                 Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
                 excel.Application.Workbooks.Add();
                 Microsoft.Office.Interop.Excel.Workbook workbook = excel.Application.ActiveWorkbook;
                 excel.Application.DisplayAlerts = false;
 
                 Microsoft.Office.Interop.Excel.Worksheet activeWorksheet;
-
-                //remove all worksheets except the first one
-                //while (workbook.Worksheets.Count > 1)
-                //{
-                //    activeWorksheet = workbook.Sheets[2];
-                //    activeWorksheet.Delete();
-                //}
 
                 excel.Application.DisplayAlerts = true;
 
@@ -557,9 +619,8 @@ namespace CommissionsCreate
                 Int64 rowFirstForGroupTotal = 0;
                 Int64 rowLastForGroupTotal = 0;
                 Int32 salespersonLoopCounter = 0;
-                // string currentMonthCommissionsFormula = "";
 
-                while (true) // foreach (Dictionary<string, object> salespersonResult in salespersonsResults) //while (true) //iterate salespersons 
+                while (true)
                 {
                     string salesperson = "";
                     string salespersonGroupName = "";
@@ -577,10 +638,25 @@ namespace CommissionsCreate
 
                         salespersonGroupName += salesperson;
 
-                        autoAttachments.Add(CreateAutoAttachments(AutoAttachmentTypes.MenuMania, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName));
-                        autoAttachments.Add(CreateAutoAttachments(AutoAttachmentTypes.NewBusiness, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName));
-                        autoAttachments.Add(CreateAutoAttachments(AutoAttachmentTypes.Products, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName));
-                        autoAttachments.Add(CreateAutoAttachments(AutoAttachmentTypes.Playbook, excel, salespersonGroup.BARCForExcelStoredProcedure, commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName));
+                        Attachment attachment = CreateAutoAttachments(AutoAttachmentTypes.MenuMania, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName);
+
+                        if (attachment != null)
+                            autoAttachments.Add(attachment);
+
+                        attachment = CreateAutoAttachments(AutoAttachmentTypes.NewBusiness, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName);
+
+                        if (attachment != null)
+                            autoAttachments.Add(attachment);
+
+                        attachment = CreateAutoAttachments(AutoAttachmentTypes.Products, excel, "", commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName);
+
+                       if (attachment != null)
+                            autoAttachments.Add(attachment);
+
+                        attachment = CreateAutoAttachments(AutoAttachmentTypes.Playbook, excel, salespersonGroup.BARCForExcelStoredProcedure, commissionRecord, salesperson, (Int32)salespersonResult["salespersons_groups_id"], sessionId, salespersonGroup.SalespersonName);
+
+                        if (attachment != null)
+                            autoAttachments.Add(attachment);
                     }
 
                     if (rowCounter != 0)
@@ -1516,7 +1592,7 @@ namespace CommissionsCreate
 
                     //build performance summary
                     if (!isSummaryRecord)
-                        BuildPerformanceSummary(excel, commissionRecord, salespersonGroup.SalespersonGroupsId, salespersonResult["salesperson_name"].ToString(), salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()), sessionId);
+                       autoAttachments.Add(BuildPerformanceSummary(excel, commissionRecord, salespersonGroup.SalespersonGroupsId, salespersonResult["salesperson_name"].ToString(), salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()), sessionId));
 
 
                     if (salespersonsResults.Count() == 1)
@@ -1533,12 +1609,6 @@ namespace CommissionsCreate
                 }
 
 
-
-
-                //activeWorksheet = workbook.Sheets[1];
-                //activeWorksheet.Activate();
-
-                // excel.Windows.Application.ActiveWindow.DisplayGridlines = true;
 
                 string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroup.SalespersonGroupsId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
                 workbook.SaveAs(FileFormat: 51, Filename: fileName);
@@ -1574,34 +1644,45 @@ namespace CommissionsCreate
                 //get the previously generated file
                 string salespersonFile = generatedFiles.Where(g => g.Contains("_SPG_" + result["salespersons_groups_id"].ToString())).FirstOrDefault();
 
-                string fileName = CreateSalespersonGroupsSpreadsheets(Int64.Parse(result["salespersons_groups_id"].ToString()), sessionId, commissionRecord.SnapshotId, salespersonFile);
+                //   string fileName = CreateSalespersonGroupsSpreadsheets(Int64.Parse(result["salespersons_groups_id"].ToString()), sessionId, commissionRecord.SnapshotId, salespersonFile);
 
-                if (String.IsNullOrEmpty(fileName))
+                if (String.IsNullOrEmpty(salespersonFile))
                 {
                     WriteToJobLog(JobLogMessageType.WARNING, "Unable to create commissions spreadsheet for " + result["salesperson_name"].ToString());
-                    return false;
+                    return null;
                 }
 
-                territorySpreadsheets.Add(new Territory() { FileName = fileName, TerritoryId = Int64.Parse(result["territories_id"].ToString()) });
+                territorySpreadsheets.Add(new Territory() { FileName = salespersonFile, TerritoryId = Int64.Parse(result["territories_id"].ToString()) });
             }
 
 
             if (!CreateTerritorySpreadsheets(territorySpreadsheets, commissionRecord.SnapshotId, sessionId))
             {
                 WriteToJobLog(JobLogMessageType.WARNING, "Unable to create territory spreadsheet");
-                return false;
+                return null;
+            }
+
+            //cleanup files
+            foreach (string file in generatedFiles)
+            {
+                if (System.IO.File.Exists(file))
+                    System.IO.File.Delete(file);
+            }
+
+            foreach(Territory territory in territorySpreadsheets)
+            {
+                if (territory != null && System.IO.File.Exists(territory.FileName))
+                    System.IO.File.Delete(territory.FileName);
             }
 
 
             //remove the session
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "Proc_Delete_Sessions", new SqlParameter("@pintSessionID", sessionId));
+          //  ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "Proc_Delete_Sessions", new SqlParameter("@pintSessionID", sessionId));
 
             //todo: save all changes
 
 
-            DeleteAutoAttachments(autoAttachments);
-
-            return true;
+            return autoAttachments;
 
         }
 
@@ -1644,6 +1725,7 @@ namespace CommissionsCreate
 
                     //save the final workbook
                     territoryWorkbook.SaveAs(FileFormat: 51, Filename: territoryFileName);
+                    territoryWorkbook.Close();
 
                     Byte[] attachmentBytes = System.IO.File.ReadAllBytes(territoryFileName);
                     ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text, "UPDATE Snapshots_Territories SET embedded_file = @pvbinEmbeddedFile WHERE snapshots_id = " + snapshotId.ToString() + " AND territories_id = " + currentTerritoryId.ToString(),
@@ -1662,27 +1744,23 @@ namespace CommissionsCreate
 
         }
 
-        private string CreateSalespersonGroupsSpreadsheets(Int64 salespersonGroupId, Int64 sessionId, Int64 snapshotId, string fileName)
-        {
-            //Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, CommandType.Text, "SELECT embedded_file FROM Snapshots_Salespersons_Groups(NOLOCK) WHERE snapshots_id = @snapshotId AND salespersons_groups_id = @salespersonGroupId",
-            //                                         new SqlParameter("@snapshotId", snapshotId.ToString()),
-            //                                         new SqlParameter("@salespersonGroupId", salespersonGroupId)).FirstOrDefault();
-
-            byte[] fileContents = System.IO.File.ReadAllBytes(fileName);
-            string groupFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+        //private string CreateSalespersonGroupsSpreadsheets(Int64 salespersonGroupId, Int64 sessionId, Int64 snapshotId, string fileName)
+        //{
+        //    byte[] fileContents = System.IO.File.ReadAllBytes(fileName);
+        //    string groupFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
 
 
-            using (FileStream fileStream = new FileStream(groupFileName, FileMode.Append, FileAccess.Write))
-            {
-                fileStream.Write(fileContents, 0, fileContents.Length);
+        //    using (FileStream fileStream = new FileStream(groupFileName, FileMode.Append, FileAccess.Write))
+        //    {
+        //        fileStream.Write(fileContents, 0, fileContents.Length);
 
-            }
+        //    }
 
-            return fileName;
+        //    return fileName;
 
-        }
+        //}
 
-        private void BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel, CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
+        private Attachment BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel, CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
         {
             WriteToJobLog(JobLogMessageType.INFO, "Creating performance summary attachement for " + salespersonName + " (" + salesperson + ")");
 
@@ -1690,10 +1768,6 @@ namespace CommissionsCreate
 
             Microsoft.Office.Interop.Excel.Workbook workbook = excel.Application.ActiveWorkbook;
             Microsoft.Office.Interop.Excel.Worksheet activeWorksheet = workbook.Sheets[workbook.Sheets.Count];
-
-            excel.Application.DisplayAlerts = false;
-
-            //todo: do we need to check the sheet count again?
 
             excel.Application.DisplayAlerts = true;
 
@@ -1740,13 +1814,9 @@ namespace CommissionsCreate
 
             FormatCells(activeWorksheet.Range[ConvertToColumn(4) + rowCounter + ":" + ConvertToColumn(5) + rowCounter], new ExcelFormatOption() { MergeCells = true, NumberFormat = "@", FillColor = ExcelColor.LightGray15, IsBold = true, HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignRight, BorderBottomLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous, BorderRightLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
             activeWorksheet.Cells[rowCounter, 4] = "Created " + DateTime.Now.ToString("MM/dd/yyyy hh:mm tt");
-
-
-
-
+     
             rowCounter++;
 
-            //todo: row heights
 
             rowCounter++;
 
@@ -2038,6 +2108,21 @@ namespace CommissionsCreate
             string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_PerfSum_" + salesperson + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".pdf";
             workbook.ExportAsFixedFormat(Type: 0, Filename: fileName);
             workbook.Close(SaveChanges: false);
+
+            return new Attachment()
+            {
+                Description = "Performance summary For " + salesperson,
+                FileName = fileName,
+                HasManiaFlag = false,
+                HasNewBusinessFlag = false,
+                HasProductsFlag = false,
+                FileNameExtension = ".pdf",
+                FileNamePrefix = "Performance_Summary",
+                PlaybookFlag = false,
+                Salesperson = salesperson,
+                SalespersonGroupId = salespersonGroupId
+            };
+
         }
 
         private void SetupWorksheet(Microsoft.Office.Interop.Excel.Application excel, Microsoft.Office.Interop.Excel.Worksheet worksheet, Int64 rowCounter)
@@ -2104,8 +2189,6 @@ namespace CommissionsCreate
             Microsoft.Office.Interop.Excel.Worksheet worksheet = activeWorkBook.Sheets[activeWorkBook.Sheets.Count];
             worksheet.Select();
 
-            // List<int> rowHeights = new List<int>();
-
             switch (autoAttachmentType)
             {
                 case AutoAttachmentTypes.MenuMania:
@@ -2133,8 +2216,6 @@ namespace CommissionsCreate
                     rowCounter++;
 
                     Microsoft.Office.Interop.Excel.Range row = worksheet.Rows[rowCounter];
-
-                    // rowHeights.Add((Int32)row.RowHeight * 2);
 
                     FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(7) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
 
@@ -2230,9 +2311,6 @@ namespace CommissionsCreate
                     FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(8) + rowCounter], new ExcelFormatOption() { MergeCells = true, IsBold = true });
 
                     rowCounter++;
-
-                    //row = worksheet.Rows[rowCounter];
-                    // rowHeights.Add((Int32)row.RowHeight * 2);
 
                     FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(8) + rowCounter], new ExcelFormatOption() { MergeCells = true, BorderTopLineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous });
 
@@ -2331,9 +2409,6 @@ namespace CommissionsCreate
                     FormatCells(worksheet.Range[ConvertToColumn(1) + rowCounter + ":" + ConvertToColumn(12) + rowCounter], new ExcelFormatOption() { MergeCells = true, IsBold = true });
 
                     rowCounter += 2;
-
-                    //row = worksheet.Rows[rowCounter];
-                    //rowHeights.Add((Int32)row.RowHeight * 2);
 
                     List<BarcForExcelRecord> barcForExcelRecords = new List<BarcForExcelRecord>();
 
@@ -2745,128 +2820,6 @@ namespace CommissionsCreate
 
         }
 
-        private void FormatCells(Microsoft.Office.Interop.Excel.Range range, ExcelFormatOption excelFormatOption)
-        {
-            if (excelFormatOption.StyleName != null)
-                range.Style = excelFormatOption.StyleName;
-            if (excelFormatOption.NumberFormat != null)
-                range.NumberFormat = excelFormatOption.NumberFormat;
-
-            if (excelFormatOption.MergeCells)
-                range.Merge();
-
-            range.Font.Bold = excelFormatOption.IsBold;
-            range.Font.Underline = excelFormatOption.IsUnderLine;
-            range.HorizontalAlignment = excelFormatOption.HorizontalAlignment;
-
-
-            range.WrapText = excelFormatOption.WrapText;
-            range.Interior.Pattern = 1; //solid
-            range.Interior.PatternColorIndex = -4105; //automatic
-            switch (excelFormatOption.FillColor)
-            {
-                case ExcelColor.Black:
-                    range.Interior.ThemeColor = 2;
-                    range.Interior.TintAndShade = 0;
-                    break;
-                case ExcelColor.LightGray5:
-                    range.Interior.ThemeColor = 1;
-                    range.Interior.TintAndShade = -0.0499893185216834;
-                    break;
-                case ExcelColor.LightGray15:
-                    range.Interior.ThemeColor = 1;
-                    range.Interior.TintAndShade = -0.149998474074526;
-                    break;
-                case ExcelColor.LightGray25:
-                    range.Interior.ThemeColor = 1;
-                    range.Interior.TintAndShade = -0.249977111117893;
-                    break;
-                case ExcelColor.LightGray35:
-                    range.Interior.ThemeColor = 1;
-                    range.Interior.TintAndShade = -0.349986266670736;
-                    break;
-                case ExcelColor.LightOrange:
-                    range.Interior.ThemeColor = 10;
-                    range.Interior.TintAndShade = 0.399975585192419;
-                    break;
-                case ExcelColor.White:
-                    range.Interior.ThemeColor = 1;
-                    range.Interior.TintAndShade = 0;
-                    break;
-                default:
-                    range.Interior.ColorIndex = 0;
-                    break;
-            }
-
-            switch (excelFormatOption.TextColor)
-            {
-                case ExcelColor.Black:
-                    range.Font.ThemeColor = 2;
-                    range.Font.TintAndShade = 0;
-                    break;
-                case ExcelColor.LightGray5:
-                    range.Font.ThemeColor = 1;
-                    range.Font.TintAndShade = -0.0499893185216834;
-                    break;
-                case ExcelColor.LightGray15:
-                    range.Font.ThemeColor = 1;
-                    range.Font.TintAndShade = -0.149998474074526;
-                    break;
-                case ExcelColor.LightGray25:
-                    range.Font.ThemeColor = 1;
-                    range.Font.TintAndShade = -0.249977111117893;
-                    break;
-                case ExcelColor.LightGray35:
-                    range.Font.ThemeColor = 1;
-                    range.Font.TintAndShade = -0.349986266670736;
-                    break;
-                case ExcelColor.LightOrange:
-                    range.Font.ThemeColor = 10;
-                    range.Font.TintAndShade = 0.399975585192419;
-                    break;
-                case ExcelColor.White:
-                    range.Font.ThemeColor = 1;
-                    range.Font.TintAndShade = 0;
-                    break;
-            }
-
-            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeTop].LineStyle = excelFormatOption.BorderTopLineStyle;
-            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = excelFormatOption.BorderBottomLineStyle;
-            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft].LineStyle = excelFormatOption.BorderLeftLineStyle;
-            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight].LineStyle = excelFormatOption.BorderRightLineStyle;
-
-            range.ApplyOutlineStyles();
-
-        }
-
-        private string ConvertToColumn(Int32 columnNumber)
-        {
-            Int32 offset = 64;
-
-            if (columnNumber > 256)
-                return "";
-            else if (columnNumber < 27)
-                return ((char)(columnNumber + offset)).ToString();
-            else if (columnNumber < 53)
-                return "A" + ((char)((columnNumber - 26) + offset)).ToString();
-            else if (columnNumber < 79)
-                return "B" + ((char)((columnNumber - 52) + offset)).ToString();
-            else if (columnNumber < 105)
-                return "C" + ((char)((columnNumber - 78) + offset)).ToString();
-            else if (columnNumber < 131)
-                return "D" + ((char)((columnNumber - 104) + offset)).ToString();
-            else if (columnNumber < 157)
-                return "E" + ((char)((columnNumber - 130) + offset)).ToString();
-            else if (columnNumber < 183)
-                return "F" + ((char)((columnNumber - 156) + offset)).ToString();
-            else if (columnNumber < 209)
-                return "G" + ((char)((columnNumber - 182) + offset)).ToString();
-            else if (columnNumber < 235)
-                return "H" + ((char)((columnNumber - 208) + offset)).ToString();
-            else
-                return "I" + ((char)((columnNumber - 234) + offset)).ToString();
-        }
-
         private List<SalespersonGroup> BuildSalespersonGroup(List<Dictionary<string, object>> results)
         {
             List<SalespersonGroup> salespersonGroups = new List<SalespersonGroup>();
@@ -3031,7 +2984,8 @@ namespace CommissionsCreate
             {
                 foreach (Attachment attachment in attachments)
                 {
-                    System.IO.File.Delete(attachment.FileName);
+                    if (attachment != null && System.IO.File.Exists(attachment.FileName))
+                        System.IO.File.Delete(attachment.FileName);
                 }
             }
         }

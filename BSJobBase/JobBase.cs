@@ -213,6 +213,133 @@ namespace BSJobBase
             }
         }
 
+
+        #region Excel
+
+        protected void FormatCells(Microsoft.Office.Interop.Excel.Range range, ExcelFormatOption excelFormatOption)
+        {
+            if (excelFormatOption.StyleName != null)
+                range.Style = excelFormatOption.StyleName;
+            if (excelFormatOption.NumberFormat != null)
+                range.NumberFormat = excelFormatOption.NumberFormat;
+
+            if (excelFormatOption.MergeCells)
+                range.Merge();
+
+            range.Font.Bold = excelFormatOption.IsBold;
+            range.Font.Underline = excelFormatOption.IsUnderLine;
+            range.HorizontalAlignment = excelFormatOption.HorizontalAlignment;
+
+
+            range.WrapText = excelFormatOption.WrapText;
+            range.Interior.Pattern = 1; //solid
+            range.Interior.PatternColorIndex = -4105; //automatic
+            switch (excelFormatOption.FillColor)
+            {
+                case ExcelColor.Black:
+                    range.Interior.ThemeColor = 2;
+                    range.Interior.TintAndShade = 0;
+                    break;
+                case ExcelColor.LightGray5:
+                    range.Interior.ThemeColor = 1;
+                    range.Interior.TintAndShade = -0.0499893185216834;
+                    break;
+                case ExcelColor.LightGray15:
+                    range.Interior.ThemeColor = 1;
+                    range.Interior.TintAndShade = -0.149998474074526;
+                    break;
+                case ExcelColor.LightGray25:
+                    range.Interior.ThemeColor = 1;
+                    range.Interior.TintAndShade = -0.249977111117893;
+                    break;
+                case ExcelColor.LightGray35:
+                    range.Interior.ThemeColor = 1;
+                    range.Interior.TintAndShade = -0.349986266670736;
+                    break;
+                case ExcelColor.LightOrange:
+                    range.Interior.ThemeColor = 10;
+                    range.Interior.TintAndShade = 0.399975585192419;
+                    break;
+                case ExcelColor.White:
+                    range.Interior.ThemeColor = 1;
+                    range.Interior.TintAndShade = 0;
+                    break;
+                default:
+                    range.Interior.ColorIndex = 0;
+                    break;
+            }
+
+            switch (excelFormatOption.TextColor)
+            {
+                case ExcelColor.Black:
+                    range.Font.ThemeColor = 2;
+                    range.Font.TintAndShade = 0;
+                    break;
+                case ExcelColor.LightGray5:
+                    range.Font.ThemeColor = 1;
+                    range.Font.TintAndShade = -0.0499893185216834;
+                    break;
+                case ExcelColor.LightGray15:
+                    range.Font.ThemeColor = 1;
+                    range.Font.TintAndShade = -0.149998474074526;
+                    break;
+                case ExcelColor.LightGray25:
+                    range.Font.ThemeColor = 1;
+                    range.Font.TintAndShade = -0.249977111117893;
+                    break;
+                case ExcelColor.LightGray35:
+                    range.Font.ThemeColor = 1;
+                    range.Font.TintAndShade = -0.349986266670736;
+                    break;
+                case ExcelColor.LightOrange:
+                    range.Font.ThemeColor = 10;
+                    range.Font.TintAndShade = 0.399975585192419;
+                    break;
+                case ExcelColor.White:
+                    range.Font.ThemeColor = 1;
+                    range.Font.TintAndShade = 0;
+                    break;
+            }
+
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeTop].LineStyle = excelFormatOption.BorderTopLineStyle;
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = excelFormatOption.BorderBottomLineStyle;
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft].LineStyle = excelFormatOption.BorderLeftLineStyle;
+            range.Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight].LineStyle = excelFormatOption.BorderRightLineStyle;
+
+            range.ApplyOutlineStyles();
+
+        }
+
+        protected string ConvertToColumn(Int32 columnNumber)
+        {
+            Int32 offset = 64;
+
+            if (columnNumber > 256)
+                return "";
+            else if (columnNumber < 27)
+                return ((char)(columnNumber + offset)).ToString();
+            else if (columnNumber < 53)
+                return "A" + ((char)((columnNumber - 26) + offset)).ToString();
+            else if (columnNumber < 79)
+                return "B" + ((char)((columnNumber - 52) + offset)).ToString();
+            else if (columnNumber < 105)
+                return "C" + ((char)((columnNumber - 78) + offset)).ToString();
+            else if (columnNumber < 131)
+                return "D" + ((char)((columnNumber - 104) + offset)).ToString();
+            else if (columnNumber < 157)
+                return "E" + ((char)((columnNumber - 130) + offset)).ToString();
+            else if (columnNumber < 183)
+                return "F" + ((char)((columnNumber - 156) + offset)).ToString();
+            else if (columnNumber < 209)
+                return "G" + ((char)((columnNumber - 182) + offset)).ToString();
+            else if (columnNumber < 235)
+                return "H" + ((char)((columnNumber - 208) + offset)).ToString();
+            else
+                return "I" + ((char)((columnNumber - 234) + offset)).ToString();
+        }
+
+        #endregion
+
         #endregion
 
         #region Functions
@@ -376,51 +503,7 @@ namespace BSJobBase
             return connectionString;
         }
 
-        //public static bool IsValidFileNameAndPath(string filePath)
-        //{
-        //    if (!IsStringValidDirectory(filePath))
-        //    {
-        //        return false;
-        //    }
-
-        //    var invalidChars = Path.GetInvalidFileNameChars();
-
-        //    foreach (var c in invalidChars)
-        //    {
-        //        if (Path.GetFileName(filePath).Contains(c))
-        //        {
-        //            return false;
-        //        }
-        //    }
-
-        //    return true;
-        //}
-
-        //public static bool IsStringValidDirectory(string filePath)
-        //{
-        //    if (string.IsNullOrWhiteSpace(filePath))
-        //        return false;
-
-        //    //check for invalid path characters
-        //    if (filePath.ToCharArray().Where(c => Path.GetInvalidPathChars().Contains(c)).Count() > 0)
-        //    {
-        //        return false;
-        //    }
-
-        //    try
-        //    {
-        //        //make sure we can extract a directory
-        //        Path.GetDirectoryName(filePath);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return false;
-        //    }
-
-        //    //We've passed all tests, the path is valid
-        //    return true;
-        //}
-
+       
         public static void CheckCreateDirectory(string filePath)
         {
             CheckCreateDirectory(filePath, false);
@@ -438,71 +521,7 @@ namespace BSJobBase
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
         }
-
-        /// <summary>
-        /// Validates a string of email addresses by attempting to create a MailAddress object for each item.
-        /// </summary>
-        /// <param name="entry"></param>
-        /// <returns>True if email addresses contained in string are all valid.</returns>
-        //public static bool IsValidEmailAddressOrChainOfEmailAddresses(string entry)
-        //{
-        //    return IsValidEmailAddressOrChainOfEmailAddresses(entry, ';');
-        //}
-
-        /// <summary>
-        /// Validates a string of email addresses by attempting to create a MailAddress object for each item.
-        /// </summary>
-        /// <param name="entry"></param>
-        /// <param name="delimiter"></param>
-        /// <returns>True if email addresses contained in string are all valid.</returns>
-        //public static bool IsValidEmailAddressOrChainOfEmailAddresses(string entry, char delimiter)
-        //{
-        //    if (string.IsNullOrWhiteSpace(entry))
-        //        return false;
-
-        //    // catch extra delimiter at end of string
-        //    if (entry.Trim().Last() == delimiter)
-        //        entry = entry.Trim().Substring(0, entry.Trim().Length - 1);
-
-        //    foreach (var item in entry.Split(delimiter))
-        //    {
-        //        try
-        //        {
-        //            var address = new MailAddress(item);
-        //        }
-        //        catch (Exception)
-        //        {
-        //            return false;
-        //        }
-        //    }
-
-        //    return true;
-        //}
-
-        //internal static void CheckDeleteFile(string file)
-        //{
-        //    if (File.Exists(file))
-        //    {
-        //        File.Delete(file);
-        //    }
-        //}
-
-        //internal static void CheckCreateFile(string fileNameAndPath)
-        //{
-        //    if (!File.Exists(fileNameAndPath))
-        //    {
-        //        using (var stream = File.Create(fileNameAndPath)) { }
-        //    }
-        //}
-
-        //public static List<string> GetFiles(string sourceDirectory)
-        //{
-        //    // validate existence of directory
-        //    CheckCreateDirectory(sourceDirectory);
-
-        //    return Directory.GetFiles(sourceDirectory)
-        //        .ToList();
-        //}
+      
 
         public static List<string> GetFiles(string sourceDirectory, Regex reg)
         {
