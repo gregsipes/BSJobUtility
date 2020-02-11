@@ -32,7 +32,7 @@ namespace CommissionsCreate
 
         public override void ExecuteJob()
         {
-            Int64 commissionsId = -1;
+            Int64 commissionsInquiriesId = -1;
             CommissionRecord commissionRecord = null;
             CommissionCreateTypes createType = CommissionCreateTypes.RecreateForSalesperson;
 
@@ -52,7 +52,7 @@ namespace CommissionsCreate
                         }
 
                         //set the commissions id
-                        commissionsId = Int64.Parse(result["commissionscreate_requested_id"].ToString());
+                        commissionsInquiriesId = Int64.Parse(result["commissionscreate_requested_id"].ToString());
 
                         //build log mesage
                         string message = "Processing commissions create request by " + result["requested_user_name"] + " on " +
@@ -70,7 +70,7 @@ namespace CommissionsCreate
                         {
                             //this is a new commissions run
                             createType = CommissionCreateTypes.Create;
-                            commissionsId = -1;
+                       //     commissionsInquiriesId = -1;
                         }
                         else if (String.IsNullOrEmpty(result["salespersons_groups_id"].ToString()))
                         {
@@ -85,7 +85,7 @@ namespace CommissionsCreate
                         }
 
                         //create commissions object
-                        commissionRecord = new CommissionRecord() { Month = month, Year = year, CommissionsId = commissionsId };
+                        commissionRecord = new CommissionRecord() { Month = month, Year = year, CommissionsInquiriesId = commissionsInquiriesId };
                         commissionRecord.EndDate = (DateTime)result["commissions_end_date"];
                         commissionRecord.MonthStartDate = (DateTime)result["commissions_month_start_date"];
                         commissionRecord.PriorEndDate = (DateTime)result["commissions_prior_end_date"];
@@ -107,7 +107,7 @@ namespace CommissionsCreate
 
 
                     //delete request
-                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_CommissionsCreate_Requested", new SqlParameter("@pintCommissionsCreateRequestedID", commissionsId));
+                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_CommissionsCreate_Requested", new SqlParameter("@pintCommissionsCreateRequestedID", commissionsInquiriesId));
                 }
                 catch (Exception ex)
                 {
@@ -156,7 +156,7 @@ namespace CommissionsCreate
 
             {
                 commissionsRecord.SpreadsheetStyle = Int32.Parse(result["spreadsheet_style"].ToString());
-                //commissionsRecord.CommissionsId = reader.GetInt64(reader.GetOrdinal("commissions_id"));
+                commissionsRecord.CommissionsId = Int64.Parse(result["commissions_id"].ToString());
                 commissionsRecord.SnapshotId = Int64.Parse(result["snapshots_id"].ToString());
                 commissionsRecord.PerformanceForBARCInsertStoredProcedure = result["performance_for_barc_insert_stored_procedure"].ToString();
                 commissionsRecord.PlaybookForBARCInsertStoredProcedure = result["playbook_for_barc_insert_stored_procedure"].ToString();
@@ -364,8 +364,8 @@ namespace CommissionsCreate
                 }
             }
 
-            //get commissions inquiry id
-            Int64 commissionsInquiriesId = 0;
+            //create the commmission inquiry record in CommissionsRelated database
+            Int64 commissionsRelatedInquiriesId = 0;
             result = ExecuteSQL(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Insert_Commissions_Inquiries",
                                                                 new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                 new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
@@ -377,7 +377,7 @@ namespace CommissionsCreate
                                                                 new SqlParameter("@psdatCommissionsPriorMonthStartDate", commissionRecord.PriorMonthStartDate),
                                                                 new SqlParameter("@psdatCommissionsPriorEndDate", commissionRecord.PriorEndDate),
                                                                 new SqlParameter("@pintGainsLossesTopCount", commissionRecord.GainsLossesTopCount)).FirstOrDefault();
-            commissionsInquiriesId = Int64.Parse(result["commissions_inquiries_id"].ToString());
+            commissionsRelatedInquiriesId = Int64.Parse(result["commissions_inquiries_id"].ToString());
 
             List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Product_Data_Mining_Descriptions",
                                                      new SqlParameter("@pvchrtblEditionsEdnNumber", ""));
@@ -385,7 +385,7 @@ namespace CommissionsCreate
             foreach (Dictionary<string, object> record in results)
             {
                 ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Insert_Commissions_Inquiries_Data_Mining",
-                                            new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                            new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                             new SqlParameter("@pvchrtblEditionsEdnNumber", record["tbleditions_ednnumber"].ToString()));
             }
 
@@ -394,16 +394,16 @@ namespace CommissionsCreate
                                                     new SqlParameter("@pvchrCommissionsRelatedDatabase", GetConfigurationKeyValue("CommissionsRelatedDatabaseName")),
                                                     new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
                                                     new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
-                                                    new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId));
+                                                    new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId));
 
             foreach (var salesperson in salespersons)
             {
                 ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Insert_Commissions_Inquiries_Responsible_Salespersons",
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                         new SqlParameter("@pvchrSalesperson", salesperson.Key));
 
                 ExecuteNonQuery(DatabaseConnectionStringNames.BuffNewsForBW, "dbo.Proc_Insert_Commissions_Inquiries_Performance_Salespersons",
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                         new SqlParameter("@pvchrSalesperson", salesperson.Key));
             }
 
@@ -412,7 +412,7 @@ namespace CommissionsCreate
                                         new SqlParameter("@pvchrCommissionsRelatedDatabase", GetConfigurationKeyValue("CommissionsRelatedDatabaseName")),
                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
                                         new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId));
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting menu mania data mining data from Brainworks");
 
@@ -421,7 +421,7 @@ namespace CommissionsCreate
                                         new SqlParameter("@pvchrBrainworksDatabase", GetConfigurationKeyValue("BrainworksDatabaseName")),
                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
                                         new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                         new SqlParameter("@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_Menu_Mania"));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting new business data mining data from Brainworks");
@@ -431,7 +431,7 @@ namespace CommissionsCreate
                                         new SqlParameter("@pvchrBrainworksDatabase", GetConfigurationKeyValue("BrainworksDatabaseName")),
                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
                                         new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                         new SqlParameter("@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_New_Business"));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting product data mining data from Brainworks");
@@ -441,7 +441,7 @@ namespace CommissionsCreate
                                         new SqlParameter("@pvchrBrainworksDatabase", GetConfigurationKeyValue("BrainworksDatabaseName")),
                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
                                         new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                         new SqlParameter("@pvchrStoredProcedure", "Proc_BuffNews_Select_Commissions_Data_Mining_Product"));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting playbook data from BARC");
@@ -453,7 +453,7 @@ namespace CommissionsCreate
                                         new SqlParameter("@pvchrBuffNewsForBWDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName")),
                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
                                         new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                         new SqlParameter("@pvchrStoredProcedure", commissionRecord.PlaybookForBARCInsertStoredProcedure));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting performance data from BARC");
@@ -464,7 +464,7 @@ namespace CommissionsCreate
                                         new SqlParameter("@pvchrBuffNewsForBWDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName")),
                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
                                         new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                         new SqlParameter("@pvchrStoredProcedure", commissionRecord.PerformanceForBARCInsertStoredProcedure));
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting gains/losses data from BARC");
@@ -475,7 +475,7 @@ namespace CommissionsCreate
                                         new SqlParameter("@pvchrBuffNewsForBWDatabase", GetConfigurationKeyValue("BuffNewsForBWDatabaseName")),
                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("CommissionsRelatedUserName")),
                                         new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("CommissionsRelatedPassword")),
-                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsInquiriesId),
+                                        new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId),
                                         new SqlParameter("@pvchrStoredProcedure", "Proc_Select_Commissions_Gains_Losses_Detail"));
 
             WriteToJobLog(JobLogMessageType.INFO, "Initializing snapshots");
@@ -496,7 +496,7 @@ namespace CommissionsCreate
                 {
                     Byte[] bytes = System.IO.File.ReadAllBytes(attachment.FileName);
                     ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, CommandType.Text, "INSERT INTO Commissions_Attachments(commissions_id, " +
-                        "salespersons_groups_id,attachment_date_time,attachment_by,attachment_file_name,attachment_description," + 
+                        "salespersons_groups_id,attachment_date_time,attachment_by,attachment_file_name,attachment_description," +
                         "auto_attachment_flag,embedded_file,last_modified_by) VALUES (@pintCommissionsID,@pintSalespersonsGroupsID,@pdatAttachmentDateTime," +
                         "@pvchrAttachmentBy,@pvchrAttachmentFileName,@pvchrAttachmentDescription,1,@pvbinEmbeddedFile," +
                         "@pvchrLastModifiedBy)",
@@ -544,10 +544,10 @@ namespace CommissionsCreate
                     new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.BuffNewsForBW, "dbo.Proc_Delete_Commissions_Inquiries",
-                    new SqlParameter("@pintCommissionsInquiriesID", commissionRecord.CommissionsId));
+                    new SqlParameter("@pintCommissionsInquiriesID", commissionRecord.CommissionsInquiriesId));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Delete_Commissions_Inquiries",
-                                new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
+                                new SqlParameter("@pintCommissionsInquiriesID", commissionRecord.CommissionsInquiriesId));
 
             if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
             {
@@ -1612,7 +1612,13 @@ namespace CommissionsCreate
 
                 string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroup.SalespersonGroupsId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
                 workbook.SaveAs(FileFormat: 51, Filename: fileName);
-                workbook.Close(SaveChanges: false);
+                workbook.Close();
+                excel.Quit();
+
+                //relase spreadsheet locks
+                ReleaseExcelObject(excel);
+                ReleaseExcelObject(workbook);
+                ReleaseExcelObject(activeWorksheet);
 
                 generatedFiles.Add(fileName);
 
@@ -1626,8 +1632,7 @@ namespace CommissionsCreate
                                                                     new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                     new SqlParameter("@pintSalespersonsGroupsID", salespersonGroup.SalespersonGroupsId),
                                                                     new SqlParameter("@pdatEmbeddedDateTime", DateTime.Now));
-                //todo: testing
-                //   System.IO.File.Delete(fileName);
+                System.IO.File.Delete(fileName);
 
 
             }
@@ -1638,6 +1643,8 @@ namespace CommissionsCreate
             results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "Proc_Select_Snapshots_Salespersons_For_Territory_Spreadsheets",
                                                                     new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId));
 
+
+            Int64 currentTerritoryId = 0;
 
             foreach (Dictionary<string, object> result in results)
             {
@@ -1652,7 +1659,11 @@ namespace CommissionsCreate
                     return null;
                 }
 
-                territorySpreadsheets.Add(new Territory() { FileName = salespersonFile, TerritoryId = Int64.Parse(result["territories_id"].ToString()) });
+                if (currentTerritoryId == 0 || currentTerritoryId != Int64.Parse(result["territories_id"].ToString()))
+                {
+                    territorySpreadsheets.Add(new Territory() { FileName = salespersonFile, TerritoryId = Int64.Parse(result["territories_id"].ToString()) });
+                    currentTerritoryId = Int64.Parse(result["territories_id"].ToString());
+                }
             }
 
 
@@ -1662,18 +1673,18 @@ namespace CommissionsCreate
                 return null;
             }
 
-            //cleanup files
-            foreach (string file in generatedFiles)
-            {
-                if (System.IO.File.Exists(file))
-                    System.IO.File.Delete(file);
-            }
+            //todo: cleanup files
+            //foreach (string file in generatedFiles)
+            //{
+            //    if (System.IO.File.Exists(file))
+            //        System.IO.File.Delete(file);
+            //}
 
-            foreach(Territory territory in territorySpreadsheets)
-            {
-                if (territory != null && System.IO.File.Exists(territory.FileName))
-                    System.IO.File.Delete(territory.FileName);
-            }
+            //foreach(Territory territory in territorySpreadsheets)
+            //{
+            //    if (territory != null && System.IO.File.Exists(territory.FileName))
+            //        System.IO.File.Delete(territory.FileName);
+            //}
 
 
             //remove the session
@@ -1684,6 +1695,25 @@ namespace CommissionsCreate
 
             return autoAttachments;
 
+        }
+
+        private void ReleaseExcelObject(object obj)
+        {
+            try
+            {
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+                obj = null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in releasing object :" + ex);
+                obj = null;
+            }
+            finally
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
         }
 
         private bool CreateTerritorySpreadsheets(List<Territory> territories, Int64 snapshotId, Int64 sessionId)
