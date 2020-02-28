@@ -31,7 +31,7 @@ namespace BSJobUtility
                         PrintCommandLineHelp();
                         Console.WriteLine(string.Format("Exit code: {0}", 0));
                         return 0;
-                    } //run job
+                    } //run jobc 
                     else if (args[i] == "/j")
                         jobName = args[i + 1];
                 }

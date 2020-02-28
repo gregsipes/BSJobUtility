@@ -485,7 +485,7 @@ namespace CommissionsCreate
 
             if (autoAttachments != null)
             {
-                if (createType == CommissionCreateTypes.Create)
+                if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
                 {
                     ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions_Attachments_Auto_Attachment",
                             new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId),
@@ -501,7 +501,7 @@ namespace CommissionsCreate
                         "@pvchrAttachmentBy,@pvchrAttachmentFileName,@pvchrAttachmentDescription,1,@pvbinEmbeddedFile," +
                         "@pvchrLastModifiedBy)",
                          new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId),
-                         new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId),
+                         new SqlParameter("@pintSalespersonsGroupsID", attachment.SalespersonGroupId),
                          new SqlParameter("@pdatAttachmentDateTime", DateTime.Now),
                          new SqlParameter("@pvchrAttachmentBy", "System"),
                          new SqlParameter("@pvchrAttachmentFileName", attachment.FileName),
@@ -510,7 +510,7 @@ namespace CommissionsCreate
                          new SqlParameter("@pvchrLastModifiedBy", "System"));
                 }
 
-                //cleanup
+
                 ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Since_Last_Created",
                                             new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId),
                                             new SqlParameter("@pintSalespersonsGroupsID", commissionRecord.SalespersonGroupId));
@@ -528,17 +528,18 @@ namespace CommissionsCreate
                                 new SqlParameter("@pintCommissionsMonth", commissionRecord.Month),
                                 new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId));
             }
-            else
-            {
-                if (createType == CommissionCreateTypes.Create)
-                {
-                    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions",
-                                    new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
-                }
+            //todo: removed for testing cleanup
+            //else
+            //{
+            //    if (createType == CommissionCreateTypes.Create)
+            //    {
+            //        ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions",
+            //                        new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
+            //    }
 
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Snapshots",
-                                    new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId));
-            }
+            //    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Snapshots",
+            //                        new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId));
+            //}
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Statuses_Creating",
                     new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
@@ -549,15 +550,15 @@ namespace CommissionsCreate
             ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Delete_Commissions_Inquiries",
                                 new SqlParameter("@pintCommissionsInquiriesID", commissionRecord.CommissionsInquiriesId));
 
-            if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
-            {
-                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions_Recreate",
-                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
-                                    new SqlParameter("@pflgDeleteLatestSnapshots", 1));
-            }
+            //if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
+            //{
+            //    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions_Recreate",
+            //                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+            //                        new SqlParameter("@pflgDeleteLatestSnapshots", 1));
+            //}
 
 
-            DeleteAutoAttachments(autoAttachments);
+            //DeleteAutoAttachments(autoAttachments);
 
             return true;
         }
@@ -1608,17 +1609,20 @@ namespace CommissionsCreate
                         salespersonLoopCounter++;
                 }
 
-
+                
 
                 string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroup.SalespersonGroupsId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
                 workbook.SaveAs(FileFormat: 51, Filename: fileName);
                 workbook.Close();
-                excel.Quit();
+                // excel.Quit();
 
                 //relase spreadsheet locks
-                ReleaseExcelObject(excel);
-                ReleaseExcelObject(workbook);
-                ReleaseExcelObject(activeWorksheet);
+                //ReleaseExcelObject(excel);
+                //ReleaseExcelObject(workbook);
+                //ReleaseExcelObject(activeWorksheet);
+                activeWorksheet = null;
+                workbook = null;
+                excel = null;
 
                 generatedFiles.Add(fileName);
 
@@ -1792,7 +1796,7 @@ namespace CommissionsCreate
 
         private Attachment BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel, CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
         {
-            WriteToJobLog(JobLogMessageType.INFO, "Creating performance summary attachement for " + salespersonName + " (" + salesperson + ")");
+            WriteToJobLog(JobLogMessageType.INFO, "Creating performance summary attachment for " + salespersonName + " (" + salesperson + ")");
 
             excel.Application.Workbooks.Add();
 
@@ -2423,6 +2427,10 @@ namespace CommissionsCreate
                     attachmentDescription = "Playbook";
                     fileNamePrefix = "Playbook";
 
+                    //test code
+                    //  worksheet.VPageBreaks.Add(worksheet.Range["G1"]);
+
+
                     rowCounter = 1;
 
                     worksheet.Cells[rowCounter, 1] = "TBN Salesperson Commissions For " + CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(commissionRecord.Month) + " " + commissionRecord.Year.ToString();
@@ -2501,9 +2509,10 @@ namespace CommissionsCreate
 
                     rowCounter += 2;
 
-                    //build column headers
-                    FormatCells(worksheet.Cells[rowCounter, 1], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
+                   // build column headers
+                     FormatCells(worksheet.Cells[rowCounter, 1], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
                     worksheet.Cells[rowCounter, 1] = "Commissions Salesperson";
+
 
                     FormatCells(worksheet.Columns[2], new ExcelFormatOption() { NumberFormat = "@", HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft });
                     FormatCells(worksheet.Cells[rowCounter, 2], new ExcelFormatOption() { IsBold = true, IsUnderLine = true });
@@ -2552,10 +2561,9 @@ namespace CommissionsCreate
 
                     //iterate records
                     string commissionGroup = initialValue;
-                    //testing
-                    foreach (BarcForExcelRecord barcForExcelRecord in barcForExcelRecords.Take(10))
+                    foreach (BarcForExcelRecord barcForExcelRecord in barcForExcelRecords)
                     {
-                        //add a totals record if we are starting a new group
+                       // add a totals record if we are starting a new group
                         if (barcForExcelRecord.GroupDescription != commissionGroup)
                         {
                             //only add the records if this is not the first pass
@@ -2581,7 +2589,7 @@ namespace CommissionsCreate
 
                         //add record
                         rowCounter++;
-                        worksheet.Cells[rowCounter, 1] = barcForExcelRecord.Salesperson;
+                        worksheet.Cells[rowCounter, 1] = rowCounter.ToString(); // barcForExcelRecord.Salesperson;
                         worksheet.Cells[rowCounter, 2] = barcForExcelRecord.GroupDescription;
                         worksheet.Cells[rowCounter, 3] = barcForExcelRecord.PrintDivisionDescription;
                         worksheet.Cells[rowCounter, 4] = barcForExcelRecord.RevenueWithoutTaxes;
@@ -2594,6 +2602,14 @@ namespace CommissionsCreate
                         worksheet.Cells[rowCounter, 11] = barcForExcelRecord.Ticket;
                         worksheet.Cells[rowCounter, 12] = barcForExcelRecord.SelectSource;
                         commissionGroupDescriptionTotal += barcForExcelRecord.RevenueWithoutTaxes;
+
+
+                        //if (barcRecordCount > 0 && barcRecordCount % 10 == 0)
+                        //{
+                        //    worksheet.HPageBreaks.Add(worksheet.Range["A" + (barcRecordCount + 1).ToString()]);
+                        //}
+
+                      //  barcRecordCount++;
 
                     }
 
@@ -2678,7 +2694,7 @@ namespace CommissionsCreate
                         descriptions.Add(result["tbleditions_ednnumber"].ToString());
                     }
 
-                    worksheet.Cells[rowCounter, 1] = "Selected Data Mining Editions: " + String.Join(", ", descriptions);
+                   worksheet.Cells[rowCounter, 1] = "Selected Data Mining Editions: " + String.Join(", ", descriptions);
 
                     rowCounter++;
 
@@ -2805,7 +2821,7 @@ namespace CommissionsCreate
 
             excel.PrintCommunication = false;
 
-            worksheet.PageSetup.PrintTitleRows = "$1:$" + rowCounter;
+           worksheet.PageSetup.PrintTitleRows = "$1:$" + 8; // rowCounter;
             worksheet.PageSetup.PrintTitleColumns = "";
             worksheet.PageSetup.LeftHeader = "";
             worksheet.PageSetup.CenterHeader = "";
@@ -2821,8 +2837,8 @@ namespace CommissionsCreate
             worksheet.PageSetup.FooterMargin = 18;
             worksheet.PageSetup.PrintHeadings = false;
             worksheet.PageSetup.PrintGridlines = false;
-            //  worksheet.PageSetup.Orientation = Microsoft.Office.Interop.Excel.XlPageOrientation.xlLandscape;
-            //  worksheet.PageSetup.Zoom = 400;
+            worksheet.PageSetup.Orientation = Microsoft.Office.Interop.Excel.XlPageOrientation.xlLandscape;
+            worksheet.PageSetup.Zoom = false;
             worksheet.PageSetup.FitToPagesWide = 1;
             worksheet.PageSetup.FitToPagesTall = 999;
 
@@ -2832,7 +2848,8 @@ namespace CommissionsCreate
 
             string outputPath = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_" + fileNamePrefix + "_" + salesperson + "_" + DateTime.Now.ToString("yyyyMMddhhmmssfff") + ".pdf";
 
-            activeWorkBook.ExportAsFixedFormat(Type: 0, Filename: outputPath);
+             activeWorkBook.ExportAsFixedFormat(Type: 0, Filename: outputPath);
+            //activeWorkBook.SaveAs(outputPath);
 
             return new Attachment()
             {
