@@ -89,6 +89,10 @@ namespace CommissionsCreate
 
                         //create commissions object
                         commissionRecord = new CommissionRecord() { Month = month, Year = year, CommissionsInquiriesId = commissionsInquiriesId };
+
+                        if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
+                            commissionRecord.CommissionsId = Int64.Parse(result["commissions_id"].ToString());
+
                         commissionRecord.EndDate = (DateTime)result["commissions_end_date"];
                         commissionRecord.MonthStartDate = (DateTime)result["commissions_month_start_date"];
                         commissionRecord.PriorEndDate = (DateTime)result["commissions_prior_end_date"];
@@ -197,7 +201,7 @@ namespace CommissionsCreate
                                                         new SqlParameter("@pintCommissionsYear", commissionsRecord.Year),
                                                         new SqlParameter("@pintCommissionsMonth", commissionsRecord.Month)).FirstOrDefault();
 
-            if (ValidateProcedure(result, "Commissions cannot be recreated because other commissions are currently being recreated for this structure"))
+            if (!ValidateProcedure(result, "Commissions cannot be recreated because other commissions are currently being recreated for this structure"))
                 return;
 
             result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Commissions_Paid_Processing",
@@ -205,13 +209,13 @@ namespace CommissionsCreate
                                             new SqlParameter("@pintCommissionsYear", commissionsRecord.Year),
                                             new SqlParameter("@pintCommissionsMonth", commissionsRecord.Month)).FirstOrDefault();
 
-            if (ValidateProcedure(result, "Commissions cannot be recreated because they are in the process of being paid by Payroll"))
+            if (!ValidateProcedure(result, "Commissions cannot be recreated because they are in the process of being paid by Payroll"))
                 return;
 
             result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Structures",
                                             new SqlParameter("@pintStructuresID", commissionsRecord.StructuresId)).FirstOrDefault();
 
-            if (!(bool)result["verified_flag"])
+            if (Int32.Parse(result["verified_flag"].ToString()) != 1)
             {
                 WriteToJobLog(JobLogMessageType.WARNING, "Structure (" + commissionsRecord.StructuresId + ") must be verified before salesperson's commissions can be recreated");
                 return;
@@ -220,7 +224,7 @@ namespace CommissionsCreate
             if (createType == CommissionCreateTypes.RecreateForSalesperson)
             {
                 ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Commissions_Statuses_Creating",
-                                            new SqlParameter("@pintStructuresID", commissionsRecord.StructuresId),
+                                            new SqlParameter("@pintCommissionsID", commissionsRecord.CommissionsId),
                                             new SqlParameter("@pintSalespersonsGroupsID", commissionsRecord.SalespersonGroupId),
                                             new SqlParameter("@pvchrSalespersonName", commissionsRecord.SalespersonName),
                                             new SqlParameter("@pvchrStatusBy", commissionsRecord.RequestedUserName));
@@ -237,7 +241,7 @@ namespace CommissionsCreate
                     return;
                 }
 
-                commissionsRecord.SnapshotId = (Int64)result["snapshots_id"];
+                commissionsRecord.SnapshotId = Int64.Parse(result["snapshots_id"].ToString());
             }
 
 
@@ -288,7 +292,7 @@ namespace CommissionsCreate
 
                 commissionRecord.GainsLossesTopCount = result["gains_losses_top_count"].ToString();
                 commissionRecord.SpreadsheetStyle = (Int32)result["spreadsheet_style"];
-                commissionRecord.StructuresId = (Int64)result["structures_id"];
+                commissionRecord.StructuresId = Int64.Parse(result["structures_id"].ToString());
                 commissionRecord.PerformanceForBARCInsertStoredProcedure = result["performance_for_barc_insert_stored_procedure"].ToString();
                 commissionRecord.PlaybookForBARCInsertStoredProcedure = result["playbook_for_barc_insert_stored_procedure"].ToString();
                 commissionRecord.PlaybookForBARCUpdateStoredProcedure = result["playbook_for_barc_update_stored_procedure"].ToString();
@@ -300,7 +304,7 @@ namespace CommissionsCreate
                 //set snapshot id (unique id for the run)
                 result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots").FirstOrDefault();
                 {
-                    commissionRecord.SnapshotId = (Int64)result["snapshots_id"];
+                    commissionRecord.SnapshotId = Int64.Parse(result["snapshots_id"].ToString());
                 }
 
 
@@ -324,7 +328,7 @@ namespace CommissionsCreate
                     return false;
                 }
 
-                commissionRecord.CommissionsId = (Int64)result["commissions_recreate_id"];
+                commissionRecord.CommissionsId = Int64.Parse(result["commissions_recreate_id"].ToString());
 
                 //take a snapshot of each table
                 TakeSnapshot(commissionRecord.CommissionsId, "BARC");
@@ -550,10 +554,10 @@ namespace CommissionsCreate
                     new SqlParameter("@pintCommissionsID", commissionRecord.CommissionsId));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.BuffNewsForBW, "dbo.Proc_Delete_Commissions_Inquiries",
-                    new SqlParameter("@pintCommissionsInquiriesID", commissionRecord.CommissionsInquiriesId));
+                    new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Delete_Commissions_Inquiries",
-                                new SqlParameter("@pintCommissionsInquiriesID", commissionRecord.CommissionsInquiriesId));
+                                new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId));
 
             //if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
             //{
@@ -1653,7 +1657,8 @@ namespace CommissionsCreate
                 //get the previously generated file
                 string salespersonFile = generatedFiles.Where(g => g.Contains("_SPG_" + result["salespersons_groups_id"].ToString())).FirstOrDefault();
 
-                //   string fileName = CreateSalespersonGroupsSpreadsheets(Int64.Parse(result["salespersons_groups_id"].ToString()), sessionId, commissionRecord.SnapshotId, salespersonFile);
+                if (String.IsNullOrEmpty(salespersonFile))
+                    salespersonFile = CreateSalespersonGroupsSpreadsheets(Int64.Parse(result["salespersons_groups_id"].ToString()), sessionId, commissionRecord.SnapshotId);
 
                 if (String.IsNullOrEmpty(salespersonFile))
                 {
@@ -1703,7 +1708,7 @@ namespace CommissionsCreate
 
 
             //remove the session
-            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "Proc_Delete_Sessions", new SqlParameter("@pintSessionID", sessionId));
+            ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "Proc_Delete_Sessions", new SqlParameter("@pintSessionsID", sessionId));
 
 
             return autoAttachments;
@@ -1739,7 +1744,6 @@ namespace CommissionsCreate
                     Int64 currentTerritoryId = territories[0].TerritoryId;
                     string territoryFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_TERR_" + territories[0].TerritoryId.ToString() + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
 
-                  //  Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
                     Microsoft.Office.Interop.Excel.Workbook territoryWorkbook = excel.Workbooks.Add();
 
                     excel.Application.DisplayAlerts = false;
@@ -1790,21 +1794,19 @@ namespace CommissionsCreate
 
         }
 
-        //private string CreateSalespersonGroupsSpreadsheets(Int64 salespersonGroupId, Int64 sessionId, Int64 snapshotId, string fileName)
-        //{
-        //    byte[] fileContents = System.IO.File.ReadAllBytes(fileName);
-        //    string groupFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
+        private string CreateSalespersonGroupsSpreadsheets(Int64 salespersonGroupId, Int64 sessionId, Int64 snapshotId)
+        {
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, CommandType.Text, "SELECT embedded_file FROM Snapshots_Salespersons_Groups(NOLOCK) WHERE snapshots_id = @snapshotId AND salespersons_groups_id = @salespersonGroupId",
+                                                     new SqlParameter("@snapshotId", snapshotId.ToString()),
+                                                     new SqlParameter("@salespersonGroupId", salespersonGroupId)).FirstOrDefault();
 
+            string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
 
-        //    using (FileStream fileStream = new FileStream(groupFileName, FileMode.Append, FileAccess.Write))
-        //    {
-        //        fileStream.Write(fileContents, 0, fileContents.Length);
+            System.IO.File.WriteAllText(fileName, result["embedded_file"].ToString());
 
-        //    }
+            return fileName;
 
-        //    return fileName;
-
-        //}
+        }
 
         private Attachment BuildPerformanceSummary(Microsoft.Office.Interop.Excel.Application excel, CommissionRecord commissionRecord, Int64 salespersonGroupId, string salespersonName, string salesperson, decimal performanceGoalPercentage, Int64 sessionId)
         {
