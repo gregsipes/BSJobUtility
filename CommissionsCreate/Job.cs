@@ -30,8 +30,8 @@ namespace CommissionsCreate
             MenuMania = 3
         }
 
-        private Microsoft.Office.Interop.Excel.Application excel;
-        private Microsoft.Office.Interop.Excel.Workbook workbook;
+        private Microsoft.Office.Interop.Excel.Application Excel;
+        private Microsoft.Office.Interop.Excel.Workbook Workbook;
 
         public override void ExecuteJob()
         {
@@ -106,7 +106,7 @@ namespace CommissionsCreate
                         commissionRecord.SalespersonGroupId = String.IsNullOrEmpty(result["salespersons_groups_id"].ToString()) ? -1 : Int32.Parse(result["salespersons_groups_id"].ToString());
                     }
 
-                    excel = new Microsoft.Office.Interop.Excel.Application();
+                    Excel = new Microsoft.Office.Interop.Excel.Application();
 
                     //process commission request
                     ProcessCommissions(createType, commissionRecord);
@@ -201,7 +201,7 @@ namespace CommissionsCreate
                                                         new SqlParameter("@pintCommissionsYear", commissionsRecord.Year),
                                                         new SqlParameter("@pintCommissionsMonth", commissionsRecord.Month)).FirstOrDefault();
 
-            if (!ValidateProcedure(result, "Commissions cannot be recreated because other commissions are currently being recreated for this structure"))
+            if (!ValidateProcedure(result, "Commissions cannot be recreated because other commissions are currently being recreated for this structure", true))
                 return;
 
             result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Commissions_Paid_Processing",
@@ -209,7 +209,7 @@ namespace CommissionsCreate
                                             new SqlParameter("@pintCommissionsYear", commissionsRecord.Year),
                                             new SqlParameter("@pintCommissionsMonth", commissionsRecord.Month)).FirstOrDefault();
 
-            if (!ValidateProcedure(result, "Commissions cannot be recreated because they are in the process of being paid by Payroll"))
+            if (!ValidateProcedure(result, "Commissions cannot be recreated because they are in the process of being paid by Payroll", true))
                 return;
 
             result = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Structures",
@@ -328,25 +328,25 @@ namespace CommissionsCreate
                     return false;
                 }
 
-                commissionRecord.CommissionsId = Int64.Parse(result["commissions_recreate_id"].ToString());
+                commissionRecord.CommissionsRecreateId = Int64.Parse(result["commissions_recreate_id"].ToString());
 
                 //take a snapshot of each table
-                TakeSnapshot(commissionRecord.CommissionsId, "BARC");
-                TakeSnapshot(commissionRecord.CommissionsId, "Data_Mining");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Accounts");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Chargebacks");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Draw_Per_Days");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Noncommissions");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Nonworking_Dates");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Playbook_Groups");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Playbook_Print_Division_Descriptions");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Product_Data_Mining_Descriptions");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Product_Groups");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Responsible_Salespersons");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Salespersons");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Salespersons_Groups");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Strategies");
-                TakeSnapshot(commissionRecord.CommissionsId, "Snapshots_Territories");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "BARC");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Data_Mining");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Accounts");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Chargebacks");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Draw_Per_Days");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Noncommissions");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Nonworking_Dates");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Playbook_Groups");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Playbook_Print_Division_Descriptions");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Product_Data_Mining_Descriptions");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Product_Groups");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Responsible_Salespersons");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Salespersons");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Salespersons_Groups");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Strategies");
+                TakeSnapshot(commissionRecord.CommissionsRecreateId, "Snapshots_Territories");
 
             }
 
@@ -366,7 +366,7 @@ namespace CommissionsCreate
             else
             {
                 List<Dictionary<string, object>> salespersonResult = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Salespersons_Recreate",
-                                                            new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId));
+                                                            new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId));
                 foreach (Dictionary<string, object> record in salespersonResult)
                 {
                     salespersons.Add(record["salesperson"].ToString(), record["salesperson_name"].ToString());
@@ -559,12 +559,12 @@ namespace CommissionsCreate
             ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "dbo.Proc_Delete_Commissions_Inquiries",
                                 new SqlParameter("@pintCommissionsInquiriesID", commissionsRelatedInquiriesId));
 
-            //if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
-            //{
-            //    ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions_Recreate",
-            //                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
-            //                        new SqlParameter("@pflgDeleteLatestSnapshots", 1));
-            //}
+            if (createType == CommissionCreateTypes.RecreateForSalesperson || createType == CommissionCreateTypes.RecreateForStructure)
+            {
+                ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Delete_Commissions_Recreate",
+                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId),
+                                    new SqlParameter("@pflgDeleteLatestSnapshots", 1));
+            }
 
 
             //DeleteAutoAttachments(autoAttachments);
@@ -599,7 +599,7 @@ namespace CommissionsCreate
             else
             {
                 results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons_Groups_Recreate",
-                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId));
+                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId));
 
                 salespersonGroups = BuildSalespersonGroup(results);
             }
@@ -612,16 +612,16 @@ namespace CommissionsCreate
                 WriteToJobLog(JobLogMessageType.INFO, "Creating Commissions spreadsheet for " + salespersonGroup.SalespersonName);
 
 
-                excel.Application.Workbooks.Add();
-                workbook = excel.Application.ActiveWorkbook;
+                Excel.Application.Workbooks.Add();
+                Workbook = Excel.Application.ActiveWorkbook;
 
-                excel.Application.DisplayAlerts = false;
+                Excel.Application.DisplayAlerts = false;
 
                 // excel.Application.DisplayAlerts = true;
 
 
 
-                Microsoft.Office.Interop.Excel.Worksheet activeWorksheet = workbook.Sheets[workbook.Sheets.Count];
+                Microsoft.Office.Interop.Excel.Worksheet activeWorksheet = Workbook.Sheets[Workbook.Sheets.Count];
 
                 List<Dictionary<string, object>> salespersonsResults = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Salespersons",
                                             new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
@@ -635,6 +635,9 @@ namespace CommissionsCreate
 
                 while (true)
                 {
+
+
+
                     string salesperson = "";
                     string salespersonGroupName = "";
 
@@ -672,10 +675,12 @@ namespace CommissionsCreate
                             autoAttachments.Add(attachment);
                     }
 
-                    if (rowCounter != 0)
-                        workbook.Sheets.Add(After: workbook.Sheets[workbook.Sheets.Count]);
+                    Workbook = Excel.Workbooks.Add();
 
-                    activeWorksheet = workbook.Sheets[workbook.Sheets.Count];
+                    if (rowCounter != 0)
+                        Workbook.Sheets.Add(After: Workbook.Sheets[Workbook.Sheets.Count]);
+
+                    activeWorksheet = Workbook.Sheets[Workbook.Sheets.Count];
 
                     activeWorksheet.Name = salespersonGroup.WorksheetName + " " + (isSummaryRecord ? "Summary" : salesperson);
 
@@ -702,7 +707,7 @@ namespace CommissionsCreate
 
                     rowCounter++;
 
-                    SetupWorksheet(excel, activeWorksheet, rowCounter);
+                    SetupWorksheet(Excel, activeWorksheet, rowCounter);
 
                     rowCounter++;
 
@@ -1330,7 +1335,7 @@ namespace CommissionsCreate
                     }
                     else
                     {
-                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Noncommissions_For_Salesperson",
+                        results = ExecuteSQL(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Select_Snapshots_Chargebacks_For_Salesperson",
                                                                                 new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                                 new SqlParameter("@pvchrSalesperson", salesperson));
 
@@ -1605,7 +1610,7 @@ namespace CommissionsCreate
 
                     //build performance summary
                     if (!isSummaryRecord)
-                        autoAttachments.Add(BuildPerformanceSummary(excel, commissionRecord, salespersonGroup.SalespersonGroupsId, salespersonResult["salesperson_name"].ToString(), salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()), sessionId));
+                        autoAttachments.Add(BuildPerformanceSummary(Excel, commissionRecord, salespersonGroup.SalespersonGroupsId, salespersonResult["salesperson_name"].ToString(), salespersonGroupName, Decimal.Parse(salespersonResult["performance_goal_percentage"].ToString()), sessionId));
 
 
                     if (salespersonsResults.Count() == 1)
@@ -1624,8 +1629,8 @@ namespace CommissionsCreate
 
 
                 string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroup.SalespersonGroupsId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
-                workbook.SaveAs(Filename: fileName);
-                workbook.Close(SaveChanges: false);
+                Workbook.SaveAs(Filename: fileName);
+                Workbook.Close(SaveChanges: false);
 
                 generatedFiles.Add(fileName);
 
@@ -1639,8 +1644,9 @@ namespace CommissionsCreate
                                                                     new SqlParameter("@pintSnapshotsID", commissionRecord.SnapshotId),
                                                                     new SqlParameter("@pintSalespersonsGroupsID", salespersonGroup.SalespersonGroupsId),
                                                                     new SqlParameter("@pdatEmbeddedDateTime", DateTime.Now));
-                //  System.IO.File.Delete(fileName);
 
+                //workbook = null;
+                //activeWorksheet = null;
 
             }
 
@@ -1680,18 +1686,18 @@ namespace CommissionsCreate
                 return null;
             }
 
-            excel.Application.Quit();
+            Excel.Application.Quit();
 
             //excel.Workbooks.Close();
-            excel.Quit();
+            Excel.Quit();
 
            // release spreadsheet locks
           //  ReleaseExcelObject(worksheet);
-            ReleaseExcelObject(workbook);
-            ReleaseExcelObject(excel);
+            ReleaseExcelObject(Workbook);
+            ReleaseExcelObject(Excel);
           //  activeWorksheet = null;
-            workbook = null;
-            excel = null;
+            Workbook = null;
+            Excel = null;
 
             //cleanup files
             foreach (string file in generatedFiles)
@@ -1744,9 +1750,9 @@ namespace CommissionsCreate
                     Int64 currentTerritoryId = territories[0].TerritoryId;
                     string territoryFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_TERR_" + territories[0].TerritoryId.ToString() + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
 
-                    Microsoft.Office.Interop.Excel.Workbook territoryWorkbook = excel.Workbooks.Add();
+                    Microsoft.Office.Interop.Excel.Workbook territoryWorkbook = Excel.Workbooks.Add();
 
-                    excel.Application.DisplayAlerts = false;
+                    Excel.Application.DisplayAlerts = false;
 
                     foreach (Territory territory in territories)
                     {
@@ -1759,11 +1765,11 @@ namespace CommissionsCreate
                                                                                 new SqlParameter("@pvbinEmbeddedFile", bytes));
 
                             territoryFileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_TERR_" + territory.TerritoryId.ToString() + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
-                            territoryWorkbook = excel.Workbooks.Add();
+                            territoryWorkbook = Excel.Workbooks.Add();
                             currentTerritoryId = territory.TerritoryId;
                         }
 
-                        Microsoft.Office.Interop.Excel.Workbook salespersonWorkbook = excel.Workbooks.Open(territory.FileName);
+                        Microsoft.Office.Interop.Excel.Workbook salespersonWorkbook = Excel.Workbooks.Open(territory.FileName);
 
 
                         foreach (Microsoft.Office.Interop.Excel.Worksheet worksheet in salespersonWorkbook.Sheets)
@@ -1802,7 +1808,13 @@ namespace CommissionsCreate
 
             string fileName = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_SPG_" + salespersonGroupId + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xlsx";
 
-            System.IO.File.WriteAllText(fileName, result["embedded_file"].ToString());
+            byte[] bytes = (byte[])result["embedded_file"];
+            using (FileStream fs = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write))
+            {
+                fs.Write(bytes, 0, bytes.Length);
+                fs.Flush();
+                fs.Close();
+            }
 
             return fileName;
 
@@ -2222,21 +2234,21 @@ namespace CommissionsCreate
             string fileNamePrefix = "";
 
             //   Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
-            excel.Application.Workbooks.Add();
-            workbook = excel.Application.ActiveWorkbook;
-            excel.DisplayAlerts = false;
+            Excel.Application.Workbooks.Add();
+            Workbook = Excel.Application.ActiveWorkbook;
+            Excel.DisplayAlerts = false;
 
             //remove all worksheets except the first one
             //why are we calling this again? we just called this in the calling method
-            while (workbook.Worksheets.Count > 1)
+            while (Workbook.Worksheets.Count > 1)
             {
-                Microsoft.Office.Interop.Excel.Worksheet worksheetToDelete = workbook.Sheets[2];
+                Microsoft.Office.Interop.Excel.Worksheet worksheetToDelete = Workbook.Sheets[2];
                 worksheetToDelete.Delete();
             }
 
             //   excel.DisplayAlerts = true;
-            workbook.Sheets.Add(After: workbook.Sheets[workbook.Sheets.Count]);
-            Microsoft.Office.Interop.Excel.Worksheet worksheet = workbook.Sheets[workbook.Sheets.Count];
+            Workbook.Sheets.Add(After: Workbook.Sheets[Workbook.Sheets.Count]);
+            Microsoft.Office.Interop.Excel.Worksheet worksheet = Workbook.Sheets[Workbook.Sheets.Count];
             worksheet.Select();
 
             switch (autoAttachmentType)
@@ -2835,7 +2847,7 @@ namespace CommissionsCreate
             worksheet.Columns.AutoFit();
             worksheet.Rows.AutoFit();
 
-            excel.PrintCommunication = false;
+            Excel.PrintCommunication = false;
 
             worksheet.PageSetup.PrintTitleRows = "$1:$" + 8; // rowCounter;
             worksheet.PageSetup.PrintTitleColumns = "";
@@ -2860,14 +2872,17 @@ namespace CommissionsCreate
 
             //  worksheet.HPageBreaks.Add(worksheet.Cells[10, 1]);
 
-            excel.PrintCommunication = true;
+            Excel.PrintCommunication = true;
 
             string outputPath = GetConfigurationKeyValue("AttachmentDirectory") + sessionId + "_" + fileNamePrefix + "_" + salesperson + "_" + DateTime.Now.ToString("yyyyMMddhhmmssfff") + ".pdf";
 
-            workbook.ExportAsFixedFormat(Type: 0, Filename: outputPath);
+            Workbook.ExportAsFixedFormat(Type: 0, Filename: outputPath);
             //workbook.SaveAs(outputPath);
 
-            //workbook.Close();
+            Workbook.Close(SaveChanges: false);
+            //testing
+         //   worksheet = null;
+         //   workbook = null;
             //// excel.Workbooks.Close();
             //excel.Quit();
 
@@ -2878,6 +2893,7 @@ namespace CommissionsCreate
             //worksheet = null;
             //workbook = null;
             //excel = null;
+
 
             return new Attachment()
             {
@@ -2939,43 +2955,43 @@ namespace CommissionsCreate
             }
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Accounts",
-                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId),
                                     new SqlParameter("@pintSnapshotsID", snapshotId),
                                     new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
                                     new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Noncommissions",
-                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId),
                                     new SqlParameter("@pintSnapshotsID", snapshotId),
                                     new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
                                     new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Chargebacks",
-                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+                                    new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId),
                                     new SqlParameter("@pintSnapshotsID", snapshotId),
                                     new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
                                     new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Nonworking_Dates",
-                                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId),
                                         new SqlParameter("@pintSnapshotsID", snapshotId),
                                         new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
                                         new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Draw_Per_Days",
-                                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId),
                                         new SqlParameter("@pintSnapshotsID", snapshotId),
                                         new SqlParameter("@psdatCommissionsMonthStartDate", commissionRecord.MonthStartDate),
                                         new SqlParameter("@psdatCommissionsEndDate", commissionRecord.EndDate));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Update_Snapshots_Salespersons_Performance_Goal_Percentage",
-                                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId),
                                         new SqlParameter("@pintSnapshotsID", snapshotId),
                                         new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
                                         new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Commissions, "dbo.Proc_Insert_Snapshots_Strategies",
-                                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsId),
+                                        new SqlParameter("@pintCommissionsRecreateID", commissionRecord.CommissionsRecreateId),
                                         new SqlParameter("@pintSnapshotsID", snapshotId),
                                         new SqlParameter("@pintCommissionsYear", commissionRecord.Year),
                                         new SqlParameter("@pintCommissionsMonth", commissionRecord.Month));
@@ -3043,11 +3059,15 @@ namespace CommissionsCreate
         /// <param name="comm">Command to be executed</param>
         /// <param name="message">Log message prefix</param>
         /// <returns></returns>
-        private bool ValidateProcedure(Dictionary<string, object> result, string message)
+        private bool ValidateProcedure(Dictionary<string, object> result, string message, bool recreate)
         {
             if (result != null)
             {
-                WriteToJobLog(JobLogMessageType.WARNING, message + " by " + result["processing_by"].ToString() + " at " +
+                if (recreate)
+                    WriteToJobLog(JobLogMessageType.WARNING, message + " by " + result["recreate_by"].ToString() + " at " +
+                                    String.Format("{0:MM/dd/yyyy hh:mm tt}", (DateTime)result["recreate_date_time"]));
+                else
+                    WriteToJobLog(JobLogMessageType.WARNING, message + " by " + result["processing_by"].ToString() + " at " +
                                     String.Format("{0:MM/dd/yyyy hh:mm tt}", (DateTime)result["processing_date_time"]));
                 return false;
             }

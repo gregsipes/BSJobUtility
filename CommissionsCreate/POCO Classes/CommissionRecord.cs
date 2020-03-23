@@ -48,5 +48,7 @@ namespace CommissionsCreate
         public Int64 SnapshotId { get; set; }
 
         public Int64 CommissionsInquiriesId { get; set; }
+
+        public Int64 CommissionsRecreateId { get; set; }
     }
 }
