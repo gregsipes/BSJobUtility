@@ -70,6 +70,10 @@
       <Project>{564e163f-1504-4c49-8cde-251aa50b5e44}</Project>
       <Name>PBSMacrosLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WrappersLoad\WrappersLoad.csproj">
+      <Project>{7912f576-fb44-4dd2-971e-56f2f9ec77a0}</Project>
+      <Name>WrappersLoad</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.txt" />

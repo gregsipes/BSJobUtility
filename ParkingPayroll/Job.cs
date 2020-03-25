@@ -24,9 +24,9 @@ namespace ParkingPayroll
 
                 WriteToJobLog(JobLogMessageType.INFO, "Executed " + sproc + " on " + DatabaseConnectionStringNames.Parking.ToString());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                SendMail($"Error in Job: {JobName}", ex.ToString(), false);
                 throw;
             }
 

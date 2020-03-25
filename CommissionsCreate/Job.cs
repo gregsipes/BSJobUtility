@@ -120,6 +120,7 @@ namespace CommissionsCreate
                 }
                 catch (Exception ex)
                 {
+                    SendMail($"Error in Job: {JobName}", ex.ToString(), false);
                     throw;
                 }
                 finally

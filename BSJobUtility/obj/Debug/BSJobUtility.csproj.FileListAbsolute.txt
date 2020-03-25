@@ -47,3 +47,5 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csproj
 C:\projects\Applications\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.exe
 C:\projects\Applications\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\WrappersLoad.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\WrappersLoad.pdb

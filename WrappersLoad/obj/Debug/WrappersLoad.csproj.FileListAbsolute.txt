@@ -1,0 +1,10 @@
+C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\WrappersLoad.dll
+C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\WrappersLoad.pdb
+C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.csproj.CopyComplete
+C:\projects\Applications\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.dll
+C:\projects\Applications\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.pdb

@@ -16,7 +16,8 @@ namespace BSJobBase
         BuffNewsForBW,
         Brainworks,
         CommissionsRelated,
-        BARC
+        BARC,
+        Wrappers
     }
 
     public enum JobLogMessageType

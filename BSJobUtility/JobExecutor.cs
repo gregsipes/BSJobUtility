@@ -37,6 +37,8 @@ namespace BSJobUtility
                 _managedJob = new PBSMacrosLoad.Job();
             else if (_jobName == "CommissionsCreate")
                 _managedJob = new CommissionsCreate.Job();
+            else if (_jobName == "WrappersLoad")
+                _managedJob = new WrappersLoad.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

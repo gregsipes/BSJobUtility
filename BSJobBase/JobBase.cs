@@ -60,13 +60,8 @@ namespace BSJobBase
             //setup base job settings
             MailSettings = new MailSettings()
             {
-                UseTLS = !string.IsNullOrEmpty(GetConfigurationKeyValue("BSJobUtilitySection", "UseTLS")),
                 Host = GetConfigurationKeyValue("BSJobUtilitySection", "MailHost"),
-                Port = int.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "MailPort")),
-                User = GetConfigurationKeyValue("BSJobUtilitySection", "MailUser"),
-                Password = GetConfigurationKeyValue("BSJobUtilitySection", "MailPassword"),
-                DefaultSender = GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSender"),
-                DefaultRecipient = GetConfigurationKeyValue("BSJobUtilitySection", "DefaultRecipient"),
+                DefaultSender = GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSender")
             };
             GeneralSettings = new GeneralSettings()
             {
@@ -496,6 +491,9 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.CommissionsRelated:
                     connectionString = GetConnectionString("commissionsrelated");
                     break;
+                case DatabaseConnectionStringNames.Wrappers:
+                    connectionString = GetConnectionString("wrappers");
+                    break;
                 default:
                     break;
             }
@@ -571,86 +569,82 @@ namespace BSJobBase
         /// <summary>
         /// Send email. See mail settings in ManagedJobsUtilitySystem section of app.config.
         /// </summary>
-        /// <param name="from"></param>
-        /// <param name="recipients"></param>
         /// <param name="subject"></param>
         /// <param name="body"></param>
         /// <param name="bodyIsHTML"></param>
+        /// <param name="recipients"></param>
         /// <param name="ccs">Optional</param>
         /// <param name="bccs">Optional</param>
-        //protected void SendMail(string from, string recipients, string subject, string body, bool bodyIsHTML, string ccs = null, string bccs = null, string attachment = null)
-        //{
-        //    try
-        //    {
-        //        using (SmtpClient client = new SmtpClient())
-        //        {
-        //            NetworkCredential creds = new NetworkCredential
-        //            {
-        //                UserName = GetConfigurationKeyValue("ManagedJobsUtilitySystem", "MailUser"),
-        //                Password = GetConfigurationKeyValue("ManagedJobsUtilitySystem", "MailPassword")
-        //            };
+        protected void SendMail(string subject, string body, bool bodyIsHTML, string recipients = null, string ccs = null, string bccs = null, string attachment = null)
+        {
+            try
+            {
+                using (SmtpClient client = new SmtpClient())
+                {
 
-        //            client.Host = GetConfigurationKeyValue("ManagedJobsUtilitySystem", "MailHost");
-        //            client.Port = int.Parse(GetConfigurationKeyValue("ManagedJobsUtilitySystem", "MailPort"));
-        //            client.Credentials = creds;
-        //            client.EnableSsl = !string.IsNullOrWhiteSpace(GetConfigurationKeyValue("ManagedJobsUtilitySystem", "UseTLS"));
+                    client.Host = GetConfigurationKeyValue("BSJobUtilitySection", "MailHost");
 
-        //            using (MailMessage message = new MailMessage())
-        //            {
-        //                message.From = new MailAddress(from);
-        //                message.Subject = subject;
-        //                message.Body = body;
-        //                message.IsBodyHtml = bodyIsHTML;
+                    using (MailMessage message = new MailMessage())
+                    {
+                        message.From = new MailAddress(GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSender"));
+                        message.Subject = subject;
+                        message.Body = body;
+                        message.IsBodyHtml = bodyIsHTML;
 
-        //                if (attachment != null)
-        //                {
-        //                    var attach = new Attachment(attachment);
-        //                    message.Attachments.Add(attach);
-        //                }
+                        if (attachment != null)
+                        {
+                            var attach = new Attachment(attachment);
+                            message.Attachments.Add(attach);
+                        }
 
-        //                // clean up recipients
-        //                recipients = recipients.Replace(",", ";");
+                        // clean up recipients
+                        if (recipients == null)
+                            message.To.Add(new MailAddress(GetConfigurationKeyValue("BSJobUtilitySection", "DefaultRecipient")));
+                        else
+                        {
+                            recipients = recipients.Replace(",", ";");
 
-        //                foreach (var recipient in recipients.Split(';'))
-        //                {
-        //                    if (!string.IsNullOrEmpty(recipient))
-        //                        message.To.Add(new MailAddress(recipient.Trim()));
-        //                }
+                            foreach (var recipient in recipients.Split(';'))
+                            {
+                                if (!string.IsNullOrEmpty(recipient))
+                                    message.To.Add(new MailAddress(recipient.Trim()));
+                            }
+                        }
 
-        //                if (ccs != null)
-        //                {
-        //                    // clean up recipients
-        //                    ccs = ccs.Replace(",", ";");
+                        if (ccs != null)
+                        {
+                            // clean up recipients
+                            ccs = ccs.Replace(",", ";");
 
-        //                    foreach (var cc in ccs.Split(';'))
-        //                    {
-        //                        if (!string.IsNullOrEmpty(cc))
-        //                            message.CC.Add(new MailAddress(cc.Trim()));
-        //                    }
-        //                }
+                            foreach (var cc in ccs.Split(';'))
+                            {
+                                if (!string.IsNullOrEmpty(cc))
+                                    message.CC.Add(new MailAddress(cc.Trim()));
+                            }
+                        }
 
-        //                if (bccs != null)
-        //                {
-        //                    // clean up recipients
-        //                    bccs = bccs.Replace(",", ";");
+                        if (bccs != null)
+                        {
+                            // clean up recipients
+                            bccs = bccs.Replace(",", ";");
 
-        //                    foreach (var bcc in bccs.Split(';'))
-        //                    {
-        //                        if (!String.IsNullOrEmpty(bcc))
-        //                            message.Bcc.Add(new MailAddress(bcc.Trim()));
-        //                    }
-        //                }
+                            foreach (var bcc in bccs.Split(';'))
+                            {
+                                if (!String.IsNullOrEmpty(bcc))
+                                    message.Bcc.Add(new MailAddress(bcc.Trim()));
+                            }
+                        }
 
-        //                client.Send(message);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
+                        client.Send(message);
+                    }
+                }
+            }
+            catch (Exception)
+            {
 
-        //        throw;
-        //    }
-        //}
+                throw;
+            }
+        }
 
         //protected string GenerateEmailBodyAsHTML(string bodyText)
         //{
