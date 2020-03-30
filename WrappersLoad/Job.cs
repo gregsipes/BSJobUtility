@@ -18,27 +18,35 @@ namespace WrappersLoad
             {
                 List<string> files = Directory.GetFiles(GetConfigurationKeyValue("InputDirectory"), "labelsA*").ToList();
 
+
+
                 if (files != null && files.Count() > 0)
                 {
-                    Int32 daysToKeepLoads = Int32.Parse(GetConfigurationKeyValue("DaysToKeepLoads"));
+                    List<Dictionary<string, object>> previouslyLoadedFiles = ExecuteSQL(DatabaseConnectionStringNames.Wrappers, "dbo.Proc_Select_Loads").ToList();
+
                     foreach (string file in files)
                     {
                         FileInfo fileInfo = new FileInfo(file);
 
-                        if (daysToKeepLoads > 0 && (DateTime.Now - fileInfo.LastWriteTime).TotalDays > daysToKeepLoads)
+                        Dictionary<string, object> loadedFile = previouslyLoadedFiles.Where(p => p["original_file"].ToString() == fileInfo.Name).OrderByDescending(p => p["loads_id"]).FirstOrDefault();
+
+
+
+                        if ((DateTime.Now - fileInfo.LastWriteTime).TotalDays <= 1 && DateTime.Compare(fileInfo.LastWriteTime.Date, DateTime.Parse(loadedFile["original_file_last_modified"].ToString()).Date) > 0)
+                        {
+                            WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                            CopyAndProcessFile(fileInfo);
+                        }
+                        else
+                        {
                             ExecuteNonQuery(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads_Not_Loaded",
-                                            new SqlParameter("@pvchrOriginalDir", fileInfo.Directory),
+                                            new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
                                             new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                             new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
                                             new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
                                             new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
                                             new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
-                        else
-                        {
-                            WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
-                            CopyAndProcessFile(fileInfo);
                         }
-
                     }
                 }
 
@@ -59,7 +67,7 @@ namespace WrappersLoad
 
         private void CopyAndProcessFile(FileInfo fileInfo)
         {
-            string backupFileName = fileInfo.FullName + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
+            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
             Int32 loadsId = 0;
 
 
