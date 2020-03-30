@@ -29,10 +29,9 @@ namespace WrappersLoad
                         FileInfo fileInfo = new FileInfo(file);
 
                         Dictionary<string, object> loadedFile = previouslyLoadedFiles.Where(p => p["original_file"].ToString() == fileInfo.Name).OrderByDescending(p => p["loads_id"]).FirstOrDefault();
+                        
 
-
-
-                        if ((DateTime.Now - fileInfo.LastWriteTime).TotalDays <= 1 && DateTime.Compare(fileInfo.LastWriteTime.Date, DateTime.Parse(loadedFile["original_file_last_modified"].ToString()).Date) > 0)
+                        if ((DateTime.Now - fileInfo.LastWriteTime).TotalDays <= 1 && (loadedFile == null || DateTime.Compare(fileInfo.LastWriteTime.Date, DateTime.Parse(loadedFile["original_file_last_modified"].ToString()).Date) > 0))
                         {
                             WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
                             CopyAndProcessFile(fileInfo);
