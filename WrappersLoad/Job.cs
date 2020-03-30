@@ -37,16 +37,16 @@ namespace WrappersLoad
                             WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
                             CopyAndProcessFile(fileInfo);
                         }
-                        else
-                        {
-                            ExecuteNonQuery(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads_Not_Loaded",
-                                            new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
-                                            new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                                            new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
-                                            new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
-                                            new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
-                                            new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
-                        }
+                        //else
+                        //{
+                        //    ExecuteNonQuery(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads_Not_Loaded",
+                        //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
+                        //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                        //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                        //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                        //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
+                        //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
+                        //}
                     }
                 }
 
