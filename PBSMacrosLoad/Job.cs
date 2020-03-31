@@ -24,32 +24,44 @@ namespace PBSMacrosLoad
                 {
                     FileInfo fileInfo = new FileInfo(file);
 
-                    //create new file name
-                    string newFileName = fileInfo.Name.Replace("." + fileInfo.Extension, "") + "_" + DateTime.Now.ToString("yyyyMMddhhmmss tt") + ".txt";
-
-                    //create load record
-                    Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Insert_Loads",
-                                     new SqlParameter("@pvchrOriginalDir", sourceDirectory),
-                                     new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                                     new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
-                                     new SqlParameter("@pvchrUserName", Environment.UserName),
-                                     new SqlParameter("@pvchrComputerName", Environment.MachineName),
-                                     new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString())).FirstOrDefault();
-                
-                    Int32? loadId = (Int32)result["loads_id"];
-
-                    if (loadId == null)
+                    if (fileInfo.LastWriteTime.Date == DateTime.Today.Date)
                     {
-                        //copy file from source to destination
-                        File.Copy(file, destinationDirectory + newFileName);
+
+                        Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "Proc_Select_Loads_If_Processed",
+                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name.Replace(".=", "=")),
+                                                                  new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
+
+                        if (result == null)
+                        {
+
+                            //create new file name
+                            string newFileName = fileInfo.Name.Replace("." + fileInfo.Extension, "") + "_" + DateTime.Now.ToString("yyyyMMddhhmmss tt") + ".txt";
+
+                            //create load record
+                            result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Insert_Loads",
+                                            new SqlParameter("@pvchrOriginalDir", sourceDirectory),
+                                            new SqlParameter("@pvchrOriginalFile", fileInfo.Name.Replace(".=", "=")),
+                                            new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                                            new SqlParameter("@pvchrUserName", Environment.UserName),
+                                            new SqlParameter("@pvchrComputerName", Environment.MachineName),
+                                            new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString())).FirstOrDefault();
+
+                            Int32? loadId = (Int32)result["loads_id"];
+
+                            if (loadId == null)
+                            {
+                                //copy file from source to destination
+                                File.Copy(file, destinationDirectory + newFileName);
 
 
-                        //update load record
-                        ExecuteNonQuery(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Update_Loads",
-                                        new SqlParameter("@pintLoadsID", loadId),
-                                        new SqlParameter("@pstrBackupFile", destinationDirectory + newFileName));
-                    
-                        WriteToJobLog(JobLogMessageType.INFO, "Copied " + file + " to " + destinationDirectory + newFileName);
+                                //update load record
+                                ExecuteNonQuery(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Update_Loads",
+                                                new SqlParameter("@pintLoadsID", loadId),
+                                                new SqlParameter("@pstrBackupFile", destinationDirectory + newFileName));
+
+                                WriteToJobLog(JobLogMessageType.INFO, "Copied " + file + " to " + destinationDirectory + newFileName);
+                            }
+                        }
                     }
                 }
             }
