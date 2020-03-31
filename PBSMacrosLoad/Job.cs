@@ -20,15 +20,17 @@ namespace PBSMacrosLoad
                 string sourceDirectory = GetConfigurationKeyValue("SourceDirectory");
                 string destinationDirectory = GetConfigurationKeyValue("DestinationDirectory");
 
-                foreach (string file in GetFiles(sourceDirectory, new System.Text.RegularExpressions.Regex(@"[=]")))
+                List<string> files = GetFiles(sourceDirectory, new System.Text.RegularExpressions.Regex(@"[=]"));
+
+                foreach (string file in files)
                 {
                     FileInfo fileInfo = new FileInfo(file);
 
-                    if (fileInfo.LastWriteTime.Date == DateTime.Today.Date)
+                    if (fileInfo.LastWriteTime.Date == DateTime.Today.Date && !fileInfo.Name.Contains(".="))
                     {
 
                         Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "Proc_Select_Loads_If_Processed",
-                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name.Replace(".=", "=")),
+                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                   new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
                         if (result == null)
@@ -40,15 +42,15 @@ namespace PBSMacrosLoad
                             //create load record
                             result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Insert_Loads",
                                             new SqlParameter("@pvchrOriginalDir", sourceDirectory),
-                                            new SqlParameter("@pvchrOriginalFile", fileInfo.Name.Replace(".=", "=")),
-                                            new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                                            new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                                            new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind)),
                                             new SqlParameter("@pvchrUserName", Environment.UserName),
                                             new SqlParameter("@pvchrComputerName", Environment.MachineName),
                                             new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString())).FirstOrDefault();
 
-                            Int32? loadId = (Int32)result["loads_id"];
+                            Int32? loadId = Int32.Parse(result["loads_id"].ToString());
 
-                            if (loadId == null)
+                            if (loadId != null)
                             {
                                 //copy file from source to destination
                                 File.Copy(file, destinationDirectory + newFileName);
