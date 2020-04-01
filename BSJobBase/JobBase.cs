@@ -494,6 +494,9 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.Wrappers:
                     connectionString = GetConnectionString("wrappers");
                     break;
+                case DatabaseConnectionStringNames.Manifests:
+                    connectionString = GetConnectionString("manifests");
+                    break;
                 default:
                     break;
             }

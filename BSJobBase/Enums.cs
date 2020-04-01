@@ -17,7 +17,8 @@ namespace BSJobBase
         Brainworks,
         CommissionsRelated,
         BARC,
-        Wrappers
+        Wrappers,
+        Manifests
     }
 
     public enum JobLogMessageType
