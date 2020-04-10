@@ -28,16 +28,16 @@ namespace ManifestLoad
 
                 if (files != null && files.Count() > 0)
                 {
-                    List<Dictionary<string, object>> previouslyLoadedFiles = ExecuteSQL(DatabaseConnectionStringNames.Wrappers, "dbo.Proc_Select_Loads").ToList();
-
                     foreach (string file in files)
                     {
                         FileInfo fileInfo = new FileInfo(file);
 
-                        Dictionary<string, object> loadedFile = previouslyLoadedFiles.Where(p => p["original_file"].ToString() == fileInfo.Name).OrderByDescending(p => p["loads_id"]).FirstOrDefault();
+                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Select_Loads_If_Processed",
+                                                                new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                                                                new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
-
-                        if ((DateTime.Now - fileInfo.LastWriteTime).TotalDays <= 1 && (loadedFile == null || DateTime.Compare(fileInfo.LastWriteTime.Date, DateTime.Parse(loadedFile["original_file_last_modified"].ToString()).Date) > 0))
+                      
+                        if (previouslyLoadedFile == null)
                         {
                             WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
                             CopyAndProcessFile(fileInfo);
@@ -74,13 +74,13 @@ namespace ManifestLoad
             WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
 
             //update or create a load id
-            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads",
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Manifests, "Proc_Insert_Loads",
                                                                                         new SqlParameter("@pvchrPBSGeneralServerInstance", GetConfigurationKeyValue("RemoteServerInstance")),
                                                                                         new SqlParameter("@pvchrPBSGeneralDatabase", GetConfigurationKeyValue("RemoteDatabaseName")),
                                                                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("RemoteUserName")),
-                                                                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemoteUserPassword")),
-                                                                                        new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
-                                                                                        new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                                                                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemotePassword")),
+                                                                                        new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString() + "\\"),
+                                                                                        new SqlParameter("@pvchrOriginalFile", fileInfo.Name.Replace(fileInfo.Extension, "")),
                                                                                         new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
                                                                                         new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
                                                                                         new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
@@ -88,7 +88,7 @@ namespace ManifestLoad
             loadsId = Int32.Parse(result["loads_id"].ToString());
             WriteToJobLog(JobLogMessageType.INFO, $"Loads ID: {loadsId}");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.Wrappers, "Proc_Update_Loads_Backup",
+            ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "Proc_Update_Loads_Backup",
                                         new SqlParameter("@pintLoadsID", loadsId),
                                         new SqlParameter("@pstrBackupFile", backupFileName));
 
@@ -194,7 +194,7 @@ namespace ManifestLoad
                                        new SqlParameter("@insert_mix_combination", lineSegments[11].ToString()),
                                        new SqlParameter("@carrier_id", lineSegments[12].ToString()),
                                        new SqlParameter("@chute_number", lineSegments[13].ToString()),
-                                       new SqlParameter("@departure_order)", lineSegments[14].ToString()));
+                                       new SqlParameter("@departure_order", lineSegments[14].ToString()));
                         }
                     }
                     else if (lineSegments[0] == "R3")
@@ -332,11 +332,11 @@ namespace ManifestLoad
                                            new SqlParameter("@departure_order", lineSegments[20].ToString()));
                         }
                     }
-                    else
-                    {
-                        WriteToJobLog(JobLogMessageType.ERROR, $"Error on line: {line}");
-                        throw new Exception("File incorrectly formatted, exiting process");
-                    }
+                    //else
+                    //{
+                    //    WriteToJobLog(JobLogMessageType.ERROR, $"Error on line: {line}");
+                    //    throw new Exception("File incorrectly formatted, exiting process");
+                    //}
                 }
             }
 
@@ -376,10 +376,10 @@ namespace ManifestLoad
                                                 new SqlParameter("@pflgSuccessful", 1));
 
             if (runType == "Advance")
-                CheckInsertMixCombinationPrefix();
+                CheckInsertMixCombinationPrefix(runDate);
         }
 
-        private void CheckInsertMixCombinationPrefix()
+        private void CheckInsertMixCombinationPrefix(DateTime? runDate)
         {
             WriteToJobLog(JobLogMessageType.INFO, "Checking for insert/mix combination used by more that one advance manifest.");
 
@@ -389,8 +389,30 @@ namespace ManifestLoad
                 WriteToJobLog(JobLogMessageType.INFO, "No insert/mix combination prefix used by more than one advance manifest.");
             else
             {
-                //todo:
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.Append("Prefixes Used:");
+
+                foreach (Dictionary<string, object> result in results)
+                {
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t Section: " + result["edition_or_paper_section"].ToString());
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t Run Date: " + runDate.Value.ToShortDateString() ?? "");
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t File: " + result["original_dir"].ToString() + result["original_file"].ToString());
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t Last Modified: " + DateTime.Parse(result["original_file_last_modified"].ToString()).ToLongDateString());
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t Loaded: " + DateTime.Parse(result["load_date"].ToString()).ToLongDateString());
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t Loads ID: " + result["loads_id"].ToString());
+                }
+
+                SendMail("ManifestsLoad: Insert/Mix Combination Prefixes Used By More That One Advance Manifest", stringBuilder.ToString(), false);
+
             }
+            
 
 
         }
