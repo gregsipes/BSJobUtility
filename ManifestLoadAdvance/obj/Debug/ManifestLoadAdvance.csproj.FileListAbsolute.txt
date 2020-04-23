@@ -1,0 +1,10 @@
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\bin\Debug\ManifestLoadAdvance.dll
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\bin\Debug\ManifestLoadAdvance.pdb
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\obj\Debug\ManifestLoadAdvance.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\obj\Debug\ManifestLoadAdvance.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\obj\Debug\ManifestLoadAdvance.csproj.CopyComplete
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\obj\Debug\ManifestLoadAdvance.dll
+C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\obj\Debug\ManifestLoadAdvance.pdb

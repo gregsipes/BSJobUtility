@@ -51,3 +51,5 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\WrappersLoad.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\WrappersLoad.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoad.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoad.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoadAdvance.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoadAdvance.pdb

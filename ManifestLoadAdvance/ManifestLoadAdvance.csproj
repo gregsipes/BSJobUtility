@@ -4,18 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5EDFBCCD-A445-450F-9828-00931928CFC6}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>BSJobUtility</RootNamespace>
-    <AssemblyName>BSJobUtility</AssemblyName>
+    <ProjectGuid>{14FA5A9B-60B8-4D1D-B354-6DB61D6F77A4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ManifestLoadAdvance</RootNamespace>
+    <AssemblyName>ManifestLoadAdvance</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -44,47 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JobExecutor.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Job.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BSJobBase\BSJobBase.csproj">
       <Project>{814ddf3f-573f-4ea8-a7a1-e789e4608b9b}</Project>
       <Name>BSJobBase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CommissionsCreate\CommissionsCreate.csproj">
-      <Project>{9927a52d-b824-47ec-8653-cf444c79f7d8}</Project>
-      <Name>CommissionsCreate</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ManifestLoadAdvance\ManifestLoadAdvance.csproj">
-      <Project>{14fa5a9b-60b8-4d1d-b354-6db61d6f77a4}</Project>
-      <Name>ManifestLoadAdvance</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ManifestLoad\ManifestLoad.csproj">
-      <Project>{8fe50883-e98d-4af9-b359-b217acdecb75}</Project>
-      <Name>ManifestLoad</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ParkingPayroll\ParkingPayroll.csproj">
-      <Project>{a175a62f-3230-409d-a1d9-6c63cf332910}</Project>
-      <Name>ParkingPayroll</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PBSMacrosLoad\PBSMacrosLoad.csproj">
-      <Project>{564e163f-1504-4c49-8cde-251aa50b5e44}</Project>
-      <Name>PBSMacrosLoad</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WrappersLoad\WrappersLoad.csproj">
-      <Project>{7912f576-fb44-4dd2-971e-56f2f9ec77a0}</Project>
-      <Name>WrappersLoad</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="README.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

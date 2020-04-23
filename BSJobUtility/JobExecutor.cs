@@ -41,6 +41,8 @@ namespace BSJobUtility
                 _managedJob = new WrappersLoad.Job();
             else if (_jobName == "ManifestLoad")
                 _managedJob = new ManifestLoad.Job();
+            else if (_jobName == "ManifestLoadAdvance")
+                _managedJob = new ManifestLoadAdvance.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

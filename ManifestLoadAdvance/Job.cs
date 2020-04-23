@@ -8,22 +8,22 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManifestLoad
+namespace ManifestLoadAdvance
 {
     public class Job : JobBase
     {
         public override void SetupJob()
         {
-            JobName = "Manifest Load";
-            JobDescription = "Builds manifest labels";
-            AppConfigSectionName = "ManifestLoad";
+            JobName = "Manifest Load Advance";
+            JobDescription = "Builds advance manifest labels";
+            AppConfigSectionName = "ManifestLoadAdvance";
         }
 
         public override void ExecuteJob()
         {
             try
             {
-                 List<string> files = Directory.GetFiles(GetConfigurationKeyValue("InputDirectory"), "manifest*").ToList();
+                List<string> files = Directory.GetFiles(GetConfigurationKeyValue("InputDirectory"), "advmanifest*").ToList();
 
 
                 if (files != null && files.Count() > 0)
@@ -36,7 +36,7 @@ namespace ManifestLoad
                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                 new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
-                      
+
                         if (previouslyLoadedFile == null)
                         {
                             WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
@@ -74,6 +74,17 @@ namespace ManifestLoad
             WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
 
             //update or create a load id
+            //var x = GetConfigurationKeyValue("RemoteServerInstance");
+            //x = GetConfigurationKeyValue("RemoteDatabaseName");
+            //x = GetConfigurationKeyValue("RemoteUserName");
+            //x = GetConfigurationKeyValue("RemotePassword");
+            //x = fileInfo.Directory.ToString() + "\\";
+            //x = fileInfo.Name;
+            //x = fileInfo.LastWriteTime.ToString();
+            //x = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            //x = System.Environment.MachineName.ToLower();
+            //x = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Manifests, "Proc_Insert_Loads",
                                                                                         new SqlParameter("@pvchrPBSGeneralServerInstance", GetConfigurationKeyValue("RemoteServerInstance")),
                                                                                         new SqlParameter("@pvchrPBSGeneralDatabase", GetConfigurationKeyValue("RemoteDatabaseName")),
@@ -375,7 +386,47 @@ namespace ManifestLoad
                                                 new SqlParameter("@pintPageOrRecordCount", totalRecordsProcessed),
                                                 new SqlParameter("@pflgSuccessful", 1));
 
+
+              CheckInsertMixCombinationPrefix(runDate);
         }
 
+        private void CheckInsertMixCombinationPrefix(DateTime? runDate)
+        {
+            WriteToJobLog(JobLogMessageType.INFO, "Checking for insert/mix combination used by more that one advance manifest.");
+
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Select_Duplicate_Insert_Mix_Combination_Prefixes").ToList();
+
+            if (results == null || results.Count() == 0)
+                WriteToJobLog(JobLogMessageType.INFO, "No insert/mix combination prefix used by more than one advance manifest.");
+            else
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.Append("Prefixes Used:");
+
+                foreach (Dictionary<string, object> result in results)
+                {
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t Section: " + result["edition_or_paper_section"].ToString());
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t Run Date: " + runDate.Value.ToShortDateString() ?? "");
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t File: " + result["original_dir"].ToString() + result["original_file"].ToString());
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t Last Modified: " + DateTime.Parse(result["original_file_last_modified"].ToString()).ToLongDateString());
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t Loaded: " + DateTime.Parse(result["load_date"].ToString()).ToLongDateString());
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("\t\t\t Loads ID: " + result["loads_id"].ToString());
+                }
+
+                SendMail("ManifestsLoad: Insert/Mix Combination Prefixes Used By More That One Advance Manifest", stringBuilder.ToString(), false);
+
+            }
+
+
+
+        }
     }
+
 }
