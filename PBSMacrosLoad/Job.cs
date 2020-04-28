@@ -26,7 +26,8 @@ namespace PBSMacrosLoad
                 {
                     FileInfo fileInfo = new FileInfo(file);
 
-                    if (fileInfo.LastWriteTime.Date == DateTime.Today.Date && !fileInfo.Name.Contains(".="))
+                    // if (fileInfo.LastWriteTime.Date == DateTime.Today.Date && !fileInfo.Name.Contains(".="))
+                    if (!fileInfo.Name.Contains(".="))
                     {
 
                         Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "Proc_Select_Loads_If_Processed",
@@ -55,11 +56,11 @@ namespace PBSMacrosLoad
                                 //copy file from source to destination
                                 File.Copy(file, destinationDirectory + newFileName);
 
-
                                 //update load record
                                 ExecuteNonQuery(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Update_Loads",
                                                 new SqlParameter("@pintLoadsID", loadId),
-                                                new SqlParameter("@pstrBackupFile", destinationDirectory + newFileName));
+                                                new SqlParameter("@pstrBackupFile", destinationDirectory + newFileName),
+                                                new SqlParameter("@plongFileSize", fileInfo.Length));
 
                                 WriteToJobLog(JobLogMessageType.INFO, "Copied " + file + " to " + destinationDirectory + newFileName);
                             }

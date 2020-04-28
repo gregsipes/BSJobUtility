@@ -53,3 +53,5 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoad.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoad.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoadAdvance.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoadAdvance.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceExportLoad.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceExportLoad.pdb

@@ -497,6 +497,9 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.Manifests:
                     connectionString = GetConnectionString("manifests");
                     break;
+                case DatabaseConnectionStringNames.PBSInvoiceExportLoad:
+                    connectionString = GetConnectionString("PBSInvoiceExportLoad");
+                    break;
                 default:
                     break;
             }

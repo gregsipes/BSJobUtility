@@ -74,6 +74,10 @@
       <Project>{a175a62f-3230-409d-a1d9-6c63cf332910}</Project>
       <Name>ParkingPayroll</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBSInvoiceExportLoad\PBSInvoiceExportLoad.csproj">
+      <Project>{5e72a50a-0ca6-481b-b937-c54be921d6ce}</Project>
+      <Name>PBSInvoiceExportLoad</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PBSMacrosLoad\PBSMacrosLoad.csproj">
       <Project>{564e163f-1504-4c49-8cde-251aa50b5e44}</Project>
       <Name>PBSMacrosLoad</Name>

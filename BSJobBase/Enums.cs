@@ -18,7 +18,8 @@ namespace BSJobBase
         CommissionsRelated,
         BARC,
         Wrappers,
-        Manifests
+        Manifests,
+        PBSInvoiceExportLoad
     }
 
     public enum JobLogMessageType

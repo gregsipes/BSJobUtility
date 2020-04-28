@@ -78,7 +78,7 @@ namespace WrappersLoad
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads",
                                                                                        new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
                                                                                         new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                                                                                        new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                                                                                        new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind)),
                                                                                         new SqlParameter("@pvchrUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
                                                                                         new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
                                                                                         new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString())).FirstOrDefault();

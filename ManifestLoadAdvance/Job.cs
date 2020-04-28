@@ -74,17 +74,6 @@ namespace ManifestLoadAdvance
             WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
 
             //update or create a load id
-            //var x = GetConfigurationKeyValue("RemoteServerInstance");
-            //x = GetConfigurationKeyValue("RemoteDatabaseName");
-            //x = GetConfigurationKeyValue("RemoteUserName");
-            //x = GetConfigurationKeyValue("RemotePassword");
-            //x = fileInfo.Directory.ToString() + "\\";
-            //x = fileInfo.Name;
-            //x = fileInfo.LastWriteTime.ToString();
-            //x = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            //x = System.Environment.MachineName.ToLower();
-            //x = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Manifests, "Proc_Insert_Loads",
                                                                                         new SqlParameter("@pvchrPBSGeneralServerInstance", GetConfigurationKeyValue("RemoteServerInstance")),
                                                                                         new SqlParameter("@pvchrPBSGeneralDatabase", GetConfigurationKeyValue("RemoteDatabaseName")),
@@ -92,7 +81,7 @@ namespace ManifestLoadAdvance
                                                                                         new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemotePassword")),
                                                                                         new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString() + "\\"),
                                                                                         new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                                                                                        new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                                                                                        new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind)),
                                                                                         new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
                                                                                         new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
                                                                                         new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString())).FirstOrDefault();
