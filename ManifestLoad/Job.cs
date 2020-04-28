@@ -25,6 +25,7 @@ namespace ManifestLoad
             {
                  List<string> files = Directory.GetFiles(GetConfigurationKeyValue("InputDirectory"), "manifest*").ToList();
 
+                List<string> processedFiles = new List<string>();
 
                 if (files != null && files.Count() > 0)
                 {
@@ -41,6 +42,7 @@ namespace ManifestLoad
                         {
                             WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
                             CopyAndProcessFile(fileInfo);
+                            processedFiles.Add(fileInfo.Name);
                         }
                         //else
                         //{
@@ -53,6 +55,21 @@ namespace ManifestLoad
                         //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
                         //}
                     }
+
+                    if (processedFiles.Count() > 0)
+                    {
+                        StringBuilder stringBuilder = new StringBuilder();
+
+                        stringBuilder.AppendLine("Processed File(s):");
+                        
+                        foreach(string fileName in processedFiles)
+                        {
+                            stringBuilder.AppendLine(fileName);
+                        }
+
+                        SendMail($"{JobName} ran successfully", stringBuilder.ToString(), false, GetConfigurationKeyValue("DefaultRecipient"));
+
+                     }
                 }
 
             }

@@ -3,8 +3,8 @@ C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\bin\Debug\PBSInvoiceE
 C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\bin\Debug\BSJobBase.dll
 C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\bin\Debug\BSJobBase.pdb
 C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\bin\Debug\BSJobBase.dll.config
-C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\obj\Debug\PBSInvoiceExportLoad.csprojAssemblyReference.cache
 C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\obj\Debug\PBSInvoiceExportLoad.csproj.CoreCompileInputs.cache
 C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\obj\Debug\PBSInvoiceExportLoad.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\obj\Debug\PBSInvoiceExportLoad.dll
 C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\obj\Debug\PBSInvoiceExportLoad.pdb
+C:\projects\Applications\BSJobUtility\PBSInvoiceExportLoad\obj\Debug\PBSInvoiceExportLoad.csprojAssemblyReference.cache

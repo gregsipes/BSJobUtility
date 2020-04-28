@@ -109,12 +109,169 @@ namespace PBSInvoiceExportLoad
 
             foreach (string line in fileContents)
             {
+                int lineNumber = 0;
+                int accountInformationCount = 0;
+                int advanceDrawChargeBillCount = 0;
+                int agingCount = 0;
+                int balanceForwardCount = 0;
+                int billMessageCount = 0;
+                int collectionMessageCount = 0;
+
                 if (line != null && line.Trim().Length > 0)
                 {
                     WriteToJobLog(JobLogMessageType.INFO, "Reading " + fileInfo.FullName);
 
+                    lineNumber++;
+
+
                     List<string> lineSegments = line.Split('|').ToList();
 
+                    if (lineSegments[0] == "Account Information")
+                    {
+                        accountInformationCount++;
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Account_Information",
+                                                            new SqlParameter("@loads_id", loadsId),
+                                                          new SqlParameter("@account_record_number", accountInformationCount),
+                                                          new SqlParameter("@load_sequence", lineNumber),
+                                                          new SqlParameter("@TypeOfBill", line[1]),
+                                                          new SqlParameter("@AccountID", line[2]),
+                                                          new SqlParameter("@AreaCode", line[3]),
+                                                          new SqlParameter("@BillDate", line[4]),
+                                                          new SqlParameter("@BillSourceID", line[5]),
+                                                          new SqlParameter("@Building", line[6]),
+                                                          new SqlParameter("@CityID", line[7]),
+                                                          new SqlParameter("@CompanyID", line[8]),
+                                                          new SqlParameter("@Complex", line[9]),
+                                                          new SqlParameter("@CountryID", line[10]),
+                                                          new SqlParameter("@CountyID", line[11]),
+                                                          new SqlParameter("@CreditCardOnFile", line[12]),
+                                                          new SqlParameter("@CurrentBillAmount", line[13]),
+                                                          new SqlParameter("@DepotID", line[14]),
+                                                          new SqlParameter("@DistributionCodeID", line[15]),
+                                                          new SqlParameter("@DistrictID", line[16]),
+                                                          new SqlParameter("@DropOrder", line[17]),
+                                                          new SqlParameter("@DueDate", line[18]),
+                                                          new SqlParameter("@FirstName", line[19]),
+                                                          new SqlParameter("@HonorificID", line[20]),
+                                                          new SqlParameter("@HouseNumber", line[21]),
+                                                          new SqlParameter("@HouseNumberModifier", line[22]),
+                                                          new SqlParameter("@InvoiceNumber", line[23]),
+                                                          new SqlParameter("@LastBillAmount", line[24]),
+                                                          new SqlParameter("@LastBillDate", line[25]),
+                                                          new SqlParameter("@LastName", line[26]),
+                                                          new SqlParameter("@MiddleInitial", line[27]),
+                                                          new SqlParameter("@NameAddressLine1", line[28]),
+                                                          new SqlParameter("@NameAddressLine2", line[29]),
+                                                          new SqlParameter("@NameAddressLine3", line[30]),
+                                                          new SqlParameter("@NameAddressLine4", line[31]),
+                                                          new SqlParameter("@NameAddressLine5", line[32]),
+                                                          new SqlParameter("@NameAddressLine6", line[33]),
+                                                          new SqlParameter("@PastDueBalance", line[34]),
+                                                          new SqlParameter("@Phone", line[35]),
+                                                          new SqlParameter("@PostDirectional", line[36]),
+                                                          new SqlParameter("@PreDirectional", line[37]),
+                                                          new SqlParameter("@ProductID", line[38]),
+                                                          new SqlParameter("@RemitToAddressLine1", line[39]),
+                                                          new SqlParameter("@RemitToAddressLine2", line[40]),
+                                                          new SqlParameter("@RemitToAddressLine3", line[41]),
+                                                          new SqlParameter("@RemitToAddressLine4", line[42]),
+                                                          new SqlParameter("@RemitToAddressLine5", line[43]),
+                                                          new SqlParameter("@RemitToAddressLine6", line[44]),
+                                                          new SqlParameter("@RemitToAddressLine7", line[45]),
+                                                          new SqlParameter("@RouteID", line[46]),
+                                                          new SqlParameter("@ScanLine", line[47]),
+                                                          new SqlParameter("@StateID", line[48]),
+                                                          new SqlParameter("@StreetName", line[49]),
+                                                          new SqlParameter("@StreetSuffixID", line[50]),
+                                                          new SqlParameter("@Terms", line[51]),
+                                                          new SqlParameter("@TotalDue", line[52]),
+                                                          new SqlParameter("@TruckID", line[53]),
+                                                          new SqlParameter("@UnitDesignatorID", line[54]),
+                                                          new SqlParameter("@UnitNumber", line[55]),
+                                                          new SqlParameter("@ZipBarCode", line[56]),
+                                                          new SqlParameter("@ZipCode", line[57]),
+                                                          new SqlParameter("@ZipExtension", line[58]));
+                    }
+                    else if (lineSegments[0] == "Advance Draw Charge Bill")
+                    {
+                        advanceDrawChargeBillCount++;
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Advance_Draw_Charge_Bill",
+                                                 new SqlParameter("@loads_id", loadsId),
+                                              new SqlParameter("@account_record_number", advanceDrawChargeBillCount),
+                                              new SqlParameter("@load_sequence", lineNumber),
+                                              new SqlParameter("@AccountID", line[1]),
+                                              new SqlParameter("@Amount", line[2]),
+                                              new SqlParameter("@BillSourceID", line[3]),
+                                              new SqlParameter("@ChargeCodeID", line[4]),
+                                              new SqlParameter("@CompanyID", line[5]),
+                                              new SqlParameter("@Description", line[6]),
+                                              new SqlParameter("@ProductID", line[7]),
+                                              new SqlParameter("@Quantity", line[8]),
+                                              new SqlParameter("@RecapFormat", line[9]),
+                                              new SqlParameter("@RecapID", line[10]),
+                                              new SqlParameter("@Reversal", line[11]),
+                                              new SqlParameter("@UnitRate", line[12]));
+                    }
+                    else if (lineSegments[0] == "Aging")
+                    {
+                        agingCount++;
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Aging",
+                                             new SqlParameter("@loads_id", loadsId),
+                                              new SqlParameter("@account_record_number", agingCount),
+                                              new SqlParameter("@load_sequence", lineNumber),
+                                              new SqlParameter("@AccountID", line[1]),
+                                              new SqlParameter("@AgeCurrent", line[2]),
+                                              new SqlParameter("@AgePeriod1", line[3]),
+                                              new SqlParameter("@AgePeriod2", line[4]),
+                                              new SqlParameter("@AgePeriod3", line[5]),
+                                              new SqlParameter("@AgePeriod4", line[6]),
+                                              new SqlParameter("@BillSourceID", line[7]),
+                                              new SqlParameter("@CompanyID)", line[8]));
+                    }
+                    else if (lineSegments[0] == "Balance Forward")
+                    {
+                        balanceForwardCount++;
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Balance_Forward",
+                                         new SqlParameter("@loads_id", loadsId),
+                                          new SqlParameter("@account_record_number", balanceForwardCount),
+                                          new SqlParameter("@load_sequence", lineNumber),
+                                          new SqlParameter("@AccountID", line[1]),
+                                          new SqlParameter("@BillSourceID", line[2]),
+                                          new SqlParameter("@CompanyID", line[3]),
+                                          new SqlParameter("@LastBillAmount", line[4]),
+                                          new SqlParameter("@LastBillDate)", line[5]));
+                    }
+                    else if (lineSegments[0] == "Bill Message")
+                    {
+                        billMessageCount++;
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Bill_Message",
+                                      new SqlParameter("@loads_id", loadsId),
+                                      new SqlParameter("@account_record_number", billMessageCount),
+                                      new SqlParameter("@load_sequence", lineNumber),
+                                      new SqlParameter("@BillSourceID", line[1]),
+                                      new SqlParameter("@CompanyID", line[2]),
+                                      new SqlParameter("@EntityID", line[3]),
+                                      new SqlParameter("@EntityType", line[4]),
+                                      new SqlParameter("@MessageText", line[5]),
+                                      new SqlParameter("@PrintOrder", line[6]));
+                    }
+                    else if (lineSegments[0] == "Collection Message")
+                    {
+                        collectionMessageCount++;
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Collection_Message",
+                                     new SqlParameter("@loads_id", loadsId),
+                                      new SqlParameter("@account_record_number", collectionMessageCount),
+                                      new SqlParameter("@load_sequence", lineNumber),
+                                      new SqlParameter("@BillSourceID", line[1]),
+                                      new SqlParameter("@CollectMessage", line[2]),
+                                      new SqlParameter("@CompanyID", line[3]);
+                    }
 
                 }
 
