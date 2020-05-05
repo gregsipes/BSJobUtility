@@ -16,6 +16,7 @@ namespace WrappersLoad
         {
             try
             {
+
                 List<string> files = Directory.GetFiles(GetConfigurationKeyValue("InputDirectory"), "labelsA*").ToList();
 
 
@@ -52,7 +53,7 @@ namespace WrappersLoad
             }
             catch (Exception ex)
             {
-                SendMail($"Error in Job: {JobName}", ex.ToString(), false);
+                LogException(ex);
                 throw;
             }
         }

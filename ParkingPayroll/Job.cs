@@ -26,7 +26,7 @@ namespace ParkingPayroll
             }
             catch (Exception ex)
             {
-                SendMail($"Error in Job: {JobName}", ex.ToString(), false);
+                LogException(ex);
                 throw;
             }
 

@@ -68,14 +68,13 @@ namespace ManifestLoad
                         }
 
                         SendMail($"{JobName} ran successfully", stringBuilder.ToString(), false, GetConfigurationKeyValue("DefaultRecipient"));
-
                      }
                 }
 
             }
             catch (Exception ex)
             {
-                SendMail($"Error in Job: {JobName}", ex.ToString(), false);
+                LogException(ex);
                 throw;
             }
         }
@@ -118,6 +117,7 @@ namespace ManifestLoad
             Int32 TMDetailCounter = 0;
             Int32 TMTotalCounter = 0;
             Int32 truckTotalCounter = 0;
+            Int32 ignoredCounter = 0;
 
             DateTime? runDate = null;
             String runType = "";
@@ -349,13 +349,17 @@ namespace ManifestLoad
                                            new SqlParameter("@departure_order", lineSegments[20].ToString() == "" ? (object)DBNull.Value : lineSegments[20].ToString()));
                         }
                     }
-                    //else
-                    //{
-                    //    WriteToJobLog(JobLogMessageType.ERROR, $"Error on line: {line}");
-                    //    throw new Exception("File incorrectly formatted, exiting process");
-                    //}
+                    else
+                    {
+                        ignoredCounter++;
+                       // WriteToJobLog(JobLogMessageType.ERROR, $"Error on line: {line}");
+                      //  throw new Exception("File incorrectly formatted, exiting process");
+                    }
                 }
             }
+
+            //test code
+            Int32 total = routeDetailCounter + advanceDetailCounter + advanceTotalCounter + TMDetailCounter + TMTotalCounter + truckTotalCounter + ignoredCounter;
 
             WriteToJobLog(JobLogMessageType.INFO, $"{routeDetailCounter + advanceDetailCounter + advanceTotalCounter + TMDetailCounter + TMTotalCounter + truckTotalCounter} total records read for publishing date {runDate.Value.ToShortDateString() ?? ""} type {runType}");
             WriteToJobLog(JobLogMessageType.INFO, $"{routeDetailCounter} route detail read.");
@@ -380,10 +384,10 @@ namespace ManifestLoad
             WriteToJobLog(JobLogMessageType.INFO, "Records inserted into Relay_Trucks_Sequence & Relay_Trucks_Sequence tables.");
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_Mother_Trucks_Sequence_For_Loading_Dock", new SqlParameter("@pintLoadsID", loadsId));
-            WriteToJobLog(JobLogMessageType.INFO, "Records inserted into Editions_Sections_Sequence table.");
+            WriteToJobLog(JobLogMessageType.INFO, "Records inserted into Mother_Trucks_Sequence_For_Loading_Dock table.");
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_Editions_Sections_Sequence", new SqlParameter("@pintLoadsID", loadsId));
-            WriteToJobLog(JobLogMessageType.INFO, "Records inserted into Editions_Sections_No_AMPM_Sequence table.");
+            WriteToJobLog(JobLogMessageType.INFO, "Records inserted into Editions_Sections_Sequence table.");
 
             ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_Editions_Sections_No_AMPM_Sequence", new SqlParameter("@pintLoadsID", loadsId));
             WriteToJobLog(JobLogMessageType.INFO, "Records inserted into Editions_Sections_No_AMPM_Sequence table.");

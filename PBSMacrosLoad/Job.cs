@@ -36,6 +36,15 @@ namespace PBSMacrosLoad
 
                         if (result == null)
                         {
+                            //make sure we the file is longer being edited
+                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes < 2)
+                            {
+                                while ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes < (Convert.ToInt32(GetConfigurationKeyValue("SleepTimeout")) / 60))
+                                {
+                                    System.Threading.Thread.Sleep(5000); //5 seconds
+                                }
+                            }
+
 
                             //create new file name
                             string newFileName = fileInfo.Name.Replace("." + fileInfo.Extension, "") + "_" + DateTime.Now.ToString("yyyyMMddhhmmss tt") + ".txt";
@@ -70,7 +79,7 @@ namespace PBSMacrosLoad
             }
             catch (Exception ex)
             {
-                SendMail($"Error in Job: {JobName}", ex.ToString(), false);
+                LogException(ex);
                 throw;
             }
         }

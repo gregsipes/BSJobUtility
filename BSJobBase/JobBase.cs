@@ -133,6 +133,12 @@ namespace BSJobBase
 
         #region Methods
 
+        public void LogException(Exception ex)
+        {
+            SendMail($"Error in Job: {JobName}", ex.ToString(), false);
+            WriteToJobLog(JobLogMessageType.ERROR, ex.ToString());
+        }
+
         public void WriteToJobLog(JobLogMessageType type, string message)
         {
             Console.WriteLine($"{DateTime.Now.ToString()} {type.ToString("g"),-7}  Message: {message}");

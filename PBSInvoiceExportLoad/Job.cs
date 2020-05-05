@@ -70,7 +70,7 @@ namespace PBSInvoiceExportLoad
             }
             catch (Exception ex)
             {
-                SendMail($"Error in Job: {JobName}", ex.ToString(), false);
+                LogException(ex);
                 throw;
             }
         }
@@ -125,6 +125,8 @@ namespace PBSInvoiceExportLoad
                 int miscChargeReversalCount = 0;
                 int paymentCount = 0;
                 int returnsBillCount = 0;
+                int returnsDrawCount = 0;
+                int totalDueCount = 0;
 
                 if (line != null && line.Trim().Length > 0)
                 {
@@ -463,6 +465,42 @@ namespace PBSInvoiceExportLoad
                                 new SqlParameter("@Reversal", line[12]),
                                 new SqlParameter("@UnitRate", line[13]));
                      }
+                    else if (lineSegments[0] == "Returns Draw")
+                    {
+                        returnsDrawCount++;
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Returns_Draw",
+                                 new SqlParameter("@loads_id", loadsId),
+                              new SqlParameter("@account_record_number", returnsDrawCount),
+                              new SqlParameter("@load_sequence", lineNumber),
+                              new SqlParameter("@returns_group_number", line[1]),
+                              new SqlParameter("@AccountID", line[2]),
+                              new SqlParameter("@BillSourceID", line[3]),
+                              new SqlParameter("@CompanyID", line[4]),
+                              new SqlParameter("@DeliveryScheduleID", line[5]),
+                              new SqlParameter("@DistrictID", line[6]),
+                              new SqlParameter("@DrawClassID", line[7]),
+                              new SqlParameter("@DrawDate", line[8]),
+                              new SqlParameter("@DrawTotal", line[9]),
+                              new SqlParameter("@ProductID", line[10]),
+                              new SqlParameter("@RouteID", line[11]),
+                              new SqlParameter("@RouteType", line[12]),
+                              new SqlParameter("@SubstituteDelivery)", line[13]));
+                    }
+                    else if (lineSegments[0] == "Total Due")
+                    {
+                        totalDueCount++;
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Total_Due",
+                                      new SqlParameter("@loads_id", loadsId),
+                                      new SqlParameter("@account_record_number", totalDueCount),
+                                      new SqlParameter("@load_sequence", lineNumber),
+                                      new SqlParameter("@AccountID", line[1]),
+                                      new SqlParameter("@Amount", line[2]),
+                                      new SqlParameter("@BillSourceID", line[3]),
+                                      new SqlParameter("@CompanyID", line[4]),
+                                      new SqlParameter("@DueDate", line[5]));
+                    }
                 }
 
             }
