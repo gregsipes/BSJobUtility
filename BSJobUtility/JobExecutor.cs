@@ -43,6 +43,8 @@ namespace BSJobUtility
                 _managedJob = new ManifestLoad.Job();
             else if (_jobName == "ManifestLoadAdvance")
                 _managedJob = new ManifestLoadAdvance.Job();
+            else if (_jobName == "PBSInvoiceExportLoad")
+                _managedJob = new PBSInvoiceExportLoad.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

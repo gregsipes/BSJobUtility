@@ -504,7 +504,7 @@ namespace BSJobBase
                     connectionString = GetConnectionString("manifests");
                     break;
                 case DatabaseConnectionStringNames.PBSInvoiceExportLoad:
-                    connectionString = GetConnectionString("PBSInvoiceExportLoad");
+                    connectionString = GetConnectionString("pbsinvoiceexport");
                     break;
                 default:
                     break;
