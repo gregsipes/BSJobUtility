@@ -51,17 +51,16 @@ namespace PBSInvoiceExportLoad
 
                         if (previouslyLoadedFile == null)
                         {
-                            //make sure we the file is longer being edited
-                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes < 2)
+                            //make sure we the file is no longer being edited
+                            var x = (DateTime.Now - fileInfo.LastWriteTime).TotalMinutes;
+                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
                             {
-                                while ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes < (Convert.ToInt32(GetConfigurationKeyValue("SleepTimeout")) / 60))
-                                {
-                                    System.Threading.Thread.Sleep(5000); //5 seconds
-                                }
+                                WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                                CopyAndProcessFile(fileInfo);
                             }
+                            else
+                                WriteToJobLog(JobLogMessageType.INFO, "There's a chance the file is still getting updated, so we'll pick it up next run");
 
-                            WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
-                            CopyAndProcessFile(fileInfo);
                         }
                         //else
                         //{
@@ -103,7 +102,7 @@ namespace PBSInvoiceExportLoad
                                                                                         new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString() + "\\"),
                                                                                         new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                                         new SqlParameter("@pvchrBackupDir", GetConfigurationKeyValue("BackupDirectory")),
-                                                                                        new SqlParameter("@pvchrBackupFile", backupFileName),
+                                                                                        new SqlParameter("@pvchrBackupFile", fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt"),
                                                                                         new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind)),
                                                                                         new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
                                                                                         new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
@@ -119,34 +118,25 @@ namespace PBSInvoiceExportLoad
             String runType = "";
 
             int lineNumber = 0;
-            int accountInformationCount = 0;
-            int advanceDrawChargeBillCount = 0;
-            int agingCount = 0;
-            int balanceForwardCount = 0;
-            int billMessageCount = 0;
-            int collectionMessageCount = 0;
-            int currentBillAmountCount = 0;
-            int debitMemoCount = 0;
-            int drawChargeBillCount = 0;
+            int accountRecordNumber = 0;
+
             int drawChargeDrawGroupCount = 0;
             string drawChargeDrawGroupProductId = "";
             int drawChargeBillGroupCount = 0;
             string drawChargeDrawBillProductId = "";
-            int drawChargeDrawCount = 0;
-            int dropCompensationCount = 0;
-            int miscChargeCount = 0;
-            int miscChargeReversalCount = 0;
-            int paymentCount = 0;
-            int returnsBillCount = 0;
-            int returnsDrawCount = 0;
-            int totalDueCount = 0;
+
+            int returnsBillGroupCount = 0;
+            string returnsBillGroupProductId = "";
+            int returnsDrawGroupCount = 0;
+            string returnsDrawGroupProductId = "";
+
+            WriteToJobLog(JobLogMessageType.INFO, "Reading " + fileInfo.FullName);
 
             foreach (string line in fileContents)
             {
 
                 if (line != null && line.Trim().Length > 0)
                 {
-                    WriteToJobLog(JobLogMessageType.INFO, "Reading " + fileInfo.FullName);
 
                     lineNumber++;
 
@@ -155,14 +145,21 @@ namespace PBSInvoiceExportLoad
 
                     if (lineSegments[0] == "Account Information")
                     {
-                        accountInformationCount++;
+                        if (lineSegments[5].ToString() != "")
+                            runType = lineSegments[5].ToString();
 
+                        if (lineSegments[4].ToString() != "")
+                            runDate = Convert.ToDateTime(lineSegments[4].ToString());
+
+
+                        accountRecordNumber++;
+                        
                         drawChargeDrawGroupCount = 0;
                         drawChargeBillGroupCount = 0;
 
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Account_Information",
                                                             new SqlParameter("@loads_id", loadsId),
-                                                          new SqlParameter("@account_record_number", accountInformationCount),
+                                                          new SqlParameter("@account_record_number", accountRecordNumber),
                                                           new SqlParameter("@load_sequence", lineNumber),
                                                           new SqlParameter("@TypeOfBill", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString() ),
                                                           new SqlParameter("@AccountID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
@@ -227,11 +224,9 @@ namespace PBSInvoiceExportLoad
                     {
                         if (lineSegments[1] == "Bill")
                         {
-                            advanceDrawChargeBillCount++;
-
-                            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Advance_Draw_Charge_Bill",
+                                 ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Advance_Draw_Charge_Bill",
                                                      new SqlParameter("@loads_id", loadsId),
-                                                  new SqlParameter("@account_record_number", advanceDrawChargeBillCount),
+                                                  new SqlParameter("@account_record_number", accountRecordNumber),
                                                   new SqlParameter("@load_sequence", lineNumber),
                                                   new SqlParameter("@AccountID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
                                                   new SqlParameter("@Amount", lineSegments[3].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[3].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
@@ -249,14 +244,12 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Aging")
                     {
-                        agingCount++;
-
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Aging",
                                              new SqlParameter("@loads_id", loadsId),
-                                              new SqlParameter("@account_record_number", agingCount),
+                                              new SqlParameter("@account_record_number", accountRecordNumber),
                                               new SqlParameter("@load_sequence", lineNumber),
                                               new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
-                                              new SqlParameter("@AgeCurrent", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
+                                              new SqlParameter("@AgeCurrent", lineSegments[2].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[2].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
                                               new SqlParameter("@AgePeriod1", lineSegments[3].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[3].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
                                               new SqlParameter("@AgePeriod2", lineSegments[4].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[4].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
                                               new SqlParameter("@AgePeriod3", lineSegments[5].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[5].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
@@ -266,11 +259,9 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Balance Forward")
                     {
-                        balanceForwardCount++;
-
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Balance_Forward",
                                          new SqlParameter("@loads_id", loadsId),
-                                          new SqlParameter("@account_record_number", balanceForwardCount),
+                                          new SqlParameter("@account_record_number", accountRecordNumber),
                                           new SqlParameter("@load_sequence", lineNumber),
                                           new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                                           new SqlParameter("@BillSourceID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
@@ -280,11 +271,11 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Bill Message")
                     {
-                        billMessageCount++;
+                    //    billMessageCount++;
 
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Bill_Message",
                                       new SqlParameter("@loads_id", loadsId),
-                                      new SqlParameter("@account_record_number", billMessageCount),
+                                      new SqlParameter("@account_record_number", accountRecordNumber),
                                       new SqlParameter("@load_sequence", lineNumber),
                                       new SqlParameter("@BillSourceID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                                       new SqlParameter("@CompanyID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
@@ -295,11 +286,9 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Collection Message")
                     {
-                        collectionMessageCount++;
-
-                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Collection_Message",
+                       ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Collection_Message",
                                      new SqlParameter("@loads_id", loadsId),
-                                      new SqlParameter("@account_record_number", collectionMessageCount),
+                                      new SqlParameter("@account_record_number", accountRecordNumber),
                                       new SqlParameter("@load_sequence", lineNumber),
                                       new SqlParameter("@BillSourceID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                                       new SqlParameter("@CollectMessage", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
@@ -307,11 +296,9 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Current Bill Amount")
                     {
-                        currentBillAmountCount++;
-
-                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Current_Bill_Amount",
+                       ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Current_Bill_Amount",
                                       new SqlParameter("@loads_id", loadsId),
-                                      new SqlParameter("@account_record_number", currentBillAmountCount),
+                                      new SqlParameter("@account_record_number", accountRecordNumber),
                                       new SqlParameter("@load_sequence", lineNumber),
                                       new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                                       new SqlParameter("@Amount", lineSegments[2].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[2].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
@@ -321,11 +308,9 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Debit Memo")
                     {
-                        debitMemoCount++;
-
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Debit_Memo",
                                          new SqlParameter("@loads_id", loadsId),
-                                      new SqlParameter("@account_record_number", debitMemoCount),
+                                      new SqlParameter("@account_record_number", accountRecordNumber),
                                       new SqlParameter("@load_sequence", lineNumber),
                                       new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                                       new SqlParameter("@BillSourceID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
@@ -339,8 +324,6 @@ namespace PBSInvoiceExportLoad
                         if (lineSegments[1] == "Bill")
                         {
 
-                            drawChargeBillCount++;
-
                             if (drawChargeBillGroupCount == 0)
                                 drawChargeBillGroupCount++;
                             else if (drawChargeDrawBillProductId != lineSegments[11].ToString())
@@ -351,7 +334,7 @@ namespace PBSInvoiceExportLoad
 
                             ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Draw_Charge_Bill",
                                                   new SqlParameter("@loads_id", loadsId),
-                                          new SqlParameter("@account_record_number", drawChargeBillCount),
+                                          new SqlParameter("@account_record_number", accountRecordNumber),
                                           new SqlParameter("@load_sequence", lineNumber),
                                           new SqlParameter("@draw_group_number", drawChargeBillGroupCount),
                                           new SqlParameter("@AccountID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
@@ -369,7 +352,7 @@ namespace PBSInvoiceExportLoad
                         }
                         else if (lineSegments[1] == "Draw")
                         {
-                            drawChargeDrawCount++;
+                         //   drawChargeDrawCount++;
 
                             if (drawChargeDrawGroupCount == 0)
                                 drawChargeDrawGroupCount++;
@@ -381,7 +364,7 @@ namespace PBSInvoiceExportLoad
 
                             ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Draw_Charge_Draw",
                                              new SqlParameter("@loads_id", loadsId),
-                                          new SqlParameter("@account_record_number", drawChargeDrawCount),
+                                          new SqlParameter("@account_record_number", accountRecordNumber),
                                           new SqlParameter("@load_sequence", lineNumber),
                                           new SqlParameter("@draw_group_number", drawChargeDrawGroupCount),
                                           new SqlParameter("@AccountID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
@@ -400,11 +383,10 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Drop Compensation")
                     {
-                        dropCompensationCount++;
-
+                      
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Drop_Compensation",
                                             new SqlParameter("@loads_id", loadsId),
-                                      new SqlParameter("@account_record_number", dropCompensationCount),
+                                      new SqlParameter("@account_record_number", accountRecordNumber),
                                       new SqlParameter("@load_sequence", lineNumber),
                                       new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                                       new SqlParameter("@Amount", lineSegments[2].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[2].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
@@ -415,20 +397,18 @@ namespace PBSInvoiceExportLoad
                                       new SqlParameter("@CompanyID", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
                                       new SqlParameter("@Description", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
                                       new SqlParameter("@ProductID", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
-                                      new SqlParameter("@Quantity", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
+                                      new SqlParameter("@Quantity", lineSegments[10].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[10].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
                                       new SqlParameter("@RecapFormat", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
                                       new SqlParameter("@RecapID", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
                                       new SqlParameter("@Remarks", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()),
                                       new SqlParameter("@RouteID", lineSegments[14].ToString() == "" ? (object)DBNull.Value : lineSegments[14].ToString()),
-                                      new SqlParameter("@UnitRate", lineSegments[15].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[14].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)));
+                                      new SqlParameter("@UnitRate", lineSegments[15].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[15].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)));
                     }
                     else if (lineSegments[0] == "Misc Charge")
                     {
-                        miscChargeCount++;
-
-                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Misc_Charge",
+                       ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Misc_Charge",
                                      new SqlParameter("@loads_id", loadsId),
-                                  new SqlParameter("@account_record_number", miscChargeCount),
+                                  new SqlParameter("@account_record_number", accountRecordNumber),
                                   new SqlParameter("@load_sequence", lineNumber),
                                   new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                                   new SqlParameter("@Amount", lineSegments[2].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[2].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
@@ -439,7 +419,7 @@ namespace PBSInvoiceExportLoad
                                   new SqlParameter("@CompanyID", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
                                   new SqlParameter("@Description", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
                                   new SqlParameter("@ProductID", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
-                                  new SqlParameter("@Quantity", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
+                                  new SqlParameter("@Quantity", lineSegments[10].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[10].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
                                   new SqlParameter("@RecapFormat", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
                                   new SqlParameter("@RecapID", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
                                   new SqlParameter("@Remarks", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()),
@@ -448,11 +428,9 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Misc Charge Reversal")
                     {
-                        miscChargeReversalCount++;
-
-                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Misc_Charge_Reversal",
+                       ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Misc_Charge_Reversal",
                                 new SqlParameter("@loads_id", loadsId),
-                              new SqlParameter("@account_record_number", miscChargeReversalCount),
+                              new SqlParameter("@account_record_number", accountRecordNumber),
                               new SqlParameter("@load_sequence", lineNumber),
                               new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                               new SqlParameter("@Amount", lineSegments[2].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[2].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
@@ -472,11 +450,9 @@ namespace PBSInvoiceExportLoad
                     }
                     else if (lineSegments[0] == "Payment")
                     {
-                        paymentCount++;
-
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Payment",
                                  new SqlParameter("@loads_id", loadsId),
-                              new SqlParameter("@account_record_number", paymentCount),
+                              new SqlParameter("@account_record_number", accountRecordNumber),
                               new SqlParameter("@load_sequence", lineNumber),
                               new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                               new SqlParameter("@Amount", lineSegments[2].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[2].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
@@ -489,13 +465,19 @@ namespace PBSInvoiceExportLoad
                     {
                         if (lineSegments[1] == "Bill")
                         {
-                            returnsBillCount++;
+                            if (returnsBillGroupCount == 0)
+                                returnsBillGroupCount++;
+                            else if (returnsBillGroupProductId != lineSegments[8].ToString())
+                            {
+                                returnsBillGroupCount++;
+                                returnsBillGroupProductId = lineSegments[8].ToString();
+                            }
 
                             ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Returns_Bill",
                                         new SqlParameter("@loads_id", loadsId),
-                                    new SqlParameter("@account_record_number", returnsBillCount),
-                                    new SqlParameter("@returns_group_number", lineNumber),
-                                    new SqlParameter("@load_sequence", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
+                                    new SqlParameter("@account_record_number", accountRecordNumber),
+                                    new SqlParameter("@returns_group_number", returnsBillGroupCount),
+                                    new SqlParameter("@load_sequence", lineNumber),
                                     new SqlParameter("@AccountID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
                                     new SqlParameter("@Amount", lineSegments[3].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[3].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
                                     new SqlParameter("@BillSourceID", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
@@ -503,21 +485,27 @@ namespace PBSInvoiceExportLoad
                                     new SqlParameter("@CompanyID", lineSegments[6].ToString() == "" ? (object)DBNull.Value : lineSegments[6].ToString()),
                                     new SqlParameter("@Description", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
                                     new SqlParameter("@ProductID", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
-                                    new SqlParameter("@Quantity", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
+                                    new SqlParameter("@Quantity", lineSegments[9].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[9].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
                                     new SqlParameter("@RecapFormat", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
                                     new SqlParameter("@RecapID", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
-                                    new SqlParameter("@Reversal", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
+                                    new SqlParameter("@Reversal", lineSegments[12].ToString() == "no" ? 1 : 0),
                                     new SqlParameter("@UnitRate", lineSegments[13].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[13].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)));
                         }
-                        else if (lineSegments[2] == "Draw")
+                        else if (lineSegments[1] == "Draw")
                         {
-                            returnsDrawCount++;
+                            if (returnsDrawGroupCount == 0)
+                                returnsDrawGroupCount++;
+                            else if (returnsDrawGroupProductId != lineSegments[10].ToString())
+                            {
+                                returnsDrawGroupCount++;
+                                returnsDrawGroupProductId = lineSegments[10].ToString();
+                            }
 
                             ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Returns_Draw",
                                      new SqlParameter("@loads_id", loadsId),
-                                  new SqlParameter("@account_record_number", returnsDrawCount),
+                                  new SqlParameter("@account_record_number", accountRecordNumber),
                                   new SqlParameter("@load_sequence", lineNumber),
-                                  new SqlParameter("@returns_group_number", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
+                                  new SqlParameter("@returns_group_number", returnsDrawGroupCount),
                                   new SqlParameter("@AccountID", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
                                   new SqlParameter("@BillSourceID", lineSegments[3].ToString() == "" ? (object)DBNull.Value : lineSegments[3].ToString()),
                                   new SqlParameter("@CompanyID", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
@@ -529,16 +517,15 @@ namespace PBSInvoiceExportLoad
                                   new SqlParameter("@ProductID", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
                                   new SqlParameter("@RouteID", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
                                   new SqlParameter("@RouteType", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
-                                  new SqlParameter("@SubstituteDelivery", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()));
+                                  new SqlParameter("@SubstituteDelivery", lineSegments[12].ToString() == "no" ? 1 : 0));
                         }
                      }
                     else if (lineSegments[0] == "Total Due")
                     {
-                        totalDueCount++;
-
+                        
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Total_Due",
                                       new SqlParameter("@loads_id", loadsId),
-                                      new SqlParameter("@account_record_number", totalDueCount),
+                                      new SqlParameter("@account_record_number", accountRecordNumber),
                                       new SqlParameter("@load_sequence", lineNumber),
                                       new SqlParameter("@AccountID", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
                                       new SqlParameter("@Amount", lineSegments[2].ToString() == "" ? (object)DBNull.Value : Decimal.Parse(lineSegments[2].ToString(), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign)),
@@ -549,6 +536,15 @@ namespace PBSInvoiceExportLoad
                 }
 
             }
+
+            WriteToJobLog(JobLogMessageType.INFO, $"{lineNumber} total records read.");
+            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "dbo.Proc_Update_Loads",
+                                     new SqlParameter("@pintLoadsID", loadsId),
+                                new SqlParameter("@pvchrBillSourceID", runType),
+                                new SqlParameter("@pvchrBillDate", runDate.Value.ToShortDateString()),
+                                new SqlParameter("@pintRecordCount", lineNumber),
+                                new SqlParameter("@pflgSuccessfulLoad", true));
+            WriteToJobLog(JobLogMessageType.INFO, "Load information updated");
         }
     }
 }
