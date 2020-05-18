@@ -1,0 +1,10 @@
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\QualificationReportLoad.dll
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\QualificationReportLoad.pdb
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.csproj.CopyComplete
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.dll
+C:\projects\Applications\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.pdb

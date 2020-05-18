@@ -506,6 +506,9 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.PBSInvoiceExportLoad:
                     connectionString = GetConnectionString("pbsinvoiceexport");
                     break;
+                case DatabaseConnectionStringNames.QualificationReportLoad:
+                    connectionString = GetConnectionString("qualificationreport");
+                    break;
                 default:
                     break;
             }
@@ -542,41 +545,7 @@ namespace BSJobBase
                 .Where(f => ((reg == null) ? true : reg.IsMatch(Path.GetFileName(f))))
                 .ToList();
         }
-
-        //public static List<string> GetFiles(string sourceDirectory, int ageLimitMinutes)
-        //{
-        //    // validate existence of directory
-        //    CheckCreateDirectory(sourceDirectory);
-
-        //    return Directory.GetFiles(sourceDirectory)
-        //        .Where(f => File.GetCreationTime(f) < DateTime.Now.AddMinutes(ageLimitMinutes * -1))
-        //        .ToList();
-        //}
-
-        //public static List<string> GetFiles(string sourceDirectory, Regex reg, int ageLimitMinutes)
-        //{
-        //    // validate existence of directory
-        //    CheckCreateDirectory(sourceDirectory);
-
-        //    return Directory.GetFiles(sourceDirectory)
-        //        .Where(f => ((reg == null) ? true : reg.IsMatch(Path.GetFileName(f))) && File.GetCreationTime(f) < DateTime.Now.AddMinutes(ageLimitMinutes * -1))
-        //        .ToList();
-        //}
-
-        /// <summary>
-        /// Send email using default sender email address. See DefaultSender in ManagedJobsUtilitySystem section of app.config.
-        /// </summary>
-        /// <param name="recipients"></param>
-        /// <param name="subject"></param>
-        /// <param name="body"></param>
-        /// <param name="bodyIsHTML"></param>
-        /// <param name="ccs">Optional</param>
-        /// <param name="bccs">Optional</param>
-        //protected void SendMail(string recipients, string subject, string body, bool bodyIsHTML, string ccs = null, string bccs = null, string attachment = null)
-        //{
-        //    string from = GetConfigurationKeyValue("BSJobUtility", "DefaultSender");
-        //    SendMail(from, recipients, subject, body, bodyIsHTML, ccs, bccs, attachment);
-        //}
+             
 
         /// <summary>
         /// Send email. See mail settings in ManagedJobsUtilitySystem section of app.config.
@@ -657,160 +626,7 @@ namespace BSJobBase
                 throw;
             }
         }
-
-        //protected string GenerateEmailBodyAsHTML(string bodyText)
-        //{
-        //    return GenerateEmailBodyAsHTML(null, bodyText, null);
-        //}
-
-        //protected string GenerateEmailBodyAsHTML(string headerText, string bodyText, string footerText)
-        //{
-        //    StringBuilder builder = new StringBuilder();
-
-        //    try
-        //    {
-        //        builder.Append("<meta http-equiv=\"Content - Type\" content=\"text / html; charset = iso - 8859 - 1\">");
-
-        //        if (headerText != null && headerText != "")
-        //        {
-        //            builder.Append(headerText.Replace(Environment.NewLine, "<br>"));
-        //            builder.Append("<br>");
-        //        }
-
-        //        if (bodyText != null && bodyText != "")
-        //        {
-        //            builder.Append(bodyText.Replace(Environment.NewLine, "<br>"));
-        //            builder.Append("<br>");
-        //        }
-
-        //        if (footerText != null && footerText != "")
-        //        {
-        //            builder.Append(footerText.Replace(Environment.NewLine, "<br>"));
-        //            builder.Append("<br>");
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //        throw;
-        //    }
-
-        //    return builder.ToString();
-        //}
-
-        //public int DefaultSQLCommandTimeout
-        //{
-        //    get
-        //    {
-        //        int returnValue = 60;
-
-        //        try
-        //        {
-        //            returnValue = int.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSQLCommandTimeout"));
-        //        }
-        //        catch (Exception)
-        //        {
-
-        //            throw;
-        //        }
-
-        //        return returnValue;
-        //    }
-        //}
-
-        //protected string GenerateEmailBodyAsHTML(string bodyHeaderText, List<EmailTableHeader> tableHeaders, IEnumerable<EmailTableBodyItemBase> tableRows)
-        //{
-        //    return GenerateEmailBodyAsHTML(bodyHeaderText, tableHeaders, tableRows, "");
-        //}
-
-        //protected string GenerateEmailBodyAsHTML(string bodyHeaderText, List<EmailTableHeader> tableHeaders, IEnumerable<EmailTableBodyItemBase> tableRows, string bodyFooterText)
-        //{
-        //    StringBuilder builder = new StringBuilder();
-
-        //    try
-        //    {
-        //        builder.Append("<meta http-equiv=\"Content - Type\" content=\"text / html; charset = iso - 8859 - 1\">");
-        //        builder.Append(bodyHeaderText == null ? "" : bodyHeaderText);
-        //        builder.Append("<br>");
-        //        builder.Append(GenerateTableAsHTML(tableHeaders, tableRows));
-        //        builder.Append("<br>");
-        //        builder.Append(bodyFooterText == null ? "" : bodyFooterText);
-        //        builder.Append("<br>");
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //        throw;
-        //    }
-
-        //    return builder.ToString();
-        //}
-
-        //protected string GenerateTableAsHTML(List<EmailTableHeader> tableHeaders, IEnumerable<EmailTableBodyItemBase> tableRows)
-        //{
-        //    StringBuilder builder = new StringBuilder();
-
-        //    if (tableHeaders != null && tableRows != null)
-        //    {
-        //        double columnWidth = 1 / tableHeaders.Count;
-
-        //        builder.Append("<table border=\"3\" style=\"border - collapse: collapse\">");
-
-        //        // write table header row
-        //        builder.Append("<tr>");
-
-        //        foreach (EmailTableHeader item in tableHeaders)
-        //        {
-        //            builder.Append(string.Format("<td width=\"{0}%\">", columnWidth));
-        //            builder.Append(string.Format("<b>{0}</b>", item.HeaderText));
-        //            builder.Append("</td>");
-        //        }
-
-        //        builder.Append("</tr>");
-
-        //        string backgroundColor = "White";
-
-        //        // write table body rows
-        //        foreach (EmailTableBodyItemBase item in tableRows)
-        //        {
-        //            builder.Append("<tr>");
-
-        //            foreach (EmailTableBodyCell subItem in item.ItemsToListOfEmailTableBodyCells())
-        //            {
-        //                switch (subItem.Type)
-        //                {
-        //                    case EmailCellType.NONE:
-        //                        backgroundColor = "White";
-        //                        break;
-        //                    case EmailCellType.INFO:
-        //                        backgroundColor = "Silver";
-        //                        break;
-        //                    case EmailCellType.ERROR:
-        //                        backgroundColor = "Red";
-        //                        break;
-        //                    default:
-        //                        break;
-        //                }
-
-        //                builder.Append($"<td colspan=\"{subItem.ColumnSpan}\" style=\"background-color: {backgroundColor};\">");
-
-        //                if (subItem.ContentIsHTML)
-        //                    builder.Append($"<b>{subItem.Content}</b>");
-        //                else
-        //                    builder.Append($"<b>{WebUtility.HtmlEncode(subItem.Content)}</b>");
-
-        //                builder.Append("</td>");
-        //            }
-
-        //            builder.Append("</tr>");
-        //        }
-
-        //        builder.Append("</table>");
-        //    }
-
-        //    return builder.ToString();
-        //}
-
+      
 
         #endregion
 

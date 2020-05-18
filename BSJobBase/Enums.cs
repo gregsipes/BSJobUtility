@@ -19,7 +19,8 @@ namespace BSJobBase
         BARC,
         Wrappers,
         Manifests,
-        PBSInvoiceExportLoad
+        PBSInvoiceExportLoad,
+        QualificationReportLoad
     }
 
     public enum JobLogMessageType

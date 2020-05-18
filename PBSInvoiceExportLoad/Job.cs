@@ -52,7 +52,6 @@ namespace PBSInvoiceExportLoad
                         if (previouslyLoadedFile == null)
                         {
                             //make sure we the file is no longer being edited
-                            var x = (DateTime.Now - fileInfo.LastWriteTime).TotalMinutes;
                             if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
                             {
                                 WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");

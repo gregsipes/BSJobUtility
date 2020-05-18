@@ -358,9 +358,6 @@ namespace ManifestLoad
                 }
             }
 
-            //test code
-            Int32 total = routeDetailCounter + advanceDetailCounter + advanceTotalCounter + TMDetailCounter + TMTotalCounter + truckTotalCounter + ignoredCounter;
-
             WriteToJobLog(JobLogMessageType.INFO, $"{routeDetailCounter + advanceDetailCounter + advanceTotalCounter + TMDetailCounter + TMTotalCounter + truckTotalCounter} total records read for publishing date {runDate.Value.ToShortDateString() ?? ""} type {runType}");
             WriteToJobLog(JobLogMessageType.INFO, $"{routeDetailCounter} route detail read.");
             WriteToJobLog(JobLogMessageType.INFO, $"{advanceDetailCounter} advance detail read.");

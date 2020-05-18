@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManifestLoadAdvance", "Mani
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBSInvoiceExportLoad", "PBSInvoiceExportLoad\PBSInvoiceExportLoad.csproj", "{5E72A50A-0CA6-481B-B937-C54BE921D6CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QualificationReportLoad", "QualificationReportLoad\QualificationReportLoad.csproj", "{1D5268DF-D016-4EAC-BB9E-073275C349D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{5E72A50A-0CA6-481B-B937-C54BE921D6CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E72A50A-0CA6-481B-B937-C54BE921D6CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E72A50A-0CA6-481B-B937-C54BE921D6CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D5268DF-D016-4EAC-BB9E-073275C349D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D5268DF-D016-4EAC-BB9E-073275C349D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D5268DF-D016-4EAC-BB9E-073275C349D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D5268DF-D016-4EAC-BB9E-073275C349D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +83,7 @@ Global
 		{8FE50883-E98D-4AF9-B359-B217ACDECB75} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{14FA5A9B-60B8-4D1D-B354-6DB61D6F77A4} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{5E72A50A-0CA6-481B-B937-C54BE921D6CE} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{1D5268DF-D016-4EAC-BB9E-073275C349D3} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}
