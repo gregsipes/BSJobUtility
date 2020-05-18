@@ -29,6 +29,7 @@ namespace PBSMacrosLoad
                     // if (fileInfo.LastWriteTime.Date == DateTime.Today.Date && !fileInfo.Name.Contains(".="))
                     if (!fileInfo.Name.Contains(".="))
                     {
+                        WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.Name} last write time {fileInfo.LastAccessTime}");
 
                         Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "Proc_Select_Loads_If_Processed",
                                                                  new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
