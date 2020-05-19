@@ -18,7 +18,7 @@ namespace QualificationReportLoad
             {
                 List<string> files = Directory.GetFiles(GetConfigurationKeyValue("InputDirectory"), "combined*.pqr").ToList();
 
-                List<string> processedFiles = new List<string>();
+              //  List<string> processedFiles = new List<string>();
 
                 if (files != null && files.Count() > 0)
                 {
@@ -35,7 +35,7 @@ namespace QualificationReportLoad
                         {
                             WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
                             CopyAndProcessFile(fileInfo);
-                            processedFiles.Add(fileInfo.Name);
+                           // processedFiles.Add(fileInfo.Name);
                         }
                         //else
                         //{
@@ -80,7 +80,7 @@ namespace QualificationReportLoad
             loadsId = Int32.Parse(result["loads_id"].ToString());
             WriteToJobLog(JobLogMessageType.INFO, $"Loads ID: {loadsId}");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "Proc_Update_Loads_Backup",
+            ExecuteNonQuery(DatabaseConnectionStringNames.QualificationReportLoad, "Proc_Update_Loads_Backup",
                                         new SqlParameter("@pintLoadsID", loadsId),
                                         new SqlParameter("@pstrBackupFile", backupFileName));
 
@@ -106,7 +106,12 @@ namespace QualificationReportLoad
                         if (line.Trim() == startOfRecordsLine)
                             pastStartLine = true;
                         else if (line.StartsWith("Mailer Name"))
+                        {
                             runDate = DateTime.Parse(line.Substring(60, 2) + "/" + line.Substring(62, 2) + "/" + line.Substring(56, 4));
+                            ExecuteNonQuery(DatabaseConnectionStringNames.QualificationReportLoad, "dbo.Proc_Update_Loads_Date",
+                                                        new SqlParameter("@pintLoadsID", loadsId),
+                                                        new SqlParameter("@sdatRunDate", runDate.Value.ToShortDateString()));
+                        }
 
                     }
                     else
