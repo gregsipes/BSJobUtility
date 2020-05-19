@@ -20,7 +20,9 @@ namespace BSJobBase
         Wrappers,
         Manifests,
         PBSInvoiceExportLoad,
-        QualificationReportLoad
+        QualificationReportLoad,
+        OfficePay,
+        AutoRenew
     }
 
     public enum JobLogMessageType

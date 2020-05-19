@@ -509,6 +509,12 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.QualificationReportLoad:
                     connectionString = GetConnectionString("qualificationreport");
                     break;
+                case DatabaseConnectionStringNames.OfficePay:
+                    connectionString = GetConnectionString("officepay");
+                    break;
+                case DatabaseConnectionStringNames.AutoRenew:
+                    connectionString = GetConnectionString("autorenew");
+                    break;
                 default:
                     break;
             }
