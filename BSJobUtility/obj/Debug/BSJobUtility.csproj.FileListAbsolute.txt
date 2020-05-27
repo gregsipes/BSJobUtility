@@ -57,3 +57,5 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceExportLoa
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceExportLoad.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\QualificationReportLoad.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\QualificationReportLoad.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\OfficePay.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\OfficePay.pdb
