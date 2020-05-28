@@ -7,4 +7,3 @@ C:\projects\Applications\BSJobUtility\OfficePay\bin\Debug\BSJobBase.dll.config
 C:\projects\Applications\BSJobUtility\OfficePay\obj\Debug\OfficePay.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\OfficePay\obj\Debug\OfficePay.dll
 C:\projects\Applications\BSJobUtility\OfficePay\obj\Debug\OfficePay.pdb
-C:\projects\Applications\BSJobUtility\OfficePay\obj\Debug\OfficePay.csprojAssemblyReference.cache
