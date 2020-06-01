@@ -633,6 +633,22 @@ namespace BSJobBase
             }
         }
       
+        protected object FormatCurrency(string inputString)
+        {
+            if (inputString.Trim() == "" || inputString.Trim() == "?")
+                return (object)DBNull.Value;
+            else
+            {
+                inputString = inputString.Replace("$", "").Trim();
+
+                if (inputString.EndsWith("-"))
+                    return Decimal.Parse(inputString, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign);
+                else
+                    return inputString;
+
+            }
+
+        }
 
         #endregion
 
