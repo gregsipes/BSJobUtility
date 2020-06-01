@@ -49,6 +49,8 @@ namespace BSJobUtility
                 _managedJob = new QualificationReportLoad.Job();
             else if (_jobName == "OfficePay")
                 _managedJob = new OfficePay.Job();
+            else if (_jobName == "AutoRenew")
+                _managedJob = new AutoRenew.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

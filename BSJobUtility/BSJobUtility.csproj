@@ -54,6 +54,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AutoRenew\AutoRenew.csproj">
+      <Project>{47bbd75c-7e23-40a0-b6a4-7fffc7e37ef4}</Project>
+      <Name>AutoRenew</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BSJobBase\BSJobBase.csproj">
       <Project>{814ddf3f-573f-4ea8-a7a1-e789e4608b9b}</Project>
       <Name>BSJobBase</Name>
