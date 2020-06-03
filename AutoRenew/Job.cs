@@ -63,13 +63,14 @@ namespace AutoRenew
 
         private void CopyAndProcessFile(FileInfo fileInfo)
         {
-            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
+            //for some reason, this job isn't currently backing up the input, so we will blindly follow
+           // string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
             Int32 loadsId = 0;
 
 
             //copy file to backup directory
-            File.Copy(fileInfo.FullName, backupFileName);
-            WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
+            //File.Copy(fileInfo.FullName, backupFileName);
+            //WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
 
             //update or create a load id
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.AutoRenew, "Proc_Insert_Loads",
@@ -86,9 +87,9 @@ namespace AutoRenew
             loadsId = Int32.Parse(result["loads_id"].ToString());
             WriteToJobLog(JobLogMessageType.INFO, $"Loads ID: {loadsId}");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "Proc_Update_Loads_Backup",
-                                        new SqlParameter("@pintLoadsID", loadsId),
-                                        new SqlParameter("@pstrBackupFile", backupFileName));
+            //ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "Proc_Update_Loads_Backup",
+            //                            new SqlParameter("@pintLoadsID", loadsId),
+            //                            new SqlParameter("@pstrBackupFile", backupFileName));
 
             //parse file and store contents
             List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
@@ -103,7 +104,7 @@ namespace AutoRenew
                 if (line != null && line.Trim().Length > 0)
                 {
                     List<string> lineSegments = line.Split('|').ToList();
-                    List<string> segmentNames = new List<string>() { "F1", "B1", "C1", "D1", "X1", "EG", "E1", "G1", "G2", "G3",
+                    List<string> segmentNames = new List<string>() { "F1", "A1", "A2", "B1", "C1", "D1", "X1", "EG", "E1", "G1", "G2", "G3",
                                                                      "G4", "Z0", "Z1", "Z2", "M1", "M2", "P1", "P2", "R1", "R2",
                                                                      "SG", "S1", "S2", "T1", "TC" };
 
@@ -136,13 +137,14 @@ namespace AutoRenew
                     Int32 T1Count = 0;
                     Int32 TCCount = 0;
 
+                    bool hasS1Segment = false;
+
 
                     string currentSegmentName = lineSegments[0];
                     Int32 lineSegmentCounter = 0;
 
                     foreach (string lineSegment in lineSegments)
                     {
-
 
                         //check to see if we are starting a new segment
                         if (segmentNames.Where(s => s == lineSegment).FirstOrDefault() != null)
@@ -158,47 +160,59 @@ namespace AutoRenew
                                                    new SqlParameter("@loads_id", loadsId),
                                                    new SqlParameter("@pbs_record_number", lineNumber),
                                                    new SqlParameter("@segment_instance", SGCount),
-                                                   new SqlParameter("@bill_to_name", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                   new SqlParameter("@bill_to_address_1", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                   new SqlParameter("@bill_to_address_2", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                   new SqlParameter("@bill_to_address_3", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                   new SqlParameter("@zip", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                   new SqlParameter("@zip_extension", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                   new SqlParameter("@delivery_point_code", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()),
-                                                   new SqlParameter("@route", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()),
-                                                   new SqlParameter("@imb", lineSegments[lineSegmentCounter + 9].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 9].ToString()),
-                                                   new SqlParameter("@encoded_imb_mixed_case", lineSegments[lineSegmentCounter + 10].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 10].ToString()),
-                                                   new SqlParameter("@encoded_imb_uppercase", lineSegments[lineSegmentCounter + 11].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 11].ToString()),
+                                                   new SqlParameter("@bill_to_name", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                   new SqlParameter("@bill_to_address_1", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                   new SqlParameter("@bill_to_address_2", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                   new SqlParameter("@bill_to_address_3", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                   new SqlParameter("@zip", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                   new SqlParameter("@zip_extension", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                   new SqlParameter("@delivery_point_code", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                   new SqlParameter("@route", FormatString(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                   new SqlParameter("@imb", FormatString(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                   new SqlParameter("@encoded_imb_mixed_case", FormatString(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                   new SqlParameter("@encoded_imb_uppercase", FormatString(lineSegments[lineSegmentCounter + 11].ToString())),
                                                    new SqlParameter("@last_field", (object)DBNull.Value));
                                     break;
                                 case "S1":
-                                    S1Count++;
 
-                                    ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "dbo.Proc_Insert_Subscription_S1",
-                                               new SqlParameter("@loads_id", loadsId),
-                                               new SqlParameter("@pbs_record_number", lineNumber),
-                                               new SqlParameter("@segment_instance", S1Count),
-                                               new SqlParameter("@subscription_number", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                               new SqlParameter("@delivery_schedule", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                               new SqlParameter("@expire_date", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                               new SqlParameter("@end_grace_date", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" || lineSegments[lineSegmentCounter + 4].ToString() == "?" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                               new SqlParameter("@days_of_week_1", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                               new SqlParameter("@days_of_week_2", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                               new SqlParameter("@publication_name", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()),
-                                               new SqlParameter("@lockbox_scanline_data", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()),
-                                               new SqlParameter("@renewal_run_date", lineSegments[lineSegmentCounter + 9].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 9].ToString()),
-                                               new SqlParameter("@renewal_invoice_or_grace", lineSegments[lineSegmentCounter + 10].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 10].ToString()),
-                                               new SqlParameter("@last_renewal_date", lineSegments[lineSegmentCounter + 11].ToString().Trim() == "" || lineSegments[lineSegmentCounter + 11].ToString() == "?" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 11].ToString()),
-                                               new SqlParameter("@renewal_number", lineSegments[lineSegmentCounter + 12].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 12].ToString()),
-                                               new SqlParameter("@start_reason_code", lineSegments[lineSegmentCounter + 13].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 13].ToString()),
-                                               new SqlParameter("@number_of_payments_since_start", lineSegments[lineSegmentCounter + 14].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 14].ToString()),
-                                               new SqlParameter("@copies_1", lineSegments[lineSegmentCounter + 15].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 15].ToString()),
-                                               new SqlParameter("@copies_2", lineSegments[lineSegmentCounter + 16].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 16].ToString()),
-                                               new SqlParameter("@copies_3", lineSegments[lineSegmentCounter + 17].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 17].ToString()),
-                                               new SqlParameter("@copies_4", lineSegments[lineSegmentCounter + 18].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 18].ToString()),
-                                               new SqlParameter("@copies_5", lineSegments[lineSegmentCounter + 19].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 19].ToString()),
-                                               new SqlParameter("@copies_6", lineSegments[lineSegmentCounter + 20].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 20].ToString()),
-                                               new SqlParameter("@copies_7", lineSegments[lineSegmentCounter + 21].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 21].ToString()));
+                                    if (!hasS1Segment)
+                                    {
+                                        S1Count++;
+
+                                        //test code
+                                        if (lineNumber >= 2383)
+                                        {
+                                            var x = 2 + 1;
+                                        }
+
+                                        ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "dbo.Proc_Insert_Subscription_S1",
+                                                    new SqlParameter("@loads_id", loadsId),
+                                                    new SqlParameter("@pbs_record_number", lineNumber),
+                                                    new SqlParameter("@segment_instance", S1Count),
+                                                    new SqlParameter("@subscription_number", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@delivery_schedule", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@expire_date", FormatDateTime(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@end_grace_date", FormatDateTime(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@days_of_week_1", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@days_of_week_2", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@publication_name", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@lockbox_scanline_data", FormatString(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@renewal_run_date", FormatDateTime(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@renewal_invoice_or_grace", FormatString(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@last_renewal_date", FormatDateTime(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@renewal_number", FormatString(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@start_reason_code", FormatString(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@number_of_payments_since_start", FormatString(lineSegments[lineSegmentCounter + 14].ToString())),
+                                                    new SqlParameter("@copies_1", FormatString(lineSegments[lineSegmentCounter + 15].ToString())),
+                                                    new SqlParameter("@copies_2", FormatString(lineSegments[lineSegmentCounter + 16].ToString())),
+                                                    new SqlParameter("@copies_3", FormatString(lineSegments[lineSegmentCounter + 17].ToString())),
+                                                    new SqlParameter("@copies_4", FormatString(lineSegments[lineSegmentCounter + 18].ToString())),
+                                                    new SqlParameter("@copies_5", FormatString(lineSegments[lineSegmentCounter + 19].ToString())),
+                                                    new SqlParameter("@copies_6", FormatString(lineSegments[lineSegmentCounter + 20].ToString())),
+                                                    new SqlParameter("@copies_7", FormatString(lineSegments[lineSegmentCounter + 21].ToString())));
+
+                                        hasS1Segment = true;
+                                    }
 
                                     break;
                                 case "S2":
@@ -208,15 +222,15 @@ namespace AutoRenew
                                                new SqlParameter("@loads_id", loadsId),
                                                new SqlParameter("@pbs_record_number", lineNumber),
                                                new SqlParameter("@segment_instance", SGCount),
-                                               new SqlParameter("@original_start_date", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                               new SqlParameter("@source_of_last_start", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                               new SqlParameter("@subsource_of_last_start", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                               new SqlParameter("@credit_status", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                               new SqlParameter("@occupant_type", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                               new SqlParameter("@census_tract", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                               new SqlParameter("@dwelling_type", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()),
-                                               new SqlParameter("@abc_zone", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()),
-                                               new SqlParameter("@method_of_renewal_delivery", lineSegments[lineSegmentCounter + 9].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 9].ToString()));
+                                               new SqlParameter("@original_start_date", FormatDateTime(lineSegments[lineSegmentCounter + 1].ToString())),
+                                               new SqlParameter("@source_of_last_start", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                               new SqlParameter("@subsource_of_last_start", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                               new SqlParameter("@credit_status", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                               new SqlParameter("@occupant_type", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                               new SqlParameter("@census_tract", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                               new SqlParameter("@dwelling_type", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                               new SqlParameter("@abc_zone", FormatString(lineSegments[lineSegmentCounter + 8].ToString())),
+                                               new SqlParameter("@method_of_renewal_delivery", FormatString(lineSegments[lineSegmentCounter + 1].ToString())));
                                     break;
                                 case "EG":
                                     EGCount++;
@@ -225,20 +239,20 @@ namespace AutoRenew
                                                new SqlParameter("@loads_id", loadsId),
                                                new SqlParameter("@pbs_record_number", lineNumber),
                                                new SqlParameter("@segment_instance", EGCount),
-                                               new SqlParameter("@number_of_subscribers_in_group", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
+                                               new SqlParameter("@number_of_subscribers_in_group", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
                                                new SqlParameter("@last_field", (object)DBNull.Value));
                                     break;
                                 case "F1":
                                     F1Count++;
 
                                     ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "dbo.Proc_Insert_Additional_Fields_F1",
-                                               new SqlParameter("@loads_id", loadsId),
-                                               new SqlParameter("@pbs_record_number", lineNumber),
-                                               new SqlParameter("@segment_instance", F1Count),
-                                               new SqlParameter("@renewal_delivery_override_code", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                               new SqlParameter("@route_walk_sequence", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                               new SqlParameter("@trip_walk_sequence", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()));
-                                    break;
+                                              new SqlParameter("@loads_id", loadsId),
+                                              new SqlParameter("@pbs_record_number", lineNumber),
+                                              new SqlParameter("@segment_instance", F1Count),
+                                              new SqlParameter("@renewal_delivery_override_code", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                              new SqlParameter("@route_walk_sequence", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                              new SqlParameter("@trip_walk_sequence", FormatString(lineSegments[lineSegmentCounter + 3].ToString())));
+                                   break;
                                 case "A1":
                                     A1Count++;
 
@@ -246,14 +260,14 @@ namespace AutoRenew
                                                new SqlParameter("@loads_id", loadsId),
                                                new SqlParameter("@pbs_record_number", lineNumber),
                                                new SqlParameter("@segment_instance", A1Count),
-                                               new SqlParameter("@tip_amount", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                               new SqlParameter("@credit_card_number", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                               new SqlParameter("@credit_card_authorization_number", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                               new SqlParameter("@credit_card_expiration_date", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                               new SqlParameter("@bank_number", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                               new SqlParameter("@client_type", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                               new SqlParameter("@account_type", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()),
-                                               new SqlParameter("@account_number", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()));
+                                               new SqlParameter("@tip_amount", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                               new SqlParameter("@credit_card_number", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                               new SqlParameter("@credit_card_authorization_number", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                               new SqlParameter("@credit_card_expiration_date", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                               new SqlParameter("@bank_number", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                               new SqlParameter("@client_type", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                               new SqlParameter("@account_type", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                               new SqlParameter("@account_number", FormatString(lineSegments[lineSegmentCounter + 8].ToString())));
                                      break;
                                 case "A2":
                                     A2Count++;
@@ -262,9 +276,9 @@ namespace AutoRenew
                                                new SqlParameter("@loads_id", loadsId),
                                                new SqlParameter("@pbs_record_number", lineNumber),
                                                new SqlParameter("@segment_instance", A2Count),
-                                               new SqlParameter("@adj_code_id", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                               new SqlParameter("@adj_code_desc", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                               new SqlParameter("@adj_amount", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()));
+                                               new SqlParameter("@adj_code_id", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                               new SqlParameter("@adj_code_desc", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                               new SqlParameter("@adj_amount", FormatNumber(lineSegments[lineSegmentCounter + 3].ToString())));
                                    break;
                                 case "B1":
                                     B1Count++;
@@ -273,23 +287,23 @@ namespace AutoRenew
                                                new SqlParameter("@loads_id", loadsId),
                                                new SqlParameter("@pbs_record_number", lineNumber),
                                                new SqlParameter("@segment_instance", B1Count),
-                                               new SqlParameter("@bill_to_name", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                               new SqlParameter("@bill_to_address_1", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                               new SqlParameter("@bill_to_address_2", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                               new SqlParameter("@bill_to_address_3", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                               new SqlParameter("@zip", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                               new SqlParameter("@zip_extension", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                               new SqlParameter("@delivery_point_code", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()),
-                                               new SqlParameter("@po_route_type", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()),
-                                               new SqlParameter("@bill_to_indicator", lineSegments[lineSegmentCounter + 9].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 9].ToString()),
-                                               new SqlParameter("@bill_to_occupant_id", lineSegments[lineSegmentCounter + 10].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 10].ToString()),
-                                               new SqlParameter("@bill_to_address_id", lineSegments[lineSegmentCounter + 11].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 11].ToString()),
-                                               new SqlParameter("@bill_to_full_billing_name", lineSegments[lineSegmentCounter + 12].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 12].ToString()),
-                                               new SqlParameter("@bill_to_other_name", lineSegments[lineSegmentCounter + 13].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 13].ToString()),
-                                               new SqlParameter("@imb", lineSegments[lineSegmentCounter + 14].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 14].ToString()),
-                                               new SqlParameter("@encoded_imb_mixed_case", lineSegments[lineSegmentCounter + 15].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 15].ToString()),
-                                               new SqlParameter("@encoded_imb_uppercase", lineSegments[lineSegmentCounter + 16].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 16].ToString()),
-                                               new SqlParameter("@bill_to_address_isonline", lineSegments[lineSegmentCounter + 17].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 17].ToString()));
+                                               new SqlParameter("@bill_to_name", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                               new SqlParameter("@bill_to_address_1", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                               new SqlParameter("@bill_to_address_2", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                               new SqlParameter("@bill_to_address_3", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                               new SqlParameter("@zip", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                               new SqlParameter("@zip_extension", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                               new SqlParameter("@delivery_point_code", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                               new SqlParameter("@po_route_type", FormatString(lineSegments[lineSegmentCounter + 8].ToString())),
+                                               new SqlParameter("@bill_to_indicator", FormatString(lineSegments[lineSegmentCounter + 9].ToString())),
+                                               new SqlParameter("@bill_to_occupant_id", FormatString(lineSegments[lineSegmentCounter + 10].ToString())),
+                                               new SqlParameter("@bill_to_address_id", FormatString(lineSegments[lineSegmentCounter + 11].ToString())),
+                                               new SqlParameter("@bill_to_full_billing_name", FormatString(lineSegments[lineSegmentCounter + 12].ToString())),
+                                               new SqlParameter("@bill_to_other_name", FormatString(lineSegments[lineSegmentCounter + 13].ToString())),
+                                               new SqlParameter("@imb", FormatString(lineSegments[lineSegmentCounter + 14].ToString())),
+                                               new SqlParameter("@encoded_imb_mixed_case", FormatString(lineSegments[lineSegmentCounter + 15].ToString())),
+                                               new SqlParameter("@encoded_imb_uppercase", FormatString(lineSegments[lineSegmentCounter + 16].ToString())),
+                                               new SqlParameter("@bill_to_address_isonline", FormatString(lineSegments[lineSegmentCounter + 17].ToString())));
                                     break;
                                 case "C1":
                                     C1Count++;
@@ -298,17 +312,17 @@ namespace AutoRenew
                                                   new SqlParameter("@loads_id", loadsId),
                                                  new SqlParameter("@pbs_record_number", lineNumber),
                                                  new SqlParameter("@segment_instance", C1Count),
-                                                 new SqlParameter("@carrier_name", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                 new SqlParameter("@carrier_home_area_code", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                 new SqlParameter("@carrier_home_phone", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                 new SqlParameter("@district_manager", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                 new SqlParameter("@zone_manager", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                 new SqlParameter("@regional_manager", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                 new SqlParameter("@area_manager", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()),
-                                                 new SqlParameter("@depot", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()),
-                                                 new SqlParameter("@depot_drop_order", lineSegments[lineSegmentCounter + 9].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 9].ToString()),
-                                                 new SqlParameter("@truck", lineSegments[lineSegmentCounter + 10].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 10].ToString()),
-                                                 new SqlParameter("@route_drop_sequence", lineSegments[lineSegmentCounter + 11].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 11].ToString()));
+                                                 new SqlParameter("@carrier_name", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                 new SqlParameter("@carrier_home_area_code", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                 new SqlParameter("@carrier_home_phone", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                 new SqlParameter("@district_manager", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                 new SqlParameter("@zone_manager", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                 new SqlParameter("@regional_manager", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                 new SqlParameter("@area_manager", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                 new SqlParameter("@depot", FormatString(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                 new SqlParameter("@depot_drop_order", FormatString(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                 new SqlParameter("@truck", FormatString(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                 new SqlParameter("@route_drop_sequence", FormatString(lineSegments[lineSegmentCounter + 11].ToString())));
                                     break;
                                 case "D1":
                                     D1Count++;
@@ -317,20 +331,20 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", D1Count),
-                                                    new SqlParameter("@deliver_to_name", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@deliver_to_address_1", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@deliver_to_address_2", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@deliver_to_address_3", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@zip", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                    new SqlParameter("@zip_extension", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                    new SqlParameter("@delivery_point_code", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()),
-                                                    new SqlParameter("@newspaper_delivery_route", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()),
-                                                    new SqlParameter("@route_type", lineSegments[lineSegmentCounter + 9].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 9].ToString()),
-                                                    new SqlParameter("@subscription_home_area_code", lineSegments[lineSegmentCounter + 10].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 10].ToString()),
-                                                    new SqlParameter("@subscription_home_phone", lineSegments[lineSegmentCounter + 11].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 11].ToString()),
-                                                    new SqlParameter("@trip_id", lineSegments[lineSegmentCounter + 12].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 12].ToString()),
-                                                    new SqlParameter("@full_delivery_name", lineSegments[lineSegmentCounter + 13].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 13].ToString()),
-                                                    new SqlParameter("@other_name", lineSegments[lineSegmentCounter + 14].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 14].ToString()));
+                                                    new SqlParameter("@deliver_to_name", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@deliver_to_address_1", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@deliver_to_address_2", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@deliver_to_address_3", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@zip", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@zip_extension", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@delivery_point_code", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@newspaper_delivery_route", FormatString(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@route_type", FormatString(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@subscription_home_area_code", FormatString(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@subscription_home_phone", FormatString(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@trip_id", FormatString(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@full_delivery_name", FormatString(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@other_name", FormatString(lineSegments[lineSegmentCounter + 14].ToString())));
                                     break;
                                 case "X1":
                                     X1Count++;
@@ -339,9 +353,9 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", X1Count),
-                                                    new SqlParameter("@demographic_type", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@demographic_question", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@demographic_answer", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()));
+                                                    new SqlParameter("@demographic_type", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@demographic_question", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@demographic_answer", FormatString(lineSegments[lineSegmentCounter + 3].ToString())));
                                     break;
                                 case "E1":
                                     E1Count++;
@@ -350,21 +364,21 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", E1Count),
-                                                    new SqlParameter("@transaction_date", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@transaction_description", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@reason_code", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@comments", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@value_of_adjustment", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                    new SqlParameter("@days_adjusted", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                    new SqlParameter("@transfer_amount", FormatCurrency(lineSegments[lineSegmentCounter + 7].ToString())),
-                                                    new SqlParameter("@transfer_days", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()),
-                                                    new SqlParameter("@payment_amount", FormatCurrency(lineSegments[lineSegmentCounter + 9].ToString())),
-                                                    new SqlParameter("@tip_amount", FormatCurrency(lineSegments[lineSegmentCounter + 10].ToString())),
-                                                    new SqlParameter("@coupon_amount", FormatCurrency(lineSegments[lineSegmentCounter + 11].ToString())),
-                                                    new SqlParameter("@payment_adjustment_description", lineSegments[lineSegmentCounter + 12].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 12].ToString()),
-                                                    new SqlParameter("@payment_adjustment_amount", FormatCurrency(lineSegments[lineSegmentCounter + 13].ToString())),
-                                                    new SqlParameter("@update_expire_adjustment_amount", FormatCurrency(lineSegments[lineSegmentCounter + 14].ToString())),
-                                                    new SqlParameter("@donation_amount", FormatCurrency(lineSegments[lineSegmentCounter + 15].ToString())));
+                                                    new SqlParameter("@transaction_date", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@transaction_description", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@reason_code", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@comments", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@value_of_adjustment", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@days_adjusted", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@transfer_amount", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@transfer_days", FormatString(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@payment_amount", FormatNumber(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@tip_amount", FormatNumber(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@coupon_amount", FormatNumber(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@payment_adjustment_description", FormatString(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@payment_adjustment_amount", FormatNumber(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@update_expire_adjustment_amount", FormatNumber(lineSegments[lineSegmentCounter + 14].ToString())),
+                                                    new SqlParameter("@donation_amount", FormatNumber(lineSegments[lineSegmentCounter + 15].ToString())));
                                     break;
                                 case "G1":
                                     G1Count++;
@@ -373,12 +387,12 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", G1Count),
-                                                    new SqlParameter("@grace_owed_amount", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                                    new SqlParameter("@city_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 2].ToString())),
-                                                    new SqlParameter("@county_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 3].ToString())),
-                                                    new SqlParameter("@state_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 4].ToString())),
-                                                    new SqlParameter("@country_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 5].ToString())),
-                                                    new SqlParameter("@total_grace_owed_amount", FormatCurrency(lineSegments[lineSegmentCounter + 6].ToString())));
+                                                    new SqlParameter("@grace_owed_amount", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@city_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@county_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@state_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@country_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@total_grace_owed_amount", FormatNumber(lineSegments[lineSegmentCounter + 6].ToString())));
                                     break;
                                 case "G2":
                                     G2Count++;
@@ -387,9 +401,9 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", G2Count),
-                                                    new SqlParameter("@tran_type_id", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@tran_date", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@renewal_description", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()));
+                                                    new SqlParameter("@tran_type_id", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@tran_date", FormatDateTime(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@renewal_description", FormatString(lineSegments[lineSegmentCounter + 3].ToString())));
                                     break;
                                 case "G3":
                                     G3Count++;
@@ -398,12 +412,12 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", G3Count),
-                                                    new SqlParameter("@grace_owed_amount", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                                    new SqlParameter("@city_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 2].ToString())),
-                                                    new SqlParameter("@county_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 3].ToString())),
-                                                    new SqlParameter("@state_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 4].ToString())),
-                                                    new SqlParameter("@country_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 5].ToString())),
-                                                    new SqlParameter("@total_grace_owed_amount", FormatCurrency(lineSegments[lineSegmentCounter + 6].ToString())));
+                                                    new SqlParameter("@grace_owed_amount", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@city_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@county_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@state_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@country_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@total_grace_owed_amount", FormatNumber(lineSegments[lineSegmentCounter + 6].ToString())));
                                     break;
                                 case "G4":
                                     G4Count++;
@@ -412,12 +426,12 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", G4Count),
-                                                    new SqlParameter("@grace_owed_amount", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                                    new SqlParameter("@city_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 2].ToString())),
-                                                    new SqlParameter("@county_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 3].ToString())),
-                                                    new SqlParameter("@state_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 4].ToString())),
-                                                    new SqlParameter("@country_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 5].ToString())),
-                                                    new SqlParameter("@total_grace_owed_amount", FormatCurrency(lineSegments[lineSegmentCounter + 6].ToString())));
+                                                    new SqlParameter("@grace_owed_amount", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@city_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@county_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@state_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@country_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@total_grace_owed_amount", FormatNumber(lineSegments[lineSegmentCounter + 6].ToString())));
                                     break;
                                 case "Z0":
                                     Z0Count++;
@@ -426,30 +440,30 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", Z0Count),
-                                                    new SqlParameter("@rate_code", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@rate_code_description", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@marketing_term_length", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@end_date", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@amount", FormatCurrency(lineSegments[lineSegmentCounter + 5].ToString())),
-                                                    new SqlParameter("@discount_amount", FormatCurrency(lineSegments[lineSegmentCounter + 6].ToString())),
-                                                    new SqlParameter("@city_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 7].ToString())),
-                                                    new SqlParameter("@county_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 8].ToString())),
-                                                    new SqlParameter("@state_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 9].ToString())),
-                                                    new SqlParameter("@country_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 10].ToString())),
-                                                    new SqlParameter("@sunday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 11].ToString())),
-                                                    new SqlParameter("@monday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 12].ToString())),
-                                                    new SqlParameter("@tuesday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 13].ToString())),
-                                                    new SqlParameter("@wednesday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 14].ToString())),
-                                                    new SqlParameter("@thursday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 15].ToString())),
-                                                    new SqlParameter("@friday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 16].ToString())),
-                                                    new SqlParameter("@saturday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 17].ToString())),
-                                                    new SqlParameter("@sunday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 18].ToString())),
-                                                    new SqlParameter("@monday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 19].ToString())),
-                                                    new SqlParameter("@tuesday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 20].ToString())),
-                                                    new SqlParameter("@wednesday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 21].ToString())),
-                                                    new SqlParameter("@thursday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 22].ToString())),
-                                                    new SqlParameter("@friday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 23].ToString())),
-                                                    new SqlParameter("@saturday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 24].ToString())));
+                                                    new SqlParameter("@rate_code", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@rate_code_description", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@marketing_term_length", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@end_date", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@amount", FormatNumber(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@discount_amount", FormatNumber(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@city_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@county_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@state_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@country_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@sunday_rate", FormatNumber(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@monday_rate", FormatNumber(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@tuesday_rate", FormatNumber(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@wednesday_rate", FormatNumber(lineSegments[lineSegmentCounter + 14].ToString())),
+                                                    new SqlParameter("@thursday_rate", FormatNumber(lineSegments[lineSegmentCounter + 15].ToString())),
+                                                    new SqlParameter("@friday_rate", FormatNumber(lineSegments[lineSegmentCounter + 16].ToString())),
+                                                    new SqlParameter("@saturday_rate", FormatNumber(lineSegments[lineSegmentCounter + 17].ToString())),
+                                                    new SqlParameter("@sunday_discount", FormatNumber(lineSegments[lineSegmentCounter + 18].ToString())),
+                                                    new SqlParameter("@monday_discount", FormatNumber(lineSegments[lineSegmentCounter + 19].ToString())),
+                                                    new SqlParameter("@tuesday_discount", FormatNumber(lineSegments[lineSegmentCounter + 20].ToString())),
+                                                    new SqlParameter("@wednesday_discount", FormatNumber(lineSegments[lineSegmentCounter + 21].ToString())),
+                                                    new SqlParameter("@thursday_discount", FormatNumber(lineSegments[lineSegmentCounter + 22].ToString())),
+                                                    new SqlParameter("@friday_discount", FormatNumber(lineSegments[lineSegmentCounter + 23].ToString())),
+                                                    new SqlParameter("@saturday_discount", FormatNumber(lineSegments[lineSegmentCounter + 24].ToString())));
                                     break;
                                 case "Z1":
                                     Z1Count++;
@@ -458,30 +472,30 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", Z1Count),
-                                                    new SqlParameter("@rate_code", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@rate_code_description", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@marketing_term_length", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@end_date", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@amount", FormatCurrency(lineSegments[lineSegmentCounter + 5].ToString())),
-                                                    new SqlParameter("@discount_amount", FormatCurrency(lineSegments[lineSegmentCounter + 6].ToString())),
-                                                    new SqlParameter("@city_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 7].ToString())),
-                                                    new SqlParameter("@county_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 8].ToString())),
-                                                    new SqlParameter("@state_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 9].ToString())),
-                                                    new SqlParameter("@country_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 10].ToString())),
-                                                    new SqlParameter("@sunday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 11].ToString())),
-                                                    new SqlParameter("@monday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 12].ToString())),
-                                                    new SqlParameter("@tuesday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 13].ToString())),
-                                                    new SqlParameter("@wednesday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 14].ToString())),
-                                                    new SqlParameter("@thursday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 15].ToString())),
-                                                    new SqlParameter("@friday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 16].ToString())),
-                                                    new SqlParameter("@saturday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 17].ToString())),
-                                                    new SqlParameter("@sunday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 18].ToString())),
-                                                    new SqlParameter("@monday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 19].ToString())),
-                                                    new SqlParameter("@tuesday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 20].ToString())),
-                                                    new SqlParameter("@wednesday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 21].ToString())),
-                                                    new SqlParameter("@thursday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 22].ToString())),
-                                                    new SqlParameter("@friday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 23].ToString())),
-                                                    new SqlParameter("@saturday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 24].ToString())));
+                                                    new SqlParameter("@rate_code", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@rate_code_description", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@marketing_term_length", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@end_date", FormatDateTime(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@amount", FormatNumber(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@discount_amount", FormatNumber(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@city_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@county_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@state_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@country_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@sunday_rate", FormatNumber(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@monday_rate", FormatNumber(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@tuesday_rate", FormatNumber(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@wednesday_rate", FormatNumber(lineSegments[lineSegmentCounter + 14].ToString())),
+                                                    new SqlParameter("@thursday_rate", FormatNumber(lineSegments[lineSegmentCounter + 15].ToString())),
+                                                    new SqlParameter("@friday_rate", FormatNumber(lineSegments[lineSegmentCounter + 16].ToString())),
+                                                    new SqlParameter("@saturday_rate", FormatNumber(lineSegments[lineSegmentCounter + 17].ToString())),
+                                                    new SqlParameter("@sunday_discount", FormatNumber(lineSegments[lineSegmentCounter + 18].ToString())),
+                                                    new SqlParameter("@monday_discount", FormatNumber(lineSegments[lineSegmentCounter + 19].ToString())),
+                                                    new SqlParameter("@tuesday_discount", FormatNumber(lineSegments[lineSegmentCounter + 20].ToString())),
+                                                    new SqlParameter("@wednesday_discount", FormatNumber(lineSegments[lineSegmentCounter + 21].ToString())),
+                                                    new SqlParameter("@thursday_discount", FormatNumber(lineSegments[lineSegmentCounter + 22].ToString())),
+                                                    new SqlParameter("@friday_discount", FormatNumber(lineSegments[lineSegmentCounter + 23].ToString())),
+                                                    new SqlParameter("@saturday_discount", FormatNumber(lineSegments[lineSegmentCounter + 24].ToString())));
                                     break;
                                 case "Z2":
                                     Z2Count++;
@@ -490,30 +504,30 @@ namespace AutoRenew
                                                    new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", Z2Count),
-                                                    new SqlParameter("@rate_code", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@rate_code_description", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@marketing_term_length", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@end_date", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@amount", FormatCurrency(lineSegments[lineSegmentCounter + 5].ToString())),
-                                                    new SqlParameter("@discount_amount", FormatCurrency(lineSegments[lineSegmentCounter + 6].ToString())),
-                                                    new SqlParameter("@city_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 7].ToString())),
-                                                    new SqlParameter("@county_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 8].ToString())),
-                                                    new SqlParameter("@state_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 9].ToString())),
-                                                    new SqlParameter("@country_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 10].ToString())),
-                                                    new SqlParameter("@sunday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 11].ToString())),
-                                                    new SqlParameter("@monday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 12].ToString())),
-                                                    new SqlParameter("@tuesday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 13].ToString())),
-                                                    new SqlParameter("@wednesday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 14].ToString())),
-                                                    new SqlParameter("@thursday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 15].ToString())),
-                                                    new SqlParameter("@friday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 16].ToString())),
-                                                    new SqlParameter("@saturday_rate", FormatCurrency(lineSegments[lineSegmentCounter + 17].ToString())),
-                                                    new SqlParameter("@sunday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 18].ToString())),
-                                                    new SqlParameter("@monday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 19].ToString())),
-                                                    new SqlParameter("@tuesday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 20].ToString())),
-                                                    new SqlParameter("@wednesday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 21].ToString())),
-                                                    new SqlParameter("@thursday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 22].ToString())),
-                                                    new SqlParameter("@friday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 23].ToString())),
-                                                    new SqlParameter("@saturday_discount", FormatCurrency(lineSegments[lineSegmentCounter + 24].ToString())));
+                                                    new SqlParameter("@rate_code", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@rate_code_description", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@marketing_term_length", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@end_date", FormatDateTime(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@amount", FormatNumber(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@discount_amount", FormatNumber(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@city_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@county_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@state_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@country_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@sunday_rate", FormatNumber(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@monday_rate", FormatNumber(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@tuesday_rate", FormatNumber(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@wednesday_rate", FormatNumber(lineSegments[lineSegmentCounter + 14].ToString())),
+                                                    new SqlParameter("@thursday_rate", FormatNumber(lineSegments[lineSegmentCounter + 15].ToString())),
+                                                    new SqlParameter("@friday_rate", FormatNumber(lineSegments[lineSegmentCounter + 16].ToString())),
+                                                    new SqlParameter("@saturday_rate", FormatNumber(lineSegments[lineSegmentCounter + 17].ToString())),
+                                                    new SqlParameter("@sunday_discount", FormatNumber(lineSegments[lineSegmentCounter + 18].ToString())),
+                                                    new SqlParameter("@monday_discount", FormatNumber(lineSegments[lineSegmentCounter + 19].ToString())),
+                                                    new SqlParameter("@tuesday_discount", FormatNumber(lineSegments[lineSegmentCounter + 20].ToString())),
+                                                    new SqlParameter("@wednesday_discount", FormatNumber(lineSegments[lineSegmentCounter + 21].ToString())),
+                                                    new SqlParameter("@thursday_discount", FormatNumber(lineSegments[lineSegmentCounter + 22].ToString())),
+                                                    new SqlParameter("@friday_discount", FormatNumber(lineSegments[lineSegmentCounter + 23].ToString())),
+                                                    new SqlParameter("@saturday_discount", FormatNumber(lineSegments[lineSegmentCounter + 24].ToString())));
                                     break;
                                 case "M1":
                                     M1Count++;
@@ -522,13 +536,13 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", M1Count),
-                                                    new SqlParameter("@copy_message_1", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@copy_message_2", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@country_tax_message", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@state_tax_message", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@county_tax_message", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                    new SqlParameter("@city_tax_message", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                    new SqlParameter("@purchase_order_number", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()));
+                                                    new SqlParameter("@copy_message_1", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@copy_message_2", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@country_tax_message", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@state_tax_message", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@county_tax_message", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@city_tax_message", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@purchase_order_number", FormatString(lineSegments[lineSegmentCounter + 7].ToString())));
                                     break;
                                 case "M2":
                                     M2Count++;
@@ -537,13 +551,13 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", M2Count),
-                                                    new SqlParameter("@renewal_period_message_1", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@renewal_period_message_2", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@general_message", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@rate_code_message_1", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@rate_code_message_2", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                    new SqlParameter("@rate_code_message_3", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                    new SqlParameter("@rate_code_message_4", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()));
+                                                    new SqlParameter("@renewal_period_message_1", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@renewal_period_message_2", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@general_message", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@rate_code_message_1", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@rate_code_message_2", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@rate_code_message_3", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@rate_code_message_4", FormatString(lineSegments[lineSegmentCounter + 7].ToString())));
                                     break;
                                 case "P1":
                                     P1Count++;
@@ -552,13 +566,13 @@ namespace AutoRenew
                                                    new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", P1Count),
-                                                    new SqlParameter("@payment_amount", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                                    new SqlParameter("@payment_length", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@payment_term", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@effective_date", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@rate_code", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                    new SqlParameter("@payment_transaction_date", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                    new SqlParameter("@transaction_type", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()));
+                                                    new SqlParameter("@payment_amount", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@payment_length", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@payment_term", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@effective_date", FormatDateTime(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@rate_code", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@payment_transaction_date", FormatDateTime(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@transaction_type", FormatString(lineSegments[lineSegmentCounter + 7].ToString())));
                                     break;
                                 case "P2":
                                     P2Count++;
@@ -567,13 +581,13 @@ namespace AutoRenew
                                                    new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", P2Count),
-                                                    new SqlParameter("@payment_amount", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                                    new SqlParameter("@payment_length", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@payment_term", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@effective_date", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@rate_code", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                    new SqlParameter("@payment_transaction_date", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                    new SqlParameter("@transaction_type", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()));
+                                                    new SqlParameter("@payment_amount", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@payment_length", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@payment_term", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@effective_date", FormatDateTime(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@rate_code", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@payment_transaction_date", FormatDateTime(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@transaction_type", FormatString(lineSegments[lineSegmentCounter + 7].ToString())));
                                     break;
                                 case "R1":
                                     R1Count++;
@@ -582,118 +596,118 @@ namespace AutoRenew
                                                    new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", R1Count),
-                                                    new SqlParameter("@rate_code", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@subscription_rate_description_1", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@subscription_rate_before_tax_1", FormatCurrency(lineSegments[lineSegmentCounter + 3].ToString())),
-                                                    new SqlParameter("@subscription_rate_1", FormatCurrency(lineSegments[lineSegmentCounter + 4].ToString())),
-                                                    new SqlParameter("@new_expire_date_1", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                    new SqlParameter("@discount_amount_1", FormatCurrency(lineSegments[lineSegmentCounter + 6].ToString())),
-                                                    new SqlParameter("@rate_by_day_1_1", FormatCurrency(lineSegments[lineSegmentCounter + 7].ToString())),
-                                                    new SqlParameter("@rate_by_day_1_2", FormatCurrency(lineSegments[lineSegmentCounter + 8].ToString())),
-                                                    new SqlParameter("@rate_by_day_1_3", FormatCurrency(lineSegments[lineSegmentCounter + 9].ToString())),
-                                                    new SqlParameter("@rate_by_day_1_4", FormatCurrency(lineSegments[lineSegmentCounter + 10].ToString())),
-                                                    new SqlParameter("@rate_by_day_1_5", FormatCurrency(lineSegments[lineSegmentCounter + 11].ToString())),
-                                                    new SqlParameter("@rate_by_day_1_6", FormatCurrency(lineSegments[lineSegmentCounter + 12].ToString())),
-                                                    new SqlParameter("@rate_by_day_1_7", FormatCurrency(lineSegments[lineSegmentCounter + 13].ToString())),
-                                                    new SqlParameter("@cost_by_day_1_1", FormatCurrency(lineSegments[lineSegmentCounter + 14].ToString())),
-                                                    new SqlParameter("@cost_by_day_1_2", FormatCurrency(lineSegments[lineSegmentCounter + 15].ToString())),
-                                                    new SqlParameter("@cost_by_day_1_3", FormatCurrency(lineSegments[lineSegmentCounter + 16].ToString())),
-                                                    new SqlParameter("@cost_by_day_1_4", FormatCurrency(lineSegments[lineSegmentCounter + 17].ToString())),
-                                                    new SqlParameter("@cost_by_day_1_5", FormatCurrency(lineSegments[lineSegmentCounter + 18].ToString())),
-                                                    new SqlParameter("@cost_by_day_1_6", FormatCurrency(lineSegments[lineSegmentCounter + 19].ToString())),
-                                                    new SqlParameter("@cost_by_day_1_7", FormatCurrency(lineSegments[lineSegmentCounter + 20].ToString())),
-                                                    new SqlParameter("@discount_by_day_1_1", FormatCurrency(lineSegments[lineSegmentCounter + 21].ToString())),
-                                                    new SqlParameter("@discount_by_day_1_2", FormatCurrency(lineSegments[lineSegmentCounter + 22].ToString())),
-                                                    new SqlParameter("@discount_by_day_1_3", FormatCurrency(lineSegments[lineSegmentCounter + 23].ToString())),
-                                                    new SqlParameter("@discount_by_day_1_4", FormatCurrency(lineSegments[lineSegmentCounter + 24].ToString())),
-                                                    new SqlParameter("@discount_by_day_1_5", FormatCurrency(lineSegments[lineSegmentCounter + 25].ToString())),
-                                                    new SqlParameter("@discount_by_day_1_6", FormatCurrency(lineSegments[lineSegmentCounter + 26].ToString())),
-                                                    new SqlParameter("@discount_by_day_1_7", FormatCurrency(lineSegments[lineSegmentCounter + 27].ToString())),
-                                                    new SqlParameter("@subscription_rate_description_2", lineSegments[lineSegmentCounter + 28].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 28].ToString()),
-                                                    new SqlParameter("@subscription_rate_before_tax_2", FormatCurrency(lineSegments[lineSegmentCounter + 29].ToString())),
-                                                    new SqlParameter("@subscription_rate_2", FormatCurrency(lineSegments[lineSegmentCounter + 30].ToString())),
-                                                    new SqlParameter("@new_expire_date_2", lineSegments[lineSegmentCounter + 31].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 31].ToString()),
-                                                    new SqlParameter("@discount_amount_2", FormatCurrency(lineSegments[lineSegmentCounter + 32].ToString())),
-                                                    new SqlParameter("@rate_by_day_2_1", FormatCurrency(lineSegments[lineSegmentCounter + 33].ToString())),
-                                                    new SqlParameter("@rate_by_day_2_2", FormatCurrency(lineSegments[lineSegmentCounter + 34].ToString())),
-                                                    new SqlParameter("@rate_by_day_2_3", FormatCurrency(lineSegments[lineSegmentCounter + 35].ToString())),
-                                                    new SqlParameter("@rate_by_day_2_4", FormatCurrency(lineSegments[lineSegmentCounter + 36].ToString())),
-                                                    new SqlParameter("@rate_by_day_2_5", FormatCurrency(lineSegments[lineSegmentCounter + 37].ToString())),
-                                                    new SqlParameter("@rate_by_day_2_6", FormatCurrency(lineSegments[lineSegmentCounter + 38].ToString())),
-                                                    new SqlParameter("@rate_by_day_2_7", FormatCurrency(lineSegments[lineSegmentCounter + 39].ToString())),
-                                                    new SqlParameter("@cost_by_day_2_1", FormatCurrency(lineSegments[lineSegmentCounter + 40].ToString())),
-                                                    new SqlParameter("@cost_by_day_2_2", FormatCurrency(lineSegments[lineSegmentCounter + 41].ToString())),
-                                                    new SqlParameter("@cost_by_day_2_3", FormatCurrency(lineSegments[lineSegmentCounter + 42].ToString())),
-                                                    new SqlParameter("@cost_by_day_2_4", FormatCurrency(lineSegments[lineSegmentCounter + 43].ToString())),
-                                                    new SqlParameter("@cost_by_day_2_5", FormatCurrency(lineSegments[lineSegmentCounter + 44].ToString())),
-                                                    new SqlParameter("@cost_by_day_2_6", FormatCurrency(lineSegments[lineSegmentCounter + 45].ToString())),
-                                                    new SqlParameter("@cost_by_day_2_7", FormatCurrency(lineSegments[lineSegmentCounter + 46].ToString())),
-                                                    new SqlParameter("@discount_by_day_2_1", FormatCurrency(lineSegments[lineSegmentCounter + 47].ToString())),
-                                                    new SqlParameter("@discount_by_day_2_2", FormatCurrency(lineSegments[lineSegmentCounter + 48].ToString())),
-                                                    new SqlParameter("@discount_by_day_2_3", FormatCurrency(lineSegments[lineSegmentCounter + 49].ToString())),
-                                                    new SqlParameter("@discount_by_day_2_4", FormatCurrency(lineSegments[lineSegmentCounter + 50].ToString())),
-                                                    new SqlParameter("@discount_by_day_2_5", FormatCurrency(lineSegments[lineSegmentCounter + 51].ToString())),
-                                                    new SqlParameter("@discount_by_day_2_6", FormatCurrency(lineSegments[lineSegmentCounter + 52].ToString())),
-                                                    new SqlParameter("@discount_by_day_2_7", FormatCurrency(lineSegments[lineSegmentCounter + 53].ToString())),
-                                                    new SqlParameter("@subscription_rate_description_3", lineSegments[lineSegmentCounter + 54].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 54].ToString()),
-                                                    new SqlParameter("@subscription_rate_before_tax_3", FormatCurrency(lineSegments[lineSegmentCounter + 55].ToString())),
-                                                    new SqlParameter("@subscription_rate_3", FormatCurrency(lineSegments[lineSegmentCounter + 56].ToString())),
-                                                    new SqlParameter("@new_expire_date_3", FormatCurrency(lineSegments[lineSegmentCounter + 57].ToString())),
-                                                    new SqlParameter("@discount_amount_3", FormatCurrency(lineSegments[lineSegmentCounter + 58].ToString())),
-                                                    new SqlParameter("@rate_by_day_3_1", FormatCurrency(lineSegments[lineSegmentCounter + 59].ToString())),
-                                                    new SqlParameter("@rate_by_day_3_2", FormatCurrency(lineSegments[lineSegmentCounter + 60].ToString())),
-                                                    new SqlParameter("@rate_by_day_3_3", FormatCurrency(lineSegments[lineSegmentCounter + 61].ToString())),
-                                                    new SqlParameter("@rate_by_day_3_4", FormatCurrency(lineSegments[lineSegmentCounter + 62].ToString())),
-                                                    new SqlParameter("@rate_by_day_3_5", FormatCurrency(lineSegments[lineSegmentCounter + 63].ToString())),
-                                                    new SqlParameter("@rate_by_day_3_6", FormatCurrency(lineSegments[lineSegmentCounter + 64].ToString())),
-                                                    new SqlParameter("@rate_by_day_3_7", FormatCurrency(lineSegments[lineSegmentCounter + 65].ToString())),
-                                                    new SqlParameter("@cost_by_day_3_1", FormatCurrency(lineSegments[lineSegmentCounter + 66].ToString())),
-                                                    new SqlParameter("@cost_by_day_3_2", FormatCurrency(lineSegments[lineSegmentCounter + 67].ToString())),
-                                                    new SqlParameter("@cost_by_day_3_3", FormatCurrency(lineSegments[lineSegmentCounter + 68].ToString())),
-                                                    new SqlParameter("@cost_by_day_3_4", FormatCurrency(lineSegments[lineSegmentCounter + 69].ToString())),
-                                                    new SqlParameter("@cost_by_day_3_5", FormatCurrency(lineSegments[lineSegmentCounter + 70].ToString())),
-                                                    new SqlParameter("@cost_by_day_3_6", FormatCurrency(lineSegments[lineSegmentCounter + 71].ToString())),
-                                                    new SqlParameter("@cost_by_day_3_7", FormatCurrency(lineSegments[lineSegmentCounter + 72].ToString())),
-                                                    new SqlParameter("@discount_by_day_3_1", FormatCurrency(lineSegments[lineSegmentCounter + 73].ToString())),
-                                                    new SqlParameter("@discount_by_day_3_2", FormatCurrency(lineSegments[lineSegmentCounter + 74].ToString())),
-                                                    new SqlParameter("@discount_by_day_3_3", FormatCurrency(lineSegments[lineSegmentCounter + 75].ToString())),
-                                                    new SqlParameter("@discount_by_day_3_4", FormatCurrency(lineSegments[lineSegmentCounter + 76].ToString())),
-                                                    new SqlParameter("@discount_by_day_3_5", FormatCurrency(lineSegments[lineSegmentCounter + 77].ToString())),
-                                                    new SqlParameter("@discount_by_day_3_6", FormatCurrency(lineSegments[lineSegmentCounter + 78].ToString())),
-                                                    new SqlParameter("@discount_by_day_3_7", FormatCurrency(lineSegments[lineSegmentCounter + 79].ToString())),
-                                                    new SqlParameter("@subscription_rate_description_4", lineSegments[lineSegmentCounter + 80].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 80].ToString()),
-                                                    new SqlParameter("@subscription_rate_before_tax_4", FormatCurrency(lineSegments[lineSegmentCounter + 81].ToString())),
-                                                    new SqlParameter("@subscription_rate_4", FormatCurrency(lineSegments[lineSegmentCounter + 82].ToString())),
-                                                    new SqlParameter("@new_expire_date_4", lineSegments[lineSegmentCounter + 83].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 83].ToString()),
-                                                    new SqlParameter("@discount_amount_4", FormatCurrency(lineSegments[lineSegmentCounter + 84].ToString())),
-                                                    new SqlParameter("@rate_by_day_4_1", FormatCurrency(lineSegments[lineSegmentCounter + 85].ToString())),
-                                                    new SqlParameter("@rate_by_day_4_2", FormatCurrency(lineSegments[lineSegmentCounter + 86].ToString())),
-                                                    new SqlParameter("@rate_by_day_4_3", FormatCurrency(lineSegments[lineSegmentCounter + 87].ToString())),
-                                                    new SqlParameter("@rate_by_day_4_4", FormatCurrency(lineSegments[lineSegmentCounter + 88].ToString())),
-                                                    new SqlParameter("@rate_by_day_4_5", FormatCurrency(lineSegments[lineSegmentCounter + 89].ToString())),
-                                                    new SqlParameter("@rate_by_day_4_6", FormatCurrency(lineSegments[lineSegmentCounter + 90].ToString())),
-                                                    new SqlParameter("@rate_by_day_4_7", FormatCurrency(lineSegments[lineSegmentCounter + 91].ToString())),
-                                                    new SqlParameter("@cost_by_day_4_1", FormatCurrency(lineSegments[lineSegmentCounter + 92].ToString())),
-                                                    new SqlParameter("@cost_by_day_4_2", FormatCurrency(lineSegments[lineSegmentCounter + 93].ToString())),
-                                                    new SqlParameter("@cost_by_day_4_3", FormatCurrency(lineSegments[lineSegmentCounter + 94].ToString())),
-                                                    new SqlParameter("@cost_by_day_4_4", FormatCurrency(lineSegments[lineSegmentCounter + 95].ToString())),
-                                                    new SqlParameter("@cost_by_day_4_5", FormatCurrency(lineSegments[lineSegmentCounter + 96].ToString())),
-                                                    new SqlParameter("@cost_by_day_4_6", FormatCurrency(lineSegments[lineSegmentCounter + 97].ToString())),
-                                                    new SqlParameter("@cost_by_day_4_7", FormatCurrency(lineSegments[lineSegmentCounter + 98].ToString())),
-                                                    new SqlParameter("@discount_by_day_4_1", FormatCurrency(lineSegments[lineSegmentCounter + 99].ToString())),
-                                                    new SqlParameter("@discount_by_day_4_2", FormatCurrency(lineSegments[lineSegmentCounter + 100].ToString())),
-                                                    new SqlParameter("@discount_by_day_4_3", FormatCurrency(lineSegments[lineSegmentCounter + 101].ToString())),
-                                                    new SqlParameter("@discount_by_day_4_4", FormatCurrency(lineSegments[lineSegmentCounter + 102].ToString())),
-                                                    new SqlParameter("@discount_by_day_4_5", FormatCurrency(lineSegments[lineSegmentCounter + 103].ToString())),
-                                                    new SqlParameter("@discount_by_day_4_6", FormatCurrency(lineSegments[lineSegmentCounter + 104].ToString())),
-                                                    new SqlParameter("@discount_by_day_4_7", FormatCurrency(lineSegments[lineSegmentCounter + 105].ToString())),
-                                                    new SqlParameter("@grace_owed_amount_not_including_taxes", FormatCurrency(lineSegments[lineSegmentCounter + 106].ToString())),
-                                                    new SqlParameter("@grace_owed_amount_including_taxes", FormatCurrency(lineSegments[lineSegmentCounter + 107].ToString())),
-                                                    new SqlParameter("@grace_owed_city_tax", FormatCurrency(lineSegments[lineSegmentCounter + 108].ToString())),
-                                                    new SqlParameter("@grace_owed_county_tax", FormatCurrency(lineSegments[lineSegmentCounter + 109].ToString())),
-                                                    new SqlParameter("@grace_owed_state_tax", FormatCurrency(lineSegments[lineSegmentCounter + 110].ToString())),
-                                                    new SqlParameter("@grace_owed_country_tax", FormatCurrency(lineSegments[lineSegmentCounter + 111].ToString())),
-                                                    new SqlParameter("@subscribers_unallocated_balance", FormatCurrency(lineSegments[lineSegmentCounter + 112].ToString())));
+                                                    new SqlParameter("@rate_code", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@subscription_rate_description_1", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@subscription_rate_before_tax_1", FormatNumber(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@subscription_rate_1", FormatNumber(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@new_expire_date_1", FormatDateTime(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@discount_amount_1", FormatNumber(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@rate_by_day_1_1", FormatNumber(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@rate_by_day_1_2", FormatNumber(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@rate_by_day_1_3", FormatNumber(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@rate_by_day_1_4", FormatNumber(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@rate_by_day_1_5", FormatNumber(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@rate_by_day_1_6", FormatNumber(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@rate_by_day_1_7", FormatNumber(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@cost_by_day_1_1", FormatNumber(lineSegments[lineSegmentCounter + 14].ToString())),
+                                                    new SqlParameter("@cost_by_day_1_2", FormatNumber(lineSegments[lineSegmentCounter + 15].ToString())),
+                                                    new SqlParameter("@cost_by_day_1_3", FormatNumber(lineSegments[lineSegmentCounter + 16].ToString())),
+                                                    new SqlParameter("@cost_by_day_1_4", FormatNumber(lineSegments[lineSegmentCounter + 17].ToString())),
+                                                    new SqlParameter("@cost_by_day_1_5", FormatNumber(lineSegments[lineSegmentCounter + 18].ToString())),
+                                                    new SqlParameter("@cost_by_day_1_6", FormatNumber(lineSegments[lineSegmentCounter + 19].ToString())),
+                                                    new SqlParameter("@cost_by_day_1_7", FormatNumber(lineSegments[lineSegmentCounter + 20].ToString())),
+                                                    new SqlParameter("@discount_by_day_1_1", FormatNumber(lineSegments[lineSegmentCounter + 21].ToString())),
+                                                    new SqlParameter("@discount_by_day_1_2", FormatNumber(lineSegments[lineSegmentCounter + 22].ToString())),
+                                                    new SqlParameter("@discount_by_day_1_3", FormatNumber(lineSegments[lineSegmentCounter + 23].ToString())),
+                                                    new SqlParameter("@discount_by_day_1_4", FormatNumber(lineSegments[lineSegmentCounter + 24].ToString())),
+                                                    new SqlParameter("@discount_by_day_1_5", FormatNumber(lineSegments[lineSegmentCounter + 25].ToString())),
+                                                    new SqlParameter("@discount_by_day_1_6", FormatNumber(lineSegments[lineSegmentCounter + 26].ToString())),
+                                                    new SqlParameter("@discount_by_day_1_7", FormatNumber(lineSegments[lineSegmentCounter + 27].ToString())),
+                                                    new SqlParameter("@subscription_rate_description_2", FormatString(lineSegments[lineSegmentCounter + 28].ToString())),
+                                                    new SqlParameter("@subscription_rate_before_tax_2", FormatNumber(lineSegments[lineSegmentCounter + 29].ToString())),
+                                                    new SqlParameter("@subscription_rate_2", FormatNumber(lineSegments[lineSegmentCounter + 30].ToString())),
+                                                    new SqlParameter("@new_expire_date_2", FormatDateTime(lineSegments[lineSegmentCounter + 31].ToString())),
+                                                    new SqlParameter("@discount_amount_2", FormatNumber(lineSegments[lineSegmentCounter + 32].ToString())),
+                                                    new SqlParameter("@rate_by_day_2_1", FormatNumber(lineSegments[lineSegmentCounter + 33].ToString())),
+                                                    new SqlParameter("@rate_by_day_2_2", FormatNumber(lineSegments[lineSegmentCounter + 34].ToString())),
+                                                    new SqlParameter("@rate_by_day_2_3", FormatNumber(lineSegments[lineSegmentCounter + 35].ToString())),
+                                                    new SqlParameter("@rate_by_day_2_4", FormatNumber(lineSegments[lineSegmentCounter + 36].ToString())),
+                                                    new SqlParameter("@rate_by_day_2_5", FormatNumber(lineSegments[lineSegmentCounter + 37].ToString())),
+                                                    new SqlParameter("@rate_by_day_2_6", FormatNumber(lineSegments[lineSegmentCounter + 38].ToString())),
+                                                    new SqlParameter("@rate_by_day_2_7", FormatNumber(lineSegments[lineSegmentCounter + 39].ToString())),
+                                                    new SqlParameter("@cost_by_day_2_1", FormatNumber(lineSegments[lineSegmentCounter + 40].ToString())),
+                                                    new SqlParameter("@cost_by_day_2_2", FormatNumber(lineSegments[lineSegmentCounter + 41].ToString())),
+                                                    new SqlParameter("@cost_by_day_2_3", FormatNumber(lineSegments[lineSegmentCounter + 42].ToString())),
+                                                    new SqlParameter("@cost_by_day_2_4", FormatNumber(lineSegments[lineSegmentCounter + 43].ToString())),
+                                                    new SqlParameter("@cost_by_day_2_5", FormatNumber(lineSegments[lineSegmentCounter + 44].ToString())),
+                                                    new SqlParameter("@cost_by_day_2_6", FormatNumber(lineSegments[lineSegmentCounter + 45].ToString())),
+                                                    new SqlParameter("@cost_by_day_2_7", FormatNumber(lineSegments[lineSegmentCounter + 46].ToString())),
+                                                    new SqlParameter("@discount_by_day_2_1", FormatNumber(lineSegments[lineSegmentCounter + 47].ToString())),
+                                                    new SqlParameter("@discount_by_day_2_2", FormatNumber(lineSegments[lineSegmentCounter + 48].ToString())),
+                                                    new SqlParameter("@discount_by_day_2_3", FormatNumber(lineSegments[lineSegmentCounter + 49].ToString())),
+                                                    new SqlParameter("@discount_by_day_2_4", FormatNumber(lineSegments[lineSegmentCounter + 50].ToString())),
+                                                    new SqlParameter("@discount_by_day_2_5", FormatNumber(lineSegments[lineSegmentCounter + 51].ToString())),
+                                                    new SqlParameter("@discount_by_day_2_6", FormatNumber(lineSegments[lineSegmentCounter + 52].ToString())),
+                                                    new SqlParameter("@discount_by_day_2_7", FormatNumber(lineSegments[lineSegmentCounter + 53].ToString())),
+                                                    new SqlParameter("@subscription_rate_description_3", FormatString(lineSegments[lineSegmentCounter + 54].ToString())),
+                                                    new SqlParameter("@subscription_rate_before_tax_3", FormatNumber(lineSegments[lineSegmentCounter + 55].ToString())),
+                                                    new SqlParameter("@subscription_rate_3", FormatNumber(lineSegments[lineSegmentCounter + 56].ToString())),
+                                                    new SqlParameter("@new_expire_date_3", FormatDateTime(lineSegments[lineSegmentCounter + 57].ToString())),
+                                                    new SqlParameter("@discount_amount_3", FormatNumber(lineSegments[lineSegmentCounter + 58].ToString())),
+                                                    new SqlParameter("@rate_by_day_3_1", FormatNumber(lineSegments[lineSegmentCounter + 59].ToString())),
+                                                    new SqlParameter("@rate_by_day_3_2", FormatNumber(lineSegments[lineSegmentCounter + 60].ToString())),
+                                                    new SqlParameter("@rate_by_day_3_3", FormatNumber(lineSegments[lineSegmentCounter + 61].ToString())),
+                                                    new SqlParameter("@rate_by_day_3_4", FormatNumber(lineSegments[lineSegmentCounter + 62].ToString())),
+                                                    new SqlParameter("@rate_by_day_3_5", FormatNumber(lineSegments[lineSegmentCounter + 63].ToString())),
+                                                    new SqlParameter("@rate_by_day_3_6", FormatNumber(lineSegments[lineSegmentCounter + 64].ToString())),
+                                                    new SqlParameter("@rate_by_day_3_7", FormatNumber(lineSegments[lineSegmentCounter + 65].ToString())),
+                                                    new SqlParameter("@cost_by_day_3_1", FormatNumber(lineSegments[lineSegmentCounter + 66].ToString())),
+                                                    new SqlParameter("@cost_by_day_3_2", FormatNumber(lineSegments[lineSegmentCounter + 67].ToString())),
+                                                    new SqlParameter("@cost_by_day_3_3", FormatNumber(lineSegments[lineSegmentCounter + 68].ToString())),
+                                                    new SqlParameter("@cost_by_day_3_4", FormatNumber(lineSegments[lineSegmentCounter + 69].ToString())),
+                                                    new SqlParameter("@cost_by_day_3_5", FormatNumber(lineSegments[lineSegmentCounter + 70].ToString())),
+                                                    new SqlParameter("@cost_by_day_3_6", FormatNumber(lineSegments[lineSegmentCounter + 71].ToString())),
+                                                    new SqlParameter("@cost_by_day_3_7", FormatNumber(lineSegments[lineSegmentCounter + 72].ToString())),
+                                                    new SqlParameter("@discount_by_day_3_1", FormatNumber(lineSegments[lineSegmentCounter + 73].ToString())),
+                                                    new SqlParameter("@discount_by_day_3_2", FormatNumber(lineSegments[lineSegmentCounter + 74].ToString())),
+                                                    new SqlParameter("@discount_by_day_3_3", FormatNumber(lineSegments[lineSegmentCounter + 75].ToString())),
+                                                    new SqlParameter("@discount_by_day_3_4", FormatNumber(lineSegments[lineSegmentCounter + 76].ToString())),
+                                                    new SqlParameter("@discount_by_day_3_5", FormatNumber(lineSegments[lineSegmentCounter + 77].ToString())),
+                                                    new SqlParameter("@discount_by_day_3_6", FormatNumber(lineSegments[lineSegmentCounter + 78].ToString())),
+                                                    new SqlParameter("@discount_by_day_3_7", FormatNumber(lineSegments[lineSegmentCounter + 79].ToString())),
+                                                    new SqlParameter("@subscription_rate_description_4", FormatString(lineSegments[lineSegmentCounter + 80].ToString())),
+                                                    new SqlParameter("@subscription_rate_before_tax_4", FormatNumber(lineSegments[lineSegmentCounter + 81].ToString())),
+                                                    new SqlParameter("@subscription_rate_4", FormatNumber(lineSegments[lineSegmentCounter + 82].ToString())),
+                                                    new SqlParameter("@new_expire_date_4", FormatDateTime(lineSegments[lineSegmentCounter + 83].ToString())),
+                                                    new SqlParameter("@discount_amount_4", FormatNumber(lineSegments[lineSegmentCounter + 84].ToString())),
+                                                    new SqlParameter("@rate_by_day_4_1", FormatNumber(lineSegments[lineSegmentCounter + 85].ToString())),
+                                                    new SqlParameter("@rate_by_day_4_2", FormatNumber(lineSegments[lineSegmentCounter + 86].ToString())),
+                                                    new SqlParameter("@rate_by_day_4_3", FormatNumber(lineSegments[lineSegmentCounter + 87].ToString())),
+                                                    new SqlParameter("@rate_by_day_4_4", FormatNumber(lineSegments[lineSegmentCounter + 88].ToString())),
+                                                    new SqlParameter("@rate_by_day_4_5", FormatNumber(lineSegments[lineSegmentCounter + 89].ToString())),
+                                                    new SqlParameter("@rate_by_day_4_6", FormatNumber(lineSegments[lineSegmentCounter + 90].ToString())),
+                                                    new SqlParameter("@rate_by_day_4_7", FormatNumber(lineSegments[lineSegmentCounter + 91].ToString())),
+                                                    new SqlParameter("@cost_by_day_4_1", FormatNumber(lineSegments[lineSegmentCounter + 92].ToString())),
+                                                    new SqlParameter("@cost_by_day_4_2", FormatNumber(lineSegments[lineSegmentCounter + 93].ToString())),
+                                                    new SqlParameter("@cost_by_day_4_3", FormatNumber(lineSegments[lineSegmentCounter + 94].ToString())),
+                                                    new SqlParameter("@cost_by_day_4_4", FormatNumber(lineSegments[lineSegmentCounter + 95].ToString())),
+                                                    new SqlParameter("@cost_by_day_4_5", FormatNumber(lineSegments[lineSegmentCounter + 96].ToString())),
+                                                    new SqlParameter("@cost_by_day_4_6", FormatNumber(lineSegments[lineSegmentCounter + 97].ToString())),
+                                                    new SqlParameter("@cost_by_day_4_7", FormatNumber(lineSegments[lineSegmentCounter + 98].ToString())),
+                                                    new SqlParameter("@discount_by_day_4_1", FormatNumber(lineSegments[lineSegmentCounter + 99].ToString())),
+                                                    new SqlParameter("@discount_by_day_4_2", FormatNumber(lineSegments[lineSegmentCounter + 100].ToString())),
+                                                    new SqlParameter("@discount_by_day_4_3", FormatNumber(lineSegments[lineSegmentCounter + 101].ToString())),
+                                                    new SqlParameter("@discount_by_day_4_4", FormatNumber(lineSegments[lineSegmentCounter + 102].ToString())),
+                                                    new SqlParameter("@discount_by_day_4_5", FormatNumber(lineSegments[lineSegmentCounter + 103].ToString())),
+                                                    new SqlParameter("@discount_by_day_4_6", FormatNumber(lineSegments[lineSegmentCounter + 104].ToString())),
+                                                    new SqlParameter("@discount_by_day_4_7", FormatNumber(lineSegments[lineSegmentCounter + 105].ToString())),
+                                                    new SqlParameter("@grace_owed_amount_not_including_taxes", FormatNumber(lineSegments[lineSegmentCounter + 106].ToString())),
+                                                    new SqlParameter("@grace_owed_amount_including_taxes", FormatNumber(lineSegments[lineSegmentCounter + 107].ToString())),
+                                                    new SqlParameter("@grace_owed_city_tax", FormatNumber(lineSegments[lineSegmentCounter + 108].ToString())),
+                                                    new SqlParameter("@grace_owed_county_tax", FormatNumber(lineSegments[lineSegmentCounter + 109].ToString())),
+                                                    new SqlParameter("@grace_owed_state_tax", FormatNumber(lineSegments[lineSegmentCounter + 110].ToString())),
+                                                    new SqlParameter("@grace_owed_country_tax", FormatNumber(lineSegments[lineSegmentCounter + 111].ToString())),
+                                                    new SqlParameter("@subscribers_unallocated_balance", FormatNumber(lineSegments[lineSegmentCounter + 112].ToString())));
                                     break;
                                 case "R2":
                                     R2Count++;
@@ -702,22 +716,22 @@ namespace AutoRenew
                                                    new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", R2Count),
-                                                    new SqlParameter("@combo_id", lineSegments[lineSegmentCounter + 1].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 1].ToString()),
-                                                    new SqlParameter("@subscription_number", lineSegments[lineSegmentCounter + 2].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 2].ToString()),
-                                                    new SqlParameter("@product_id", lineSegments[lineSegmentCounter + 3].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 3].ToString()),
-                                                    new SqlParameter("@delivery_method", lineSegments[lineSegmentCounter + 4].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 4].ToString()),
-                                                    new SqlParameter("@delivery_schedule", lineSegments[lineSegmentCounter + 5].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 5].ToString()),
-                                                    new SqlParameter("@rate_code", lineSegments[lineSegmentCounter + 6].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 6].ToString()),
-                                                    new SqlParameter("@subscription_rate_description", lineSegments[lineSegmentCounter + 7].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 7].ToString()),
-                                                    new SqlParameter("@subscription_rate_before_tax", lineSegments[lineSegmentCounter + 8].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 8].ToString()),
-                                                    new SqlParameter("@subscription_rate", lineSegments[lineSegmentCounter + 9].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 9].ToString()),
-                                                    new SqlParameter("@total_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 10].ToString())),
-                                                    new SqlParameter("@city_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 11].ToString())),
-                                                    new SqlParameter("@county_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 12].ToString())),
-                                                    new SqlParameter("@state_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 13].ToString())),
-                                                    new SqlParameter("@country_tax_amount", FormatCurrency(lineSegments[lineSegmentCounter + 14].ToString())),
-                                                    new SqlParameter("@delivery_fee_amount", FormatCurrency(lineSegments[lineSegmentCounter + 15].ToString())),
-                                                    new SqlParameter("@new_expire_date", lineSegments[lineSegmentCounter + 16].ToString().Trim() == "" ? (object)DBNull.Value : lineSegments[lineSegmentCounter + 16].ToString()));
+                                                    new SqlParameter("@combo_id", FormatString(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@subscription_number", FormatString(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@product_id", FormatString(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@delivery_method", FormatString(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@delivery_schedule", FormatString(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@rate_code", FormatString(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@subscription_rate_description", FormatString(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@subscription_rate_before_tax", FormatNumber(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@subscription_rate", FormatNumber(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@total_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@city_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@county_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@state_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@country_tax_amount", FormatNumber(lineSegments[lineSegmentCounter + 14].ToString())),
+                                                    new SqlParameter("@delivery_fee_amount", FormatNumber(lineSegments[lineSegmentCounter + 15].ToString())),
+                                                    new SqlParameter("@new_expire_date", FormatDateTime(lineSegments[lineSegmentCounter + 16].ToString())));
                                     break;
                                 case "T1":
                                     T1Count++;
@@ -726,22 +740,22 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", T1Count),
-                                                    new SqlParameter("@country_tax_amount_1", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                                    new SqlParameter("@state_tax_amount_1", FormatCurrency(lineSegments[lineSegmentCounter + 2].ToString())),
-                                                    new SqlParameter("@county_tax_amount_1", FormatCurrency(lineSegments[lineSegmentCounter + 3].ToString())),
-                                                    new SqlParameter("@city_tax_amount_1", FormatCurrency(lineSegments[lineSegmentCounter + 4].ToString())),
-                                                    new SqlParameter("@country_tax_amount_2", FormatCurrency(lineSegments[lineSegmentCounter + 5].ToString())),
-                                                    new SqlParameter("@state_tax_amount_2", FormatCurrency(lineSegments[lineSegmentCounter + 6].ToString())),
-                                                    new SqlParameter("@county_tax_amount_2", FormatCurrency(lineSegments[lineSegmentCounter + 7].ToString())),
-                                                    new SqlParameter("@city_tax_amount_2", FormatCurrency(lineSegments[lineSegmentCounter + 8].ToString())),
-                                                    new SqlParameter("@country_tax_amount_3", FormatCurrency(lineSegments[lineSegmentCounter + 9].ToString())),
-                                                    new SqlParameter("@state_tax_amount_3", FormatCurrency(lineSegments[lineSegmentCounter + 10].ToString())),
-                                                    new SqlParameter("@county_tax_amount_3", FormatCurrency(lineSegments[lineSegmentCounter + 11].ToString())),
-                                                    new SqlParameter("@city_tax_amount_3", FormatCurrency(lineSegments[lineSegmentCounter + 12].ToString())),
-                                                    new SqlParameter("@country_tax_amount_4", FormatCurrency(lineSegments[lineSegmentCounter + 13].ToString())),
-                                                    new SqlParameter("@state_tax_amount_4", FormatCurrency(lineSegments[lineSegmentCounter + 14].ToString())),
-                                                    new SqlParameter("@county_tax_amount_4", FormatCurrency(lineSegments[lineSegmentCounter + 15].ToString())),
-                                                    new SqlParameter("@city_tax_amount_4", FormatCurrency(lineSegments[lineSegmentCounter + 16].ToString())));
+                                                    new SqlParameter("@country_tax_amount_1", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@state_tax_amount_1", FormatNumber(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@county_tax_amount_1", FormatNumber(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@city_tax_amount_1", FormatNumber(lineSegments[lineSegmentCounter + 4].ToString())),
+                                                    new SqlParameter("@country_tax_amount_2", FormatNumber(lineSegments[lineSegmentCounter + 5].ToString())),
+                                                    new SqlParameter("@state_tax_amount_2", FormatNumber(lineSegments[lineSegmentCounter + 6].ToString())),
+                                                    new SqlParameter("@county_tax_amount_2", FormatNumber(lineSegments[lineSegmentCounter + 7].ToString())),
+                                                    new SqlParameter("@city_tax_amount_2", FormatNumber(lineSegments[lineSegmentCounter + 8].ToString())),
+                                                    new SqlParameter("@country_tax_amount_3", FormatNumber(lineSegments[lineSegmentCounter + 9].ToString())),
+                                                    new SqlParameter("@state_tax_amount_3", FormatNumber(lineSegments[lineSegmentCounter + 10].ToString())),
+                                                    new SqlParameter("@county_tax_amount_3", FormatNumber(lineSegments[lineSegmentCounter + 11].ToString())),
+                                                    new SqlParameter("@city_tax_amount_3", FormatNumber(lineSegments[lineSegmentCounter + 12].ToString())),
+                                                    new SqlParameter("@country_tax_amount_4", FormatNumber(lineSegments[lineSegmentCounter + 13].ToString())),
+                                                    new SqlParameter("@state_tax_amount_4", FormatNumber(lineSegments[lineSegmentCounter + 14].ToString())),
+                                                    new SqlParameter("@county_tax_amount_4", FormatNumber(lineSegments[lineSegmentCounter + 15].ToString())),
+                                                    new SqlParameter("@city_tax_amount_4", FormatNumber(lineSegments[lineSegmentCounter + 16].ToString())));
                                     break;
                                 case "TC":
                                     TCCount++;
@@ -750,36 +764,41 @@ namespace AutoRenew
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@pbs_record_number", lineNumber),
                                                     new SqlParameter("@segment_instance", TCCount),
-                                                    new SqlParameter("@transportation_cost_1", FormatCurrency(lineSegments[lineSegmentCounter + 1].ToString())),
-                                                    new SqlParameter("@transportation_cost_2", FormatCurrency(lineSegments[lineSegmentCounter + 2].ToString())),
-                                                    new SqlParameter("@transportation_cost_3", FormatCurrency(lineSegments[lineSegmentCounter + 3].ToString())),
-                                                    new SqlParameter("@transportation_cost_4", FormatCurrency(lineSegments[lineSegmentCounter + 4].ToString())));
+                                                    new SqlParameter("@transportation_cost_1", FormatNumber(lineSegments[lineSegmentCounter + 1].ToString())),
+                                                    new SqlParameter("@transportation_cost_2", FormatNumber(lineSegments[lineSegmentCounter + 2].ToString())),
+                                                    new SqlParameter("@transportation_cost_3", FormatNumber(lineSegments[lineSegmentCounter + 3].ToString())),
+                                                    new SqlParameter("@transportation_cost_4", FormatNumber(lineSegments[lineSegmentCounter + 4].ToString())));
                                     break;
                             }
 
-                            processedSegmentCount++;
+
                         }
 
                         lineSegmentCounter++;
+                    
                     }
+
+                    processedSegmentCount += (F1Count + A1Count + A2Count + B1Count + C1Count + D1Count + X1Count + EGCount + E1Count + G1Count + G2Count + G3Count + G4Count + Z0Count + Z1Count + Z2Count + M1Count + M2Count + P1Count + P2Count + R1Count + R2Count + SGCount + S1Count + S2Count + T1Count + TCCount);
+
                 }
+
 
             }
 
-            WriteToJobLog(JobLogMessageType.INFO, $"{processedSegmentCount} total segments read.");
+            WriteToJobLog(JobLogMessageType.INFO, $"{processedSegmentCount } total segments read.");
 
             ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "dbo.Proc_Update_Loads_Count",
                                         new SqlParameter("@pintLoadsID", loadsId),
-                                        new SqlParameter("@pintLoadCount", processedSegmentCount),
-                                        new SqlParameter("@pflgSuccessfulLoad", 1));
+                                        new SqlParameter("@pintRecordCount", processedSegmentCount),
+                                        new SqlParameter("@pflgSuccessful", 1));
 
         }
 
         public override void SetupJob()
         {
-            JobName = "Office Pay";
-            JobDescription = @"Parses an X12-like file dumping the records into the local database. Each segment type matches the table suffix.";
-            AppConfigSectionName = "OfficePay";
+            JobName = "Auto Renew";
+            JobDescription = @"Parses an X12-like file dumping the records into the local database. Each segment type matches the table suffix. This job is almost identical to OfficePay";
+            AppConfigSectionName = "AutoRenew";
         }
     }
 }

@@ -59,3 +59,5 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\QualificationReport
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\QualificationReportLoad.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\OfficePay.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\OfficePay.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\AutoRenew.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\AutoRenew.pdb

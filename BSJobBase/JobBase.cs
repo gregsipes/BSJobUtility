@@ -633,7 +633,7 @@ namespace BSJobBase
             }
         }
       
-        protected object FormatCurrency(string inputString)
+        protected object FormatNumber(string inputString)
         {
             if (inputString.Trim() == "" || inputString.Trim() == "?")
                 return (object)DBNull.Value;
@@ -648,6 +648,37 @@ namespace BSJobBase
 
             }
 
+        }
+
+        protected object FormatDateTime(string inputString)
+        {
+            if (inputString.Trim() == "" || inputString.Trim() == "?")
+                return (object)DBNull.Value;
+            else
+            {
+                inputString = inputString.Trim();
+
+                DateTime dateTime;
+
+                if (DateTime.TryParse(inputString, out dateTime))
+                    return dateTime.ToShortDateString();
+                else
+                    return (object)DBNull.Value;
+
+            }
+        }
+
+        protected object FormatString(string inputString)
+        {
+            if (inputString.Trim() == "" || inputString.Trim() == "?")
+                return (object)DBNull.Value;
+            else
+            {
+                inputString = inputString.Trim();
+
+                return inputString;
+
+            }
         }
 
         #endregion
