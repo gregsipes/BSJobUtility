@@ -41,7 +41,7 @@ namespace OfficePay
                         }
                         //else
                         //{
-                        //    ExecuteNonQuery(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads_Not_Loaded",
+                        //    ExecuteNonQuery(DatabaseConnectionStringNames.OfficePay, "Proc_Insert_Loads_Not_Loaded",
                         //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
                         //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                         //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),

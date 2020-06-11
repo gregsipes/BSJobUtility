@@ -46,7 +46,7 @@ namespace ManifestLoad
                         }
                         //else
                         //{
-                        //    ExecuteNonQuery(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads_Not_Loaded",
+                        //    ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "Proc_Insert_Loads_Not_Loaded",
                         //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
                         //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                         //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),

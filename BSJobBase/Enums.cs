@@ -22,7 +22,8 @@ namespace BSJobBase
         PBSInvoiceExportLoad,
         QualificationReportLoad,
         OfficePay,
-        AutoRenew
+        AutoRenew,
+        PressRoom
     }
 
     public enum JobLogMessageType

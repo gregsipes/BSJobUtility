@@ -515,6 +515,9 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.AutoRenew:
                     connectionString = GetConnectionString("autorenew");
                     break;
+                case DatabaseConnectionStringNames.PressRoom:
+                    connectionString = GetConnectionString("pressroom");
+                    break;
                 default:
                     break;
             }

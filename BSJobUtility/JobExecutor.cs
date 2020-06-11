@@ -51,6 +51,8 @@ namespace BSJobUtility
                 _managedJob = new OfficePay.Job();
             else if (_jobName == "AutoRenew")
                 _managedJob = new AutoRenew.Job();
+            else if (_jobName == "PressRoomLoad")
+                _managedJob = new PressRoomLoad.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

@@ -90,6 +90,10 @@
       <Project>{564e163f-1504-4c49-8cde-251aa50b5e44}</Project>
       <Name>PBSMacrosLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PressRoomLoad\PressRoomLoad.csproj">
+      <Project>{a67f8644-dd1c-4bcf-ac9c-a67292f39196}</Project>
+      <Name>PressRoomLoad</Name>
+    </ProjectReference>
     <ProjectReference Include="..\QualificationReportLoad\QualificationReportLoad.csproj">
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>

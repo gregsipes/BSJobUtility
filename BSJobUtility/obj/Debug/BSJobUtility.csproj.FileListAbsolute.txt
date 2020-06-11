@@ -61,3 +61,5 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\OfficePay.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\OfficePay.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\AutoRenew.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\AutoRenew.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomLoad.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomLoad.pdb
