@@ -89,6 +89,7 @@ namespace PressRoomLoad
             List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
 
             DateTime? publishDate = null;
+            DateTime? runDate = null; 
             string edition = null;
             string deliverySelection = null;
             Int32 subtotal = 0;
@@ -116,7 +117,7 @@ namespace PressRoomLoad
                     else if (inWarningMessage)
                     {
                         warnings.Add(line.Trim());
-                    }                  
+                    }
 
                 }
                 else if (line.StartsWith("\f") && publishDate != null)
@@ -145,6 +146,8 @@ namespace PressRoomLoad
                         }
                     }
 
+                    runDate = publishDate;
+
                     //clear all variables
                     inWarningMessage = false;
                     publishDate = null;
@@ -155,19 +158,12 @@ namespace PressRoomLoad
                 }
             }
 
-            //todo:     If Not flgTotalsLoaded Then
-    //        gobjLog.WriteToLog "No product totals saved for publishing date " & strRunDate & "."
-    //End If
+            ExecuteNonQuery(DatabaseConnectionStringNames.PressRoom, "dbo.Proc_Update_Loads_Date",
+                                                new SqlParameter("@pintLoadsID", loadsId),
+                                                new SqlParameter("@sdatRunDate", runDate),
+                                                new SqlParameter("@pflgSuccessfullLoad", 1));
 
-
-    //gcnnSQL.Execute "exec Proc_Update_Loads_Date " & mlngLoadsID & "," & IIf(strRunDate = "", "Null", "'" & Format$(strRunDate, "mm/dd/yyyy") & "'") & "," & IIf(mlngErrorCount = 0, 1, 0)
-    //gobjLog.WriteToLog "Load information updated.", eniInfo
-
-    //If mlngErrorCount = 0 Then
-    //    flgSuccessful = True
-    //End If
-
-
+            WriteToJobLog(JobLogMessageType.INFO, "Load information updated.");
 
         }
 
