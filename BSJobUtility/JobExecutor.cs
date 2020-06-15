@@ -55,6 +55,8 @@ namespace BSJobUtility
                 _managedJob = new PressRoomLoad.Job();
             else if (_jobName == "PressRoomFreeLoad")
                 _managedJob = new PressRoomFreeLoad.Job();
+            else if (_jobName == "PBSInvoiceTotals")
+                _managedJob = new PBSInvoiceTotals.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

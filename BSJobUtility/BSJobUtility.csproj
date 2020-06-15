@@ -86,6 +86,10 @@
       <Project>{5e72a50a-0ca6-481b-b937-c54be921d6ce}</Project>
       <Name>PBSInvoiceExportLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBSInvoiceTotals\PBSInvoiceTotals.csproj">
+      <Project>{15bc181b-c041-49ee-943d-eb28f4e1bda4}</Project>
+      <Name>PBSInvoiceTotals</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PBSMacrosLoad\PBSMacrosLoad.csproj">
       <Project>{564e163f-1504-4c49-8cde-251aa50b5e44}</Project>
       <Name>PBSMacrosLoad</Name>

@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PressRoomFreeLoad
+namespace PBSInvoiceTotals
 {
     public class Job : JobBase
     {
@@ -16,7 +16,7 @@ namespace PressRoomFreeLoad
         {
             try
             {
-                List<string> files = Directory.GetFiles(GetConfigurationKeyValue("InputDirectory"), "freepress*").ToList();
+                List<string> files = Directory.GetFiles(GetConfigurationKeyValue("InputDirectory"), "invoic*").ToList();
 
                 if (files != null && files.Count() > 0)
                 {
@@ -24,7 +24,7 @@ namespace PressRoomFreeLoad
                     {
                         FileInfo fileInfo = new FileInfo(file);
 
-                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.PressRoomFree, "dbo.Proc_Select_Loads_If_Processed",
+                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Select_Loads_If_Processed",
                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                 new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
@@ -40,7 +40,7 @@ namespace PressRoomFreeLoad
                         }
                         //else
                         //{
-                        //    ExecuteNonQuery(DatabaseConnectionStringNames.PressRoomFree, "Proc_Insert_Loads_Not_Loaded",
+                        //    ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "Proc_Insert_Loads_Not_Loaded",
                         //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
                         //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                         //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
@@ -71,7 +71,7 @@ namespace PressRoomFreeLoad
             WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
 
             //update or create a load id
-            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PressRoomFree, "Proc_Insert_Loads",
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoiceTotals, "Proc_Insert_Loads",
                                                                                         new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString() + "\\"),
                                                                                         new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                                         new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind)),
@@ -81,7 +81,7 @@ namespace PressRoomFreeLoad
             loadsId = Int32.Parse(result["loads_id"].ToString());
             WriteToJobLog(JobLogMessageType.INFO, $"Loads ID: {loadsId}");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.PressRoomFree, "Proc_Update_Loads_Backup",
+            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "Proc_Update_Loads_Backup",
                                         new SqlParameter("@pintLoadsID", loadsId),
                                         new SqlParameter("@pstrBackupFile", backupFileName));
 
@@ -123,7 +123,7 @@ namespace PressRoomFreeLoad
                 else if (line.StartsWith("\f") && publishDate != null)
                 {
                     //form feeds mark the end of a group, so save the values to the database
-                    result = ExecuteSQL(DatabaseConnectionStringNames.PressRoomFree, "dbo.Proc_Insert_Delivery_Selection_Totals",
+                    result = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Insert_Delivery_Selection_Totals",
                                                          new SqlParameter("@pintLoadsID", loadsId),
                                                          new SqlParameter("@psdatRunDate", publishDate),
                                                          new SqlParameter("@pvchrEdition", edition),
@@ -137,7 +137,7 @@ namespace PressRoomFreeLoad
                         int warningCount = 1;
                         foreach (string warning in warnings)
                         {
-                            ExecuteNonQuery(DatabaseConnectionStringNames.PressRoomFree, "dbo.Proc_Insert_Warnings",
+                            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Insert_Warnings",
                                                     new SqlParameter("@pintDeliverySelectionTotalsID", deliverySelectionId),
                                                     new SqlParameter("@pintSequence", warningCount),
                                                     new SqlParameter("@pvchrWarning", warning));
@@ -158,7 +158,7 @@ namespace PressRoomFreeLoad
                 }
             }
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.PressRoomFree, "dbo.Proc_Update_Loads_Date",
+            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Update_Loads_Date",
                                                 new SqlParameter("@pintLoadsID", loadsId),
                                                 new SqlParameter("@sdatRunDate", runDate),
                                                 new SqlParameter("@pflgSuccessfullLoad", 1));
@@ -169,9 +169,9 @@ namespace PressRoomFreeLoad
 
         public override void SetupJob()
         {
-            JobName = "Press Room Load";
-            JobDescription = @"Parses a fixed width file with delivery by area totals - free version (doesn't appear to be in use)";
-            AppConfigSectionName = "PressRoomLoad";
+            JobName = "PBS Invoice Totals";
+            JobDescription = @"";
+            AppConfigSectionName = "PBSInvoiceTotals";
         }
     }
 }
