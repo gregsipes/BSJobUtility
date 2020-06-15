@@ -23,7 +23,8 @@ namespace BSJobBase
         QualificationReportLoad,
         OfficePay,
         AutoRenew,
-        PressRoom
+        PressRoom,
+        PressRoomFree
     }
 
     public enum JobLogMessageType

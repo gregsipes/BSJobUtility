@@ -7,4 +7,3 @@ C:\projects\Applications\BSJobUtility\PressRoomLoad\bin\Debug\BSJobBase.dll.conf
 C:\projects\Applications\BSJobUtility\PressRoomLoad\obj\Debug\PressRoomLoad.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\PressRoomLoad\obj\Debug\PressRoomLoad.dll
 C:\projects\Applications\BSJobUtility\PressRoomLoad\obj\Debug\PressRoomLoad.pdb
-C:\projects\Applications\BSJobUtility\PressRoomLoad\obj\Debug\PressRoomLoad.csprojAssemblyReference.cache

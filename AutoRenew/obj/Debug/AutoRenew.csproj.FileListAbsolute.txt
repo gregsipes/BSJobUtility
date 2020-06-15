@@ -3,7 +3,6 @@ C:\projects\Applications\BSJobUtility\AutoRenew\bin\Debug\AutoRenew.pdb
 C:\projects\Applications\BSJobUtility\AutoRenew\bin\Debug\BSJobBase.dll
 C:\projects\Applications\BSJobUtility\AutoRenew\bin\Debug\BSJobBase.pdb
 C:\projects\Applications\BSJobUtility\AutoRenew\bin\Debug\BSJobBase.dll.config
-C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.csprojAssemblyReference.cache
 C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.csproj.CoreCompileInputs.cache
 C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.dll

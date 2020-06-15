@@ -518,6 +518,9 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.PressRoom:
                     connectionString = GetConnectionString("pressroom");
                     break;
+                case DatabaseConnectionStringNames.PressRoomFree:
+                    connectionString = GetConnectionString("pressroomfree");
+                    break;
                 default:
                     break;
             }
@@ -677,7 +680,8 @@ namespace BSJobBase
                 return (object)DBNull.Value;
             else
             {
-                inputString = inputString.Trim();
+                //some strings are parsed by position, so trimming whitespace is problematic
+              //  inputString = inputString.Trim();
 
                 return inputString;
 

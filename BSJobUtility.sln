@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoRenew", "AutoRenew\Auto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PressRoomLoad", "PressRoomLoad\PressRoomLoad.csproj", "{A67F8644-DD1C-4BCF-AC9C-A67292F39196}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PressRoomFreeLoad", "PressRoomFreeLoad\PressRoomFreeLoad.csproj", "{FD252A6F-65A4-4E97-93FF-7EB0AD5F5A0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{A67F8644-DD1C-4BCF-AC9C-A67292F39196}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A67F8644-DD1C-4BCF-AC9C-A67292F39196}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A67F8644-DD1C-4BCF-AC9C-A67292F39196}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD252A6F-65A4-4E97-93FF-7EB0AD5F5A0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD252A6F-65A4-4E97-93FF-7EB0AD5F5A0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD252A6F-65A4-4E97-93FF-7EB0AD5F5A0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD252A6F-65A4-4E97-93FF-7EB0AD5F5A0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +111,7 @@ Global
 		{A599015D-4696-40A1-BD42-4EB5F3C70A01} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{47BBD75C-7E23-40A0-B6A4-7FFFC7E37EF4} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{A67F8644-DD1C-4BCF-AC9C-A67292F39196} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{FD252A6F-65A4-4E97-93FF-7EB0AD5F5A0C} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}
