@@ -1,0 +1,10 @@
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\bin\Debug\PressRoomFreeLoad.dll
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\bin\Debug\PressRoomFreeLoad.pdb
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.csproj.CopyComplete
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.dll
+C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.pdb

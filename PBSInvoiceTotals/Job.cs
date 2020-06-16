@@ -88,80 +88,108 @@ namespace PBSInvoiceTotals
             //parse file and store contents
             List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
 
-            DateTime? publishDate = null;
-            DateTime? runDate = null;
-            string edition = null;
-            string deliverySelection = null;
-            Int32 subtotal = 0;
-            List<string> warnings = new List<string>();
-            bool inWarningMessage = false;
+            bool inTotalsSection = false;
+            bool inControlTotalsSection = false;
+            bool inDrawSummarySection = false;
+           // bool inGLSection = false;
+            int controlProcessRecordNumber = 0;
+            int drawRecordNumber = 0;
+           // int GLRecordNumber = 0;
+            string billDate = null;
+            string billSource = null;
 
             foreach (string line in fileContents)
             {
 
                 if (line != null && line.Trim().Length > 0)
                 {
-                    if (line.StartsWith("PUBLISHING DATE:"))
-                        publishDate = Convert.ToDateTime(line.Replace("PUBLISHING DATE:", "").Trim());
-                    else if (line.StartsWith("EDITION:"))
-                        edition = line.Replace("EDITION:", "").Trim();
-                    else if (line.StartsWith("DELIVERY SELECTION:"))
-                        deliverySelection = line.Replace("DELIVERY SELECTION:", "").Trim();
-                    else if (line.Trim().StartsWith("PRINT SUBTOTAL:"))
-                        subtotal = Convert.ToInt32(line.Replace("PRINT SUBTOTAL:", "").Replace(",", "").Trim());
-                    else if (line.Trim().StartsWith("WARNING:"))
+                    if (!inTotalsSection)  //we are only processing the bottom portion of the file
                     {
-                        warnings.Add(line.Trim().Replace("WARNING:", "").Trim());
-                        inWarningMessage = true;
+                        if (line.Contains("ACCOUNT     : TOTAL"))
+                            inTotalsSection = true;
                     }
-                    else if (inWarningMessage)
+                    else
                     {
-                        warnings.Add(line.Trim());
-                    }
-
-                }
-                else if (line.StartsWith("\f") && publishDate != null)
-                {
-                    //form feeds mark the end of a group, so save the values to the database
-                    result = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Insert_Delivery_Selection_Totals",
-                                                         new SqlParameter("@pintLoadsID", loadsId),
-                                                         new SqlParameter("@psdatRunDate", publishDate),
-                                                         new SqlParameter("@pvchrEdition", edition),
-                                                         new SqlParameter("@pvchrDeliverySelection", deliverySelection),
-                                                         new SqlParameter("@pintProductTotal", subtotal)).FirstOrDefault();
-
-                    Int32 deliverySelectionId = Int32.Parse(result["delivery_selection_totals_id"].ToString());
-
-                    if (warnings.Count() > 0)
-                    {
-                        int warningCount = 1;
-                        foreach (string warning in warnings)
+                        if (line.Contains("BILL SOURCE:"))
+                            billSource = line.Substring(0, line.IndexOf("DISTRICT    :")).Replace("BILL SOURCE:", "").Trim();
+                        else if (line.Contains("BILL DATE  :"))
+                            billDate = line.Substring(0, line.IndexOf("TRUCK       :")).Replace("BILL DATE  :", "").Trim();
+                        else if (line.Contains("CONTROL TOTALS"))
                         {
-                            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Insert_Warnings",
-                                                    new SqlParameter("@pintDeliverySelectionTotalsID", deliverySelectionId),
-                                                    new SqlParameter("@pintSequence", warningCount),
-                                                    new SqlParameter("@pvchrWarning", warning));
-
-                            warningCount++;
+                            inControlTotalsSection = true;
+                            inDrawSummarySection = false;
+                            //    inGLSection = false;
                         }
+                        else if (line.Contains("DRAW SUMMARY"))
+                        {
+                            inControlTotalsSection = false;
+                            inDrawSummarySection = true;
+                            //  inGLSection = false;
+                        }
+                        //else if (line.Contains("GENERAL LEDGER"))
+                        //{
+                        //    inControlTotalsSection = false;
+                        //    inDrawSummarySection = false;
+                        //  //  inGLSection = true;
+                        //}
+                        else if (inControlTotalsSection)
+                        {
+                            decimal controlTotal = 0;
+                            if (decimal.TryParse(line.Substring(30, 15).Trim(), out controlTotal))
+                            {
+                                string description = line.Substring(0, line.IndexOf("."));
+                                decimal processTotal = decimal.Parse(line.Substring(46).Trim());
+
+                                controlProcessRecordNumber++;
+
+                                ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Insert_Control_Process",
+                                                    new SqlParameter("@pintLoadsID", loadsId),
+                                                    new SqlParameter("@pintRecordNumber", controlProcessRecordNumber),
+                                                    new SqlParameter("@pvchrDescription", description),
+                                                    new SqlParameter("@pfltControlTotal", controlTotal),
+                                                    new SqlParameter("@pfltProcessTotal", processTotal));
+                            }
+                        }
+                        else if (inDrawSummarySection)
+                        {
+                            if (line.Contains("@") && line.IndexOf("@") == 42)
+                            {
+                                string description = line.Substring(0, 32).Trim();
+                                Int32 drawTotal = Int32.Parse(line.Substring(0, line.IndexOf("@")).Replace(description, "").Trim());
+                                decimal rate = decimal.Parse(FormatNumber(line.Substring(43, 11).Trim()).ToString());
+                                decimal total = decimal.Parse(FormatNumber(line.Substring(54, 14).Trim()).ToString());
+
+                                drawRecordNumber++;
+
+                                ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Insert_Draw_Rate",
+                                                    new SqlParameter("@pintLoadsID", loadsId),
+                                                    new SqlParameter("@pintRecordNumber", controlProcessRecordNumber),
+                                                    new SqlParameter("@pvchrDescription", description),
+                                                    new SqlParameter("@pintDrawTotal", drawTotal),
+                                                    new SqlParameter("@pmnyRate", rate),
+                                                    new SqlParameter("@pmnyTotalAmount", total));
+
+
+
+
+                            }
+                        }
+                        //else if (inGLSection)
+                        //{
+
+                        //    GLRecordNumber++;
+                        //a new GL record hasn't been created since 2007 
+
+                        //}
                     }
-
-                    runDate = publishDate;
-
-                    //clear all variables
-                    inWarningMessage = false;
-                    publishDate = null;
-                    edition = null;
-                    deliverySelection = null;
-                    subtotal = 0;
-                    warnings = new List<string>();
                 }
+
             }
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Update_Loads_Date",
+            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceTotals, "dbo.Proc_Update_Loads",
                                                 new SqlParameter("@pintLoadsID", loadsId),
-                                                new SqlParameter("@sdatRunDate", runDate),
-                                                new SqlParameter("@pflgSuccessfullLoad", 1));
+                                                new SqlParameter("@pvchrBillSource", billSource),
+                                                new SqlParameter("@pvchrBillDate", billDate));
 
             WriteToJobLog(JobLogMessageType.INFO, "Load information updated.");
 
@@ -170,7 +198,7 @@ namespace PBSInvoiceTotals
         public override void SetupJob()
         {
             JobName = "PBS Invoice Totals";
-            JobDescription = @"";
+            JobDescription = @"Parses a fixed width file with AR totals by truckk";
             AppConfigSectionName = "PBSInvoiceTotals";
         }
     }

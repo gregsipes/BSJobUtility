@@ -1,0 +1,10 @@
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\PBSInvoiceTotals.dll
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\PBSInvoiceTotals.pdb
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.csproj.CopyComplete
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.dll
+C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.pdb

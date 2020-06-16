@@ -63,3 +63,7 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\AutoRenew.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\AutoRenew.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomLoad.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomLoad.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceTotals.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomFreeLoad.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceTotals.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomFreeLoad.pdb

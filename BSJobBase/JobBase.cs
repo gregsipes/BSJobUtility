@@ -521,6 +521,9 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.PressRoomFree:
                     connectionString = GetConnectionString("pressroomfree");
                     break;
+                case DatabaseConnectionStringNames.PBSInvoiceTotals:
+                    connectionString = GetConnectionString("pbsinvoicetotals");
+                    break;
                 default:
                     break;
             }
