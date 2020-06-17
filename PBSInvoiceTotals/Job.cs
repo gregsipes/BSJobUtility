@@ -137,8 +137,8 @@ namespace PBSInvoiceTotals
                             decimal controlTotal = 0;
                             if (decimal.TryParse(line.Substring(30, 15).Trim(), out controlTotal))
                             {
-                                string description = line.Substring(0, line.IndexOf("."));
-                                decimal processTotal = decimal.Parse(line.Substring(46).Trim());
+                                string description = line.Substring(0, line.IndexOf(".")).Trim();
+                                decimal processTotal = decimal.Parse(line.Substring(46).Trim().Replace(",", ""));
 
                                 controlProcessRecordNumber++;
 
@@ -155,9 +155,9 @@ namespace PBSInvoiceTotals
                             if (line.Contains("@") && line.IndexOf("@") == 42)
                             {
                                 string description = line.Substring(0, 32).Trim();
-                                Int32 drawTotal = Int32.Parse(line.Substring(0, line.IndexOf("@")).Replace(description, "").Trim());
-                                decimal rate = decimal.Parse(FormatNumber(line.Substring(43, 11).Trim()).ToString());
-                                decimal total = decimal.Parse(FormatNumber(line.Substring(54, 14).Trim()).ToString());
+                                Int32 drawTotal = Int32.Parse(line.Substring(0, line.IndexOf("@")).Replace(description, "").Replace(",", "").Trim());
+                                decimal rate = decimal.Parse(FormatNumber(line.Substring(43, 11).Trim().Replace(",", "")).ToString());
+                                decimal total = decimal.Parse(FormatNumber(line.Substring(54).Trim().Replace(",", "")).ToString());
 
                                 drawRecordNumber++;
 

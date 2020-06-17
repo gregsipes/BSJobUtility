@@ -1,4 +1,3 @@
-C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.csprojAssemblyReference.cache
 C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.csproj.CoreCompileInputs.cache
 C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\PBSInvoiceTotals.dll
 C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\PBSInvoiceTotals.pdb
