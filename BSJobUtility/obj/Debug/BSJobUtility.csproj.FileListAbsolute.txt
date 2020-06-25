@@ -67,3 +67,5 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceTotals.dl
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomFreeLoad.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceTotals.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomFreeLoad.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceLoad.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceLoad.pdb

@@ -29,7 +29,7 @@ namespace PBSMacrosLoad
                     // if (fileInfo.LastWriteTime.Date == DateTime.Today.Date && !fileInfo.Name.Contains(".="))
                     if (!fileInfo.Name.Contains(".="))
                     {
-                        WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.Name} last write time {fileInfo.LastAccessTime}");
+                    //    WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.Name} last write time {fileInfo.LastAccessTime}");
 
                         Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "Proc_Select_Loads_If_Processed",
                                                                  new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
@@ -43,6 +43,8 @@ namespace PBSMacrosLoad
                                 //create new file name
                                 string newFileName = fileInfo.Name.Replace("." + fileInfo.Extension, "") + "_" + DateTime.Now.ToString("yyyyMMddhhmmss tt") + ".txt";
 
+                                WriteToJobLog(JobLogMessageType.INFO, $"Creating new loads record for {fileInfo.Name} last modified on  {new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind)}");
+
                                 //create load record
                                 result = ExecuteSQL(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Insert_Loads",
                                                 new SqlParameter("@pvchrOriginalDir", sourceDirectory),
@@ -52,9 +54,14 @@ namespace PBSMacrosLoad
                                                 new SqlParameter("@pvchrComputerName", Environment.MachineName),
                                                 new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString())).FirstOrDefault();
 
-                                Int32? loadId = Int32.Parse(result["loads_id"].ToString());
+                                Int32 loadId = 0;
+                                if (!Int32.TryParse(result["loads_id"].ToString(), out loadId))
+                                {
+                                    WriteToJobLog(JobLogMessageType.ERROR, result["loads_id"].ToString());
+                                    throw new Exception(result["loads_id"].ToString());
+                                }
 
-                                if (loadId != null)
+                                if (loadId != 0)
                                 {
                                     //copy file from source to destination
                                     File.Copy(file, destinationDirectory + newFileName);
@@ -68,7 +75,7 @@ namespace PBSMacrosLoad
                                     WriteToJobLog(JobLogMessageType.INFO, "Copied " + file + " to " + destinationDirectory + newFileName);
                                 }
                             } else
-                                WriteToJobLog(JobLogMessageType.INFO, "There's a chance the file is still getting updated, so we'll pick it up next run");
+                                WriteToJobLog(JobLogMessageType.INFO, $"There's a chance the file is still getting updated, so we'll pick it up next run {fileInfo.Name}");
 
 
                            

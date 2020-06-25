@@ -25,7 +25,8 @@ namespace BSJobBase
         AutoRenew,
         PressRoom,
         PressRoomFree,
-        PBSInvoiceTotals
+        PBSInvoiceTotals,
+        PBSInvoices
     }
 
     public enum JobLogMessageType

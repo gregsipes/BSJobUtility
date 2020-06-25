@@ -198,7 +198,7 @@ namespace PBSInvoiceTotals
         public override void SetupJob()
         {
             JobName = "PBS Invoice Totals";
-            JobDescription = @"Parses a fixed width file with AR totals by truckk";
+            JobDescription = @"Parses a fixed width file with AR totals by truck";
             AppConfigSectionName = "PBSInvoiceTotals";
         }
     }

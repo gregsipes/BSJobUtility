@@ -524,6 +524,9 @@ namespace BSJobBase
                 case DatabaseConnectionStringNames.PBSInvoiceTotals:
                     connectionString = GetConnectionString("pbsinvoicetotals");
                     break;
+                case DatabaseConnectionStringNames.PBSInvoices:
+                    connectionString = GetConnectionString("pbsinvoices");
+                    break;
                 default:
                     break;
             }
@@ -531,7 +534,7 @@ namespace BSJobBase
             return connectionString;
         }
 
-       
+
         public static void CheckCreateDirectory(string filePath)
         {
             CheckCreateDirectory(filePath, false);
