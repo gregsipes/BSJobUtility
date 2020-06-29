@@ -1,0 +1,10 @@
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\UnzipNewscycleExportFiles.dll
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\UnzipNewscycleExportFiles.pdb
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.dll
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.dll.config
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csproj.CopyComplete
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.dll
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.pdb

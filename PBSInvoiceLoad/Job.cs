@@ -48,7 +48,7 @@ namespace PBSInvoiceLoad
                             {
                                 WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
 
-                                CopyAndProcessFile(fileInfo);
+                              //  CopyAndProcessFile(fileInfo);
 
                             }
                         }

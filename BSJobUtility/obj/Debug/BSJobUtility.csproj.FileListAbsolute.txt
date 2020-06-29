@@ -69,3 +69,5 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceTotals.pd
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PressRoomFreeLoad.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceLoad.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceLoad.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\UnzipNewscycleExportFiles.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\UnzipNewscycleExportFiles.pdb

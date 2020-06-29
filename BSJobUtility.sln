@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBSInvoiceTotals", "PBSInvo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBSInvoiceLoad", "PBSInvoiceLoad\PBSInvoiceLoad.csproj", "{5B761D31-CAAF-4361-8B88-16DC53795B31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnzipNewscycleExportFiles", "UnzipNewscycleExportFiles\UnzipNewscycleExportFiles.csproj", "{5908EF09-95B9-4EC0-91C2-A404C8545853}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +109,10 @@ Global
 		{5B761D31-CAAF-4361-8B88-16DC53795B31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B761D31-CAAF-4361-8B88-16DC53795B31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B761D31-CAAF-4361-8B88-16DC53795B31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5908EF09-95B9-4EC0-91C2-A404C8545853}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5908EF09-95B9-4EC0-91C2-A404C8545853}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5908EF09-95B9-4EC0-91C2-A404C8545853}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5908EF09-95B9-4EC0-91C2-A404C8545853}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{FD252A6F-65A4-4E97-93FF-7EB0AD5F5A0C} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{15BC181B-C041-49EE-943D-EB28F4E1BDA4} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{5B761D31-CAAF-4361-8B88-16DC53795B31} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{5908EF09-95B9-4EC0-91C2-A404C8545853} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}

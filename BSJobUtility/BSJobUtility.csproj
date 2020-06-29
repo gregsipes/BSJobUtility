@@ -110,6 +110,10 @@
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UnzipNewscycleExportFiles\UnzipNewscycleExportFiles.csproj">
+      <Project>{5908ef09-95b9-4ec0-91c2-a404c8545853}</Project>
+      <Name>UnzipNewscycleExportFiles</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WrappersLoad\WrappersLoad.csproj">
       <Project>{7912f576-fb44-4dd2-971e-56f2f9ec77a0}</Project>
       <Name>WrappersLoad</Name>

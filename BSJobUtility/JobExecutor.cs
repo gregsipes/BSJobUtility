@@ -59,6 +59,8 @@ namespace BSJobUtility
                 _managedJob = new PBSInvoiceTotals.Job();
             else if (_jobName == "PBSInvoices")
                 _managedJob = new PBSInvoiceLoad.Job();
+            else if (_jobName == "UnzipNewscycleExportFiles")
+                _managedJob = new UnzipNewscycleExportFiles.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 
