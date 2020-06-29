@@ -7,4 +7,3 @@ C:\projects\Applications\BSJobUtility\PBSInvoiceLoad\bin\Debug\BSJobBase.dll.con
 C:\projects\Applications\BSJobUtility\PBSInvoiceLoad\obj\Debug\PBSInvoiceLoad.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\PBSInvoiceLoad\obj\Debug\PBSInvoiceLoad.dll
 C:\projects\Applications\BSJobUtility\PBSInvoiceLoad\obj\Debug\PBSInvoiceLoad.pdb
-C:\projects\Applications\BSJobUtility\PBSInvoiceLoad\obj\Debug\PBSInvoiceLoad.csprojAssemblyReference.cache

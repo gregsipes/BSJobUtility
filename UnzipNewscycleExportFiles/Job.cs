@@ -29,7 +29,7 @@ namespace UnzipNewscycleExportFiles
             // Check for any zip file(s). There should typically be only one but we can loop here
             //   to process any and all zip files.
 
-            string ZipFileExtension = GetConfigurationKeyValue(JobName, "compressedfileextension");
+            string ZipFileExtension = GetConfigurationKeyValue("compressedfileextension");
             string[] ZipFiles = Directory.GetFiles(SourceFolder, "*." + ZipFileExtension);
             List<string> ZipFileList = ZipFiles.ToList();
             foreach (string zf in ZipFileList)
