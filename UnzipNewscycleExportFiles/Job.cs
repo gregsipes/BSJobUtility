@@ -48,8 +48,8 @@ namespace UnzipNewscycleExportFiles
                     }
                     catch (Exception ex)
                     {
-                        SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT data folder " + SourceFolder + FolderName, false);
-                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newscycle EXPORT data folder " + SourceFolder + FolderName);
+                        SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT data folder " + SourceFolder + FolderName + " " + ex.ToString(), false);
+                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newscycle EXPORT data folder " + SourceFolder + FolderName + " " + ex.ToString());
                         UnzipOkay = false;
                     }
                 }
@@ -63,8 +63,8 @@ namespace UnzipNewscycleExportFiles
                     }
                     catch (Exception ex)
                     {
-                        SendMail($"Error in Job: {JobName}", "Unable to unzip Newscycle EXPORT data folder " + zf, false);
-                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to unzip Newscycle EXPORT data folder " + zf);
+                        SendMail($"Error in Job: {JobName}", "Unable to unzip Newscycle EXPORT data folder " + zf + " " + ex.ToString(), false);
+                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to unzip Newscycle EXPORT data folder " + zf + " " + ex.ToString());
                         UnzipOkay = false;
                     }
                 }
@@ -85,8 +85,8 @@ namespace UnzipNewscycleExportFiles
                         }
                         catch (Exception ex)
                         {
-                            SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT Touch folder " + TouchFolder, false);
-                            WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newscycle EXPORT Touch folder " + TouchFolder);
+                            SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT Touch folder " + TouchFolder + " " + ex.ToString(), false);
+                            WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newscycle EXPORT Touch folder " + TouchFolder + " " + ex.ToString());
                             UnzipOkay = false;
                         }
                     }
@@ -102,8 +102,8 @@ namespace UnzipNewscycleExportFiles
                     }
                     catch (Exception ex)
                     {
-                        SendMail($"Error in Job: {JobName}", "Unable to unzip Newscycle EXPORT Touch folder " + TouchFiles[0], false);
-                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to unzip Newxcycle EXPORT Touch folder " + TouchFiles[0]);
+                        SendMail($"Error in Job: {JobName}", "Unable to unzip Newscycle EXPORT Touch folder " + TouchFiles[0] + " " + ex.ToString(), false);
+                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to unzip Newxcycle EXPORT Touch folder " + TouchFiles[0] + " " + ex.ToString());
                         UnzipOkay = false;
                     }
                 }
@@ -117,8 +117,8 @@ namespace UnzipNewscycleExportFiles
                     }
                     catch (Exception ex)
                     {
-                        SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT zip file " + zf, false);
-                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newxcycle EXPORT zip file " + zf);
+                        SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT zip file " + zf + " " + ex.ToString(), false);
+                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newxcycle EXPORT zip file " + zf + " " + ex.ToString());
                         UnzipOkay = false;
                     }
                 }
