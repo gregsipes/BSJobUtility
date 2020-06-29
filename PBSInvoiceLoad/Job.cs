@@ -104,6 +104,13 @@ namespace PBSInvoiceLoad
                                                                             new SqlParameter("@pvchrAmountDueLabel", null),
                                                                             new SqlParameter("@pflgActiveOnly", 1)).ToList();
 
+            List<Dictionary<string, object>> carrierIdentifiers = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "PROC_SELECT_CARRIER_IDENTIFIERS",
+                                                                            new SqlParameter("@pvchrCarrierIdentifier", null)).ToList();
+
+            List<Dictionary<string, object>> carrierExceptions = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "PROC_SELECT_CARRIER_EXCEPTIONS",
+                                                                new SqlParameter("@pvchrCarrier", null)).ToList();
+
+
             string workingFilePath = GetConfigurationKeyValue("WorkDirectory1") + "carrinv_" + DateTime.Now.ToString("yyMMddhhmmss") + "_" + fileInfo.Name;
             //create a working copy of the file
             File.Copy(fileInfo.FullName, workingFilePath);
@@ -123,7 +130,15 @@ namespace PBSInvoiceLoad
             string district = "";
             string truck = "";
             Int32? sequence = null;
+            string billingTerms = "";
+            string nameAddress1 = "";
+            string nameAddress2 = "";
+            string carrier = "";
+            string carrierException = "";
             string pageNumber = "";
+            string printTypeIdentifier = "";
+            string exceptionPrintType = "";
+            string company;
 
             Int32 pageLineNumber = 0;
 
@@ -134,11 +149,12 @@ namespace PBSInvoiceLoad
             bool printInvoiceCredit = false;
             bool printReturnSheet = false;
             bool retailDraw = false;
+            bool hasCarrierExceptions = false;
 
             bool checkIdentifiers = false;
             bool checkRouteSuffix = false;
 
-            Dictionary<string, object> printType = null;
+          //  Dictionary<string, object> printType = null;
 
             foreach (string line in fileContents)
             {
@@ -231,114 +247,153 @@ namespace PBSInvoiceLoad
 
                             break;
                         case 2:
-                            List<string> lineSegments = line.Trim().Split(' ').ToList();
-                            printType = printTypes.Where(p => p["line_2_identifier_1"].ToString() == lineSegments[0]).FirstOrDefault(); 
 
-                            if (printType == null)
-                                printType = printTypes.Where(p => p["line_2_identifier_2"].ToString() == lineSegments[0]).FirstOrDefault();
+                            // Check for value on line 2 to determine the print type & set flags.
+                            // Carrier (including carrier exceptions array) & route may also determine print type.
+                            //List<string> lineSegments = line.Trim().Split(' ').ToList();
+                            //printType = printTypes.Where(p => p["line_2_identifier_1"].ToString() == lineSegments[0]).FirstOrDefault();
 
-                            if (printType != null)
+                            //if (printType == null)
+                            //{
+                            //    printType = printTypes.Where(p => p["line_2_identifier_2"].ToString() == lineSegments[0]).FirstOrDefault();
+                            //    printTypeIdentifier = printType["line_2_identifier_2"].ToString();
+                            //}
+                            //else
+                            //    printTypeIdentifier = printType["line_2_identifier_1"].ToString();
+
+
+
+
+                            //if (printType != null)
+                            //{
+                            //    checkIdentifiers = !bool.Parse(printType["do_not_check_carrier_identifiers_flag"].ToString());
+                            //    checkRouteSuffix = bool.Parse(printType["check_route_suffix_flag"].ToString());
+
+                            //    invoiceDate = DateTime.Parse(line.Replace(printType["line_2_identifier_1"].ToString(), "").Replace(printType["line_2_identifier_2"].ToString(), "").Replace("DATE:", "").Trim());
+                            //}
+
+                            foreach (Dictionary<string, object> printType in printTypes)
                             {
-                                checkIdentifiers = !bool.Parse(printType["do_not_check_carrier_identifiers_flag"].ToString());
-                                checkRouteSuffix = bool.Parse(printType["check_route_suffix_flag"].ToString());
+                                if (line.Contains(printType["line_2_identifier_1"].ToString())) {
+                                    printTypeIdentifier = printType["line_2_identifier_1"].ToString();
 
-                                invoiceDate = DateTime.Parse(line.Replace(printType["line_2_identifier_1"].ToString(), "").Replace(printType["line_2_identifier_2"].ToString(), "").Replace("DATE:", "").Trim());
+                                    invoiceDate = DateTime.Parse(line.Replace(printType["line_2_identifier_1"].ToString(), "").Replace("DATE:", "").Trim());
+                                    checkIdentifiers = !bool.Parse(printType["do_not_check_carrier_identifiers_flag"].ToString());
+                                    checkRouteSuffix = bool.Parse(printType["check_route_suffix_flag"].ToString());
+
+                                    break;
+                                }
+                             }
+
+                            foreach (Dictionary<string, object> printType in printTypes)
+                            {
+                                if (line.Contains(printType["line_2_identifier_2"].ToString()))
+                                {
+                                    printTypeIdentifier = printType["line_2_identifier_2"].ToString();
+
+                                    invoiceDate = DateTime.Parse(line.Replace(printType["line_2_identifier_2"].ToString(), "").Replace("DATE:", "").Trim());
+                                    checkIdentifiers = !bool.Parse(printType["do_not_check_carrier_identifiers_flag"].ToString());
+                                    checkRouteSuffix = bool.Parse(printType["check_route_suffix_flag"].ToString());
+
+                                    break;
+                                }
                             }
 
                             break;
                         case 3:
-                            if (printType["line_2_identifier_1"].ToString() == "Invoice")
+                            if (printTypeIdentifier == "Invoice")
                                 invoiceNumber = line.Substring(line.IndexOf("INVOICE NO. :")).Replace("INVOICE NO. :", "").Trim();
 
                             break;
+                        case 6:
+                            billingTerms = line.Replace("BILLING TERMS:", "").Trim();
+                            break;
+                        case 8:
+                            //check for any possible label values (BALANCE DUE, TOTAL BALANCE DUE, TOTAL OUTSTANDING BALANCE) 
+                            foreach (Dictionary<string, object> amountLabel in amountLabels)
+                            {
+                                if (line.Contains(amountLabel["amount_due_label"].ToString()))
+                                {
+                                    balanceDue = decimal.Parse(line.Replace(amountLabel["amount_due_label"].ToString(), "").Replace(",", "").Trim());
+                                    break;
+                                }
+                            }
+                            break;
+                        case 10:
+                            nameAddress1 = line.Trim().Substring(0, 40).Trim();
+                            carrier = line.Trim().Replace(nameAddress1, "").Replace("ACCOUNT     :", "").Trim();
 
-                        case 4:
+                            //Check if carrier/print type combinations is in carrier exceptions array.
+                            if (hasCarrierExceptions && printTypeIdentifier != "")
+                            {
+                                foreach (Dictionary<string, object> exception in carrierExceptions)
+                                {
+                                    if (exception["carrier"].ToString() == carrier)
+                                    {
+                                        if (exception["print_type_1"].ToString() != "" && printTypeIdentifier == exception["line_2_identifier_1"].ToString())  //print_type_1 is never empty, maybe this is something can happen in the UI?
+                                        {
+                                            checkIdentifiers = false;
+                                            checkRouteSuffix = false;
+                                            exceptionPrintType = exception["print_type_1"].ToString();
+                                        }
+                                    }
+                                    else if (exception["print_type_2"].ToString() != "" && printTypeIdentifier == exception["line_2_identifier_2"].ToString())  //print_type_2 is never empty, maybe this is something can happen in the UI?
+                                    {
+                                        checkIdentifiers = false;
+                                        checkRouteSuffix = false;
+                                        exceptionPrintType = exception["print_type_2"].ToString();
+                                    }
+                                    else if (exception["print_type_3"].ToString() != "" && printTypeIdentifier == exception["line_2_identifier_3"].ToString())  //this condition is never currently hit
+                                    {
+                                        checkIdentifiers = false;
+                                        checkRouteSuffix = false;
+                                        exceptionPrintType = exception["print_type_3"].ToString();
+                                    }
+                                }
+                            }
+
+                            //Check the carrier to determine print type.
+                            if (checkIdentifiers && carrierIdentifiers != null)
+                            {
+                                foreach (Dictionary<string, object> carrierIdentifier in carrierIdentifiers)
+                                {
+                                    if (carrier.StartsWith(carrierIdentifier["carrier"].ToString()))
+                                    {
+                                        exceptionPrintType = carrierIdentifier["print_type"].ToString();
+                                        checkRouteSuffix = false;
+                                        break;
+                                    }
+                                }
+                            }
 
                             break;
+                        case 11:
+                            if (exceptionPrintType == printTypes.Where(p => Boolean.Parse(p["total_flag"].ToString()) == true).Select(p => p["print_type"].ToString()).FirstOrDefault())
+                                company = line.Substring(20, 20); //todo, is this correct?
+                            else
+                            {
+                                nameAddress2 = line.Trim().Substring(0, 40).Trim();
+                                route = line.Trim().Replace(nameAddress2, "").Trim().Replace("ROUTE       :", "").Trim();
+                            }
+
+                            //Check the route to determine print type.
+                            if (checkRouteSuffix)
+                            {
+                                foreach(Dictionary<string, object> printType in printTypes)
+                                {
+                                   // if (printType["check_route_suffix_flag"])
+                                }
+                            }
+
+
+                            break;
+
                     }
 
 
-                         
-
-                    //    if (!inTotalsSection)  //we are only processing the bottom portion of the file
-                    //    {
-                    //        if (line.Contains("ACCOUNT     : TOTAL"))
-                    //            inTotalsSection = true;
-                    //    }
-                    //    else
-                    //    {
-                    //        if (line.Contains("BILL SOURCE:"))
-                    //            billSource = line.Substring(0, line.IndexOf("DISTRICT    :")).Replace("BILL SOURCE:", "").Trim();
-                    //        else if (line.Contains("BILL DATE  :"))
-                    //            billDate = line.Substring(0, line.IndexOf("TRUCK       :")).Replace("BILL DATE  :", "").Trim();
-                    //        else if (line.Contains("CONTROL TOTALS"))
-                    //        {
-                    //            inControlTotalsSection = true;
-                    //            inDrawSummarySection = false;
-                    //            //    inGLSection = false;
-                    //        }
-                    //        else if (line.Contains("DRAW SUMMARY"))
-                    //        {
-                    //            inControlTotalsSection = false;
-                    //            inDrawSummarySection = true;
-                    //            //  inGLSection = false;
-                    //        }
-                    //        //else if (line.Contains("GENERAL LEDGER"))
-                    //        //{
-                    //        //    inControlTotalsSection = false;
-                    //        //    inDrawSummarySection = false;
-                    //        //  //  inGLSection = true;
-                    //        //}
-                    //        else if (inControlTotalsSection)
-                    //        {
-                    //            decimal controlTotal = 0;
-                    //            if (decimal.TryParse(line.Substring(30, 15).Trim(), out controlTotal))
-                    //            {
-                    //                string description = line.Substring(0, line.IndexOf(".")).Trim();
-                    //                decimal processTotal = decimal.Parse(line.Substring(46).Trim().Replace(",", ""));
-
-                    //                controlProcessRecordNumber++;
-
-                    //                ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_Control_Process",
-                    //                                    new SqlParameter("@pintLoadsID", loadsId),
-                    //                                    new SqlParameter("@pintRecordNumber", controlProcessRecordNumber),
-                    //                                    new SqlParameter("@pvchrDescription", description),
-                    //                                    new SqlParameter("@pfltControlTotal", controlTotal),
-                    //                                    new SqlParameter("@pfltProcessTotal", processTotal));
-                    //            }
-                    //        }
-                    //        else if (inDrawSummarySection)
-                    //        {
-                    //            if (line.Contains("@") && line.IndexOf("@") == 42)
-                    //            {
-                    //                string description = line.Substring(0, 32).Trim();
-                    //                Int32 drawTotal = Int32.Parse(line.Substring(0, line.IndexOf("@")).Replace(description, "").Replace(",", "").Trim());
-                    //                decimal rate = decimal.Parse(FormatNumber(line.Substring(43, 11).Trim().Replace(",", "")).ToString());
-                    //                decimal total = decimal.Parse(FormatNumber(line.Substring(54).Trim().Replace(",", "")).ToString());
-
-                    //                drawRecordNumber++;
-
-                    //                ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_Draw_Rate",
-                    //                                    new SqlParameter("@pintLoadsID", loadsId),
-                    //                                    new SqlParameter("@pintRecordNumber", controlProcessRecordNumber),
-                    //                                    new SqlParameter("@pvchrDescription", description),
-                    //                                    new SqlParameter("@pintDrawTotal", drawTotal),
-                    //                                    new SqlParameter("@pmnyRate", rate),
-                    //                                    new SqlParameter("@pmnyTotalAmount", total));
 
 
-
-
-                    //            }
-                    //        }
-                    //        //else if (inGLSection)
-                    //        //{
-
-                    //        //    GLRecordNumber++;
-                    //        //a new GL record hasn't been created since 2007 
-
-                    //        //}
-                    //    }
+                  
                 }
 
             }
