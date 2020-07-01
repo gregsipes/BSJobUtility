@@ -125,7 +125,7 @@ namespace PBSInvoiceLoad
             DateTime? invoiceDate = null;
             string invoiceNumber = "";
             decimal? balanceDue = null;
-            string account = "";
+           // string account = "";
             string route = "";
             string district = "";
             string truck = "";
@@ -181,7 +181,10 @@ namespace PBSInvoiceLoad
                         pageNumber = line.Replace("PAGE:", "").Trim();
                     else if (line.Contains("\f"))
                     {
-                        CreateHeaderRecord();
+                        CreateHeaderAndBodyRecords(loadsId, headerLineNumber, groupPageNumber, exceptionPrintType, printTypeIdentifier,
+                                                    invoiceNumber, invoiceDate, billingTerms, balanceDue, carrier, route,
+                                                    district, depot, truck, sequence, nameAddress1, nameAddress2, nameAddress3, nameAddress4, null,
+                                                    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, bodyLines);
                         
 
                         pageLineNumber = 0;
@@ -417,7 +420,12 @@ namespace PBSInvoiceLoad
             WriteToJobLog(JobLogMessageType.INFO, $"{pageLineNumber} records read");
 
             if (pageLineNumber > 0)
-                WriteHeaderBody();
+            {
+                CreateHeaderAndBodyRecords(loadsId, headerLineNumber, groupPageNumber, exceptionPrintType, printTypeIdentifier,
+                            invoiceNumber, invoiceDate, billingTerms, balanceDue, carrier, route,
+                            district, depot, truck, sequence, nameAddress1, nameAddress2, nameAddress3, nameAddress4, null,
+                            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, bodyLines);
+            }
 
             //log details
             WriteToJobLog(JobLogMessageType.INFO, $"Company = {company}");
@@ -451,7 +459,7 @@ namespace PBSInvoiceLoad
 
             File.Delete(workingFilePath);
 
-            InsertLoadTypes();
+            InsertLoadsPrintTypes(loadsId, printTypes);
 
             ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_PBSReturns_Unscanned_From_Header",
                                             new SqlParameter("@pintLoadsID", loadsId));
@@ -467,7 +475,8 @@ namespace PBSInvoiceLoad
                                         string corpSpreadsheetRetailSundayDraw, string corpSpreadsheetSundayDrawCharges,
                                         string corpSpreadsheetDailyReturns, string corpSpreadsheetDailyReturnCredits, string corpSpreadsheetSundayReturns,
                                         string corpSpreadsheetSundayReturnCredits, string corpSpreadsheetDiscountCredits, string corpSpreadsheetDailyDrawAdjDraw,
-                                        string corpSpreadsheetDailyDrawAdjCharges, string corpSpreadsheetSundayDrawAdjDraw, string corpSpreadsheetSundayDrawAdjCharges)
+                                        string corpSpreadsheetDailyDrawAdjCharges, string corpSpreadsheetSundayDrawAdjDraw, string corpSpreadsheetSundayDrawAdjCharges,
+                                        List<string> bodyLines)
         {
             //save values and reset flags
             ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_Header",
@@ -513,14 +522,62 @@ namespace PBSInvoiceLoad
                     new SqlParameter("@corporate_spreadsheet_sunday_draw_adj_draw", corpSpreadsheetSundayDrawAdjDraw),
                     new SqlParameter("@corporate_spreadsheet_sunday_draw_adj_charges", corpSpreadsheetSundayDrawAdjCharges));
 
-            if (bodyLineNumber == 0)
+            if (bodyLines.Count() == 0)
             {
-
+                ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_Body",
+                                           new SqlParameter("@loads_id", loadsId),
+                                           new SqlParameter("@header_page_number", headerPageNumber),
+                                           new SqlParameter("@body_line_number", 1),
+                                           new SqlParameter("@body_text", ""));
             } else
             {
+                Int32 lineNumber = 0;
+                foreach (string line in bodyLines)
+                {
+                    lineNumber++;
 
+                    ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_Body",
+                           new SqlParameter("@loads_id", loadsId),
+                           new SqlParameter("@header_page_number", headerPageNumber),
+                           new SqlParameter("@body_line_number", lineNumber),
+                           new SqlParameter("@body_text", line));
+                }
             }
 
+        }
+
+        private void InsertLoadsPrintTypes(Int64 loadsId, List<Dictionary<string, object>> printTypes)
+        {
+            ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.PROC_INSERT_LOADS_PRINT_TYPES",
+                                new SqlParameter("@loads_id", loadsId));
+
+            WriteToJobLog(JobLogMessageType.INFO, "Set header count for each print type.");
+
+            List<Dictionary<string, object>> loadsPrintTypes = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Select_Loads_Print_Types",
+                                                                            new SqlParameter("@loads_id", loadsId)).ToList();
+
+            foreach (Dictionary<string, object> loadPrintType in loadsPrintTypes)
+            {
+                foreach(Dictionary<string, object> printType in printTypes)
+                {
+                    if (printType["print_type"].ToString()  == loadPrintType["print_type"].ToString())
+                    {
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Update_Load_Print_Types",
+                                 new SqlParameter("@pintLoadsID", loadsId),
+                                new SqlParameter("@print_Type", printType["print_type"].ToString()),
+                                new SqlParameter("@line_2_identifier_1", printType["line_2_identifier_1"].ToString()),
+                                new SqlParameter("@line_2_identifier_2", printType["line_2_identifier_2"].ToString()),
+                                new SqlParameter("@do_not_check_carrier_identifiers_flag", printType["do_not_check_carrier_identifiers_flag"].ToString()),
+                                new SqlParameter("@check_route_suffix_flag", printType["check_route_suffix_flag"].ToString()),
+                                new SqlParameter("@route_suffix_alpha_flag", printType["route_suffix_alpha_flag"].ToString()));
+
+                        break;
+                    }
+                }
+            }
+
+
+            WriteToJobLog(JobLogMessageType.INFO, "Load specific options noted for each print type.");
         }
 
         public override void SetupJob()
