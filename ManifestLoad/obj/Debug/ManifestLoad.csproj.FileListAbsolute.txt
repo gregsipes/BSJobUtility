@@ -7,4 +7,3 @@ C:\projects\Applications\BSJobUtility\ManifestLoad\obj\Debug\ManifestLoad.csproj
 C:\projects\Applications\BSJobUtility\ManifestLoad\obj\Debug\ManifestLoad.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\ManifestLoad\obj\Debug\ManifestLoad.dll
 C:\projects\Applications\BSJobUtility\ManifestLoad\obj\Debug\ManifestLoad.pdb
-C:\projects\Applications\BSJobUtility\ManifestLoad\obj\Debug\ManifestLoad.csprojAssemblyReference.cache
