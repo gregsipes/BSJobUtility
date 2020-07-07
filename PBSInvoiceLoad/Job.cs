@@ -20,7 +20,7 @@ namespace PBSInvoiceLoad
                 List<Dictionary<string, object>> printTypes = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Select_Print_Types_For_Load").ToList();
                 //get carrier identifiers
                 List<Dictionary<string, object>> carrierIdentifiers = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Select_Carrier_Identifiers",
-                                                                                       new SqlParameter("@pvchrCarrierIdentifier", DBNull.Value)); 
+                                                                                       new SqlParameter("@pvchrCarrierIdentifier", DBNull.Value));
                 //get carrier exceptions
                 List<Dictionary<string, object>> carrierExceptions = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Select_Carrier_Exceptions",
                                                                                 new SqlParameter("@pvchrCarrier", DBNull.Value));
@@ -48,7 +48,7 @@ namespace PBSInvoiceLoad
                             {
                                 WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
 
-                                  CopyAndProcessFile(fileInfo, printTypes);
+                                CopyAndProcessFile(fileInfo, printTypes);
 
                             }
                         }
@@ -125,7 +125,6 @@ namespace PBSInvoiceLoad
             DateTime? invoiceDate = null;
             string invoiceNumber = "";
             decimal? balanceDue = null;
-           // string account = "";
             string route = "";
             string district = "";
             string truck = "";
@@ -146,11 +145,10 @@ namespace PBSInvoiceLoad
             Int32 groupPageNumber = 0;
 
             string carrier = "";
-           // string carrierException = "";
             string pageNumber = "";
 
             string printTypeIdentifier = "";
-            string exceptionPrintType = "";
+            string printTypeName = "";
             string company = "";
 
             Int32 pageLineNumber = 0;
@@ -166,40 +164,67 @@ namespace PBSInvoiceLoad
 
             decimal printInvoiceChargeTotal = 0;
             decimal printInvoiceCreditTotal = 0;
-            //bool printInvoiceCharge = false;
-            //bool printInvoiceCredit = false;
-            //bool printReturnSheet = false;
-            //bool retailDraw = false;
-           // bool hasCarrierExceptions = false;
 
             bool checkIdentifiers = false;
             bool checkRouteSuffix = false;
 
-            //  Dictionary<string, object> printType = null;
 
             foreach (string line in fileContents)
             {
 
-                if (line != null && line.Trim().Length > 0)
+                //if (line != null && (line.Trim().Length > 0 | line.Contains("\f")))
+                //{
+
+                if (line.StartsWith("PRINT DATE:"))
                 {
+                    printDate = line.Replace("PRINT DATE:", "").Trim(); //this is the last statement that we will process in the file
+                    break;
+                }
+                else if (line.Contains("\f"))
+                {
+                    headerLineNumber += 100;
 
-                    if (line.StartsWith("PRINT DATE:"))
-                        printDate = line.Replace("PRINT DATE:", "").Trim(); //this is the last statement that we will process in the file
-                    //else if (line.Contains("PAGE:"))
-                    //    pageNumber = line.Replace("PAGE:", "").Trim();
-                    else if (line.Contains("\f"))
-                    {
-                        CreateHeaderAndBodyRecords(loadsId, headerLineNumber, groupPageNumber, exceptionPrintType, printTypeIdentifier,
-                                                    invoiceNumber, invoiceDate.Value.ToString(), billingTerms, balanceDue.Value.ToString(), carrier, route,
-                                                    district, depot, truck, sequence.Value.ToString(), nameAddress1, nameAddress2, nameAddress3, nameAddress4, null,
-                                                    null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, bodyLines);
-                        
+                    //testing
+                    //if (headerLineNumber == 53300)
+                    //{
+                    //    var x = 2 + 1;
+                    //}
 
-                        pageLineNumber = 0;
-                    }
+                    CreateHeaderAndBodyRecords(loadsId, headerLineNumber, groupPageNumber, printTypeName, printTypeIdentifier,
+                                                invoiceNumber, invoiceDate.Value.ToString(), billingTerms, balanceDue.Value.ToString(), carrier, route,
+                                                district, depot, truck, sequence.Value.ToString(), nameAddress1, nameAddress2, nameAddress3, nameAddress4,
+                                                retailDraw, printReturnSheet, printInvoiceCharge, printInvoiceChargeTotal, printInvoiceCredit, printInvoiceCreditTotal, bodyLines);
 
+
+                    pageLineNumber = 0;
+
+                    printDate = "";
+                    invoiceDate = null;
+                    invoiceNumber = "";
+                    balanceDue = null;
+                    route = "";
+                    district = "";
+                    truck = "";
+                    depot = "";
+                    sequence = null;
+                    billingTerms = "";
+                    billSource = "";
+                    nameAddress1 = "";
+                    nameAddress2 = "";
+                    nameAddress3 = "";
+                    nameAddress4 = "";
+                    billDate = null;
+                    sortOrder = "";
+                    retailDraw = false;
+                    printReturnSheet = false;
+                    printInvoiceCredit = false;
+                    printInvoiceCharge = false;
+                }
+
+
+                if ((pageLineNumber == 0 && line.Trim() != "") | pageLineNumber > 0)
+                {
                     pageLineNumber++;
-
 
                     switch (pageLineNumber)
                     {
@@ -216,7 +241,7 @@ namespace PBSInvoiceLoad
                                     groupPageNumber = page;
                                 else
                                     groupPageNumber = lastPageLineNumber;
-                               
+
                             }
 
                             if (groupPageNumber == 1)
@@ -239,9 +264,10 @@ namespace PBSInvoiceLoad
                             {
                                 if (printType["line_2_identifier_1"].ToString() != "" && line.ToLower().Contains(printType["line_2_identifier_1"].ToString().ToLower()))
                                 {
-                                    printTypeIdentifier = printType["line_2_identifier_1"].ToString().ToUpper();
+                                    printTypeIdentifier = printType["line_2_identifier_1"].ToString();
+                                    printTypeName = printType["print_type"].ToString();
 
-                                    invoiceDate = DateTime.Parse(line.Substring(line.IndexOf(printTypeIdentifier)).Replace(printTypeIdentifier, "").Replace("DATE:", "").Trim());
+                                    invoiceDate = DateTime.Parse(line.Substring(line.IndexOf(printTypeIdentifier.ToUpper())).Replace(printTypeIdentifier.ToUpper(), "").Replace("DATE:", "").Trim());
                                     checkIdentifiers = !bool.Parse(printType["do_not_check_carrier_identifiers_flag"].ToString());
                                     checkRouteSuffix = bool.Parse(printType["check_route_suffix_flag"].ToString());
 
@@ -253,9 +279,10 @@ namespace PBSInvoiceLoad
                             {
                                 if (printType["line_2_identifier_2"].ToString() != "" && line.ToLower().Contains(printType["line_2_identifier_2"].ToString().ToLower()))
                                 {
-                                    printTypeIdentifier = printType["line_2_identifier_2"].ToString().ToUpper();
+                                    printTypeIdentifier = printType["line_2_identifier_2"].ToString();
+                                    printTypeName = printType["print_type"].ToString();
 
-                                    invoiceDate = DateTime.Parse(line.Substring(line.IndexOf(printTypeIdentifier)).Replace(printTypeIdentifier, "").Replace("DATE:", "").Trim());
+                                    invoiceDate = DateTime.Parse(line.Substring(line.IndexOf(printTypeIdentifier.ToUpper())).Replace(printTypeIdentifier.ToUpper(), "").Replace("DATE:", "").Trim());
                                     checkIdentifiers = !bool.Parse(printType["do_not_check_carrier_identifiers_flag"].ToString());
                                     checkRouteSuffix = bool.Parse(printType["check_route_suffix_flag"].ToString());
 
@@ -265,14 +292,14 @@ namespace PBSInvoiceLoad
 
                             break;
                         case 3:
-                            if (printTypeIdentifier == "INVOICE")
+                            if (printTypeIdentifier == "Invoice")
                                 invoiceNumber = line.Substring(line.IndexOf("INVOICE NO. :")).Replace("INVOICE NO. :", "").Trim();
 
                             break;
-                        case 5:
-                            billingTerms = line.Substring(line.IndexOf("BILLING TERMS:")).Replace("BILLING TERMS:", "").Trim();
+                        case 6:
+                            billingTerms = line.Trim(); //.Substring(line.IndexOf("BILLING TERMS:")).Replace("BILLING TERMS:", "").Trim();
                             break;
-                        case 7:
+                        case 8:
                             //check for any possible label values (BALANCE DUE, TOTAL BALANCE DUE, TOTAL OUTSTANDING BALANCE) 
                             foreach (Dictionary<string, object> amountLabel in amountLabels)
                             {
@@ -283,7 +310,7 @@ namespace PBSInvoiceLoad
                                 }
                             }
                             break;
-                        case 8:
+                        case 10:
                             nameAddress1 = line.Trim().Substring(0, 40).Trim();
                             carrier = line.Trim().Replace(nameAddress1, "").Replace("ACCOUNT     :", "").Trim();
 
@@ -298,20 +325,20 @@ namespace PBSInvoiceLoad
                                         {
                                             checkIdentifiers = false;
                                             checkRouteSuffix = false;
-                                            exceptionPrintType = exception["print_type_1"].ToString();
+                                            printTypeName = exception["print_type_1"].ToString();
                                         }
                                     }
                                     else if (exception["print_type_2"].ToString() != "" && printTypeIdentifier == exception["line_2_identifier_2"].ToString())  //print_type_2 is never empty, maybe this is something can happen in the UI?
                                     {
                                         checkIdentifiers = false;
                                         checkRouteSuffix = false;
-                                        exceptionPrintType = exception["print_type_2"].ToString();
+                                        printTypeName = exception["print_type_2"].ToString();
                                     }
                                     else if (exception["print_type_3"].ToString() != "" && printTypeIdentifier == exception["line_2_identifier_3"].ToString())  //this condition is never currently hit
                                     {
                                         checkIdentifiers = false;
                                         checkRouteSuffix = false;
-                                        exceptionPrintType = exception["print_type_3"].ToString();
+                                        printTypeName = exception["print_type_3"].ToString();
                                     }
                                 }
                             }
@@ -323,7 +350,7 @@ namespace PBSInvoiceLoad
                                 {
                                     if (carrier.StartsWith(carrierIdentifier["carrier_identifier"].ToString()))
                                     {
-                                        exceptionPrintType = carrierIdentifier["print_type"].ToString();
+                                        printTypeName = carrierIdentifier["print_type"].ToString();
                                         checkRouteSuffix = false;
                                         break;
                                     }
@@ -331,8 +358,8 @@ namespace PBSInvoiceLoad
                             }
 
                             break;
-                        case 9:
-                            if (exceptionPrintType == printTypes.Where(p => Boolean.Parse(p["total_flag"].ToString()) == true).Select(p => p["print_type"].ToString()).FirstOrDefault())
+                        case 11:
+                            if (printTypeName == printTypes.Where(p => Boolean.Parse(p["total_flag"].ToString()) == true).Select(p => p["print_type"].ToString()).FirstOrDefault())
                                 company = line.Substring(20, 20); //todo, is this correct?
                             else
                             {
@@ -350,41 +377,41 @@ namespace PBSInvoiceLoad
                                                  | (bool.Parse(printType["route_suffix_alpha_flag"].ToString()) == false & !route.Substring(route.Length - 2, 1).All(char.IsNumber))) &
                                          (printType["line_2_identifier_1"].ToString() == printTypeIdentifier | printType["line_2_identifier_2"].ToString() == printTypeIdentifier))
                                     {
-                                        exceptionPrintType = printType["print_type"].ToString();
+                                        printTypeName = printType["print_type"].ToString();
                                         break;
                                     }
                                 }
                             }
 
                             break;
-                        case 10:
-                            if (exceptionPrintType == printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
+                        case 12:
+                            if (printTypeName == printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
                                 billSource = line.Substring(20, 20).Trim();
                             else
                                 nameAddress3 = line.Trim().Substring(0, 40).Trim();
 
                             break;
-                        case 11:
-                            if (exceptionPrintType == printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
+                        case 13:
+                            if (printTypeName == printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
                             {
                                 DateTime date;
                                 DateTime.TryParse(line.Substring(20, 20).Trim(), out date);
                                 billDate = date;
                             }
                             else
-                                nameAddress4 = line.Trim().Substring(0, 40).Trim();
+                                nameAddress4 = line.Substring(0, 40).Trim();
 
                             break;
-                        case 12:
-                            if (exceptionPrintType == printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
+                        case 14:
+                            if (printTypeName == printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
                                 sortOrder = line.Substring(20, 20).Trim();
 
                             break;
                     }
 
-                    if (exceptionPrintType != printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
+                    if (printTypeName != printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
                     {
-                        if (pageLineNumber >= 10 & pageLineNumber <= 13)
+                        if (pageLineNumber >= 12 & pageLineNumber <= 15)
                         {
                             if (line.Contains("DISTRICT    :"))
                                 district = line.Substring(line.IndexOf("DISTRICT    :")).Replace("DISTRICT    :", "").Trim();
@@ -399,7 +426,7 @@ namespace PBSInvoiceLoad
 
                     if (pageLineNumber > 0 && pageLineNumber <= 16)
                     {
-                        headerLineNumber++;
+                        //headerLineNumber++;
                         headerLines.Add(line);
                     }
                     else if (pageLineNumber > 16)
@@ -429,7 +456,7 @@ namespace PBSInvoiceLoad
                         }
                     }
 
-                    if (exceptionPrintType != printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
+                    if (printTypeName != printTypes.Where(p => p["total_flag"].ToString() == "1").Select(p => p["printType"].ToString()).FirstOrDefault())
                     {
                         if (line.Contains("Invoice Count................."))
                             invoiceCount = Convert.ToInt64(line.Replace("Invoice Count.................", "").Trim().Substring(0, 14));
@@ -446,16 +473,25 @@ namespace PBSInvoiceLoad
 
             if (pageLineNumber > 0)
             {
-                CreateHeaderAndBodyRecords(loadsId, headerLineNumber, groupPageNumber, exceptionPrintType, printTypeIdentifier,
+                headerLineNumber += 100;
+
+                ////testing
+                //if (headerLineNumber == 53400)
+                //{
+                //    var x = 2 + 1;
+                //}
+
+                CreateHeaderAndBodyRecords(loadsId, headerLineNumber, groupPageNumber, printTypeName, printTypeIdentifier,
                             invoiceNumber, invoiceDate.Value.ToString(), billingTerms, balanceDue.Value.ToString(), carrier, route,
-                            district, depot, truck, sequence.Value.ToString(), nameAddress1, nameAddress2, nameAddress3, nameAddress4, null,
-                            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, bodyLines);
+                            district, depot, truck, sequence.Value.ToString(), nameAddress1, nameAddress2, nameAddress3, nameAddress4,
+                            retailDraw, printReturnSheet, printInvoiceCharge, printInvoiceChargeTotal, printInvoiceCredit, printInvoiceCreditTotal,
+                            bodyLines);
             }
 
             //log details
             WriteToJobLog(JobLogMessageType.INFO, $"Company = {company}");
             WriteToJobLog(JobLogMessageType.INFO, $"Bill source = {billSource}");
-         //   WriteToJobLog(JobLogMessageType.INFO, $"Bill date = {billDate.ToString()}");
+            WriteToJobLog(JobLogMessageType.INFO, $"Bill date = {billDate.ToString()}");
             WriteToJobLog(JobLogMessageType.INFO, $"Sort order = {sortOrder}");
             WriteToJobLog(JobLogMessageType.INFO, $"Invoice count = {invoiceCount}");
             WriteToJobLog(JobLogMessageType.INFO, $"Statement count = {statementCount}");
@@ -494,14 +530,8 @@ namespace PBSInvoiceLoad
         private void CreateHeaderAndBodyRecords(Int64 loadsId, Int32 headerPageNumber, Int32 groupPageNumber, string printType, string line2Identifier, string invoiceNumber,
                                         string invoiceDate, string billingTerms, string balanceDue, string carrier, string route, string district, string depot,
                                         string truck, string sequence, string nameAddress1, string nameAddress2, string nameAddress3, string nameAddress4,
-                                        string barcode, string barcodeReadable, string retailDrawFlag, string printReturnsSheetFlag, string printInvoiceChargeFlag,
-                                        string printInvoiceCharge, string printInvoiceCreditFlag, string printInvoiceCredit, string corpSpreadsheetAmount,
-                                        string corpSpreadsheetRetailDailyDraw, string corpSpreadsheetRetailDailyDrawCharges, string corpSpreadsheetRetailSundayDrawCharges,
-                                        string corpSpreadsheetRetailSundayDraw, string corpSpreadsheetSundayDrawCharges,
-                                        string corpSpreadsheetDailyReturns, string corpSpreadsheetDailyReturnCredits, string corpSpreadsheetSundayReturns,
-                                        string corpSpreadsheetSundayReturnCredits, string corpSpreadsheetDiscountCredits, string corpSpreadsheetDailyDrawAdjDraw,
-                                        string corpSpreadsheetDailyDrawAdjCharges, string corpSpreadsheetSundayDrawAdjDraw, string corpSpreadsheetSundayDrawAdjCharges,
-                                        List<string> bodyLines)
+                                        bool retailDrawFlag, bool printReturnsSheetFlag, bool printInvoiceChargeFlag,
+                                        decimal printInvoiceCharge, bool printInvoiceCreditFlag, decimal printInvoiceCredit, List<string> bodyLines)
         {
             //save values and reset flags
             ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_Header",
@@ -524,28 +554,28 @@ namespace PBSInvoiceLoad
                     new SqlParameter("@name_address_2", nameAddress2),
                     new SqlParameter("@name_address_3", nameAddress3),
                     new SqlParameter("@name_address_4", nameAddress4),
-                    new SqlParameter("@barcode", barcode),
-                    new SqlParameter("@barcode_readable", barcodeReadable),
+                    new SqlParameter("@barcode", DBNull.Value),
+                    new SqlParameter("@barcode_readable", DBNull.Value),
                     new SqlParameter("@retail_draw_flag", retailDrawFlag),
                     new SqlParameter("@print_returns_sheet_flag", printReturnsSheetFlag),
                     new SqlParameter("@print_invoice_charge_flag", printInvoiceChargeFlag),
                     new SqlParameter("@print_invoice_charge", printInvoiceCharge),
                     new SqlParameter("@print_invoice_credit_flag", printInvoiceCreditFlag),
                     new SqlParameter("@print_invoice_credit", printInvoiceCredit),
-                    new SqlParameter("@corporate_spreadsheet_amount", corpSpreadsheetAmount),
-                    new SqlParameter("@corporate_spreadsheet_retail_daily_draw", corpSpreadsheetRetailDailyDraw),
-                    new SqlParameter("@corporate_spreadsheet_retail_daily_draw_charges", corpSpreadsheetRetailDailyDrawCharges),
-                    new SqlParameter("@corporate_spreadsheet_retail_sunday_draw", corpSpreadsheetRetailSundayDraw),
-                    new SqlParameter("@corporate_spreadsheet_retail_sunday_draw_charges", corpSpreadsheetRetailSundayDrawCharges),
-                    new SqlParameter("@corporate_spreadsheet_daily_returns", corpSpreadsheetDailyReturns),
-                    new SqlParameter("@corporate_spreadsheet_daily_return_credits", corpSpreadsheetDailyReturnCredits),
-                    new SqlParameter("@corporate_spreadsheet_sunday_returns", corpSpreadsheetSundayReturns),
-                    new SqlParameter("@corporate_spreadsheet_sunday_return_credits", corpSpreadsheetSundayReturnCredits),
-                    new SqlParameter("@corporate_spreadsheet_discount_credits", corpSpreadsheetDiscountCredits),
-                    new SqlParameter("@corporate_spreadsheet_daily_draw_adj_draw", corpSpreadsheetDailyDrawAdjDraw),
-                    new SqlParameter("@corporate_spreadsheet_daily_draw_adj_charges", corpSpreadsheetDailyDrawAdjCharges),
-                    new SqlParameter("@corporate_spreadsheet_sunday_draw_adj_draw", corpSpreadsheetSundayDrawAdjDraw),
-                    new SqlParameter("@corporate_spreadsheet_sunday_draw_adj_charges", corpSpreadsheetSundayDrawAdjCharges));
+                    new SqlParameter("@corporate_spreadsheet_amount", "$0.00"),
+                    new SqlParameter("@corporate_spreadsheet_retail_daily_draw", "$0.00"),
+                    new SqlParameter("@corporate_spreadsheet_retail_daily_draw_charges", "$0.00"),
+                    new SqlParameter("@corporate_spreadsheet_retail_sunday_draw", "0"),
+                    new SqlParameter("@corporate_spreadsheet_retail_sunday_draw_charges", "$0.00"),
+                    new SqlParameter("@corporate_spreadsheet_daily_returns", "0"),
+                    new SqlParameter("@corporate_spreadsheet_daily_return_credits", "$0.00"),
+                    new SqlParameter("@corporate_spreadsheet_sunday_returns", "0"),
+                    new SqlParameter("@corporate_spreadsheet_sunday_return_credits", "$0.00"),
+                    new SqlParameter("@corporate_spreadsheet_discount_credits", "$0.00"),
+                    new SqlParameter("@corporate_spreadsheet_daily_draw_adj_draw", "0"),
+                    new SqlParameter("@corporate_spreadsheet_daily_draw_adj_charges", "$0.00"),
+                    new SqlParameter("@corporate_spreadsheet_sunday_draw_adj_draw", "0"),
+                    new SqlParameter("@corporate_spreadsheet_sunday_draw_adj_charges", "$0.00"));
 
             if (bodyLines.Count() == 0)
             {
@@ -554,18 +584,19 @@ namespace PBSInvoiceLoad
                                            new SqlParameter("@header_page_number", headerPageNumber),
                                            new SqlParameter("@body_line_number", 1),
                                            new SqlParameter("@body_text", ""));
-            } else
+            }
+            else
             {
                 Int32 lineNumber = 0;
                 foreach (string line in bodyLines)
                 {
                     lineNumber++;
 
-                    ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_Body",
-                           new SqlParameter("@loads_id", loadsId),
-                           new SqlParameter("@header_page_number", headerPageNumber),
-                           new SqlParameter("@body_line_number", lineNumber),
-                           new SqlParameter("@body_text", line));
+                    //ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Insert_Body",
+                    //       new SqlParameter("@loads_id", loadsId),
+                    //       new SqlParameter("@header_page_number", headerPageNumber),
+                    //       new SqlParameter("@body_line_number", lineNumber),
+                    //       new SqlParameter("@body_text", line));
                 }
             }
 
@@ -583,9 +614,9 @@ namespace PBSInvoiceLoad
 
             foreach (Dictionary<string, object> loadPrintType in loadsPrintTypes)
             {
-                foreach(Dictionary<string, object> printType in printTypes)
+                foreach (Dictionary<string, object> printType in printTypes)
                 {
-                    if (printType["print_type"].ToString()  == loadPrintType["print_type"].ToString())
+                    if (printType["print_type"].ToString() == loadPrintType["print_type"].ToString())
                     {
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Update_Load_Print_Types",
                                  new SqlParameter("@pintLoadsID", loadsId),
