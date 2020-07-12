@@ -8,3 +8,12 @@ C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipN
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.dll
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\UnzipNewscycleExportFiles.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\UnzipNewscycleExportFiles.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csprojResolveAssemblyReference.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.pdb

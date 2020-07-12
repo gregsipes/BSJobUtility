@@ -7,3 +7,11 @@ C:\projects\Applications\BSJobUtility\OfficePay\bin\Debug\BSJobBase.dll.config
 C:\projects\Applications\BSJobUtility\OfficePay\obj\Debug\OfficePay.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\OfficePay\obj\Debug\OfficePay.dll
 C:\projects\Applications\BSJobUtility\OfficePay\obj\Debug\OfficePay.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\bin\Debug\OfficePay.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\bin\Debug\OfficePay.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\obj\Debug\OfficePay.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\obj\Debug\OfficePay.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\obj\Debug\OfficePay.pdb

@@ -36,9 +36,27 @@ namespace UnzipNewscycleExportFiles
             {
                 WriteToJobLog(JobLogMessageType.INFO, "Unzip of Newscycle EXPORT file " + zf + " started");
 
-                // Get the name (w/o extension) of this zip file and delete this folder if it exists and delete any old folders.
+                // Get the name (w/o extension) of this zip file's root folder and delete this folder if it exists and delete any old folders.
                 bool UnzipOkay = true;
                 string FolderName = Path.GetFileNameWithoutExtension(zf);
+                try
+                {
+                    using (ZipArchive archive = ZipFile.OpenRead(zf))
+                    {
+                        List<ZipArchiveEntry> ListOfZipFolders = archive.Entries.Where(x => x.FullName.EndsWith("/")).ToList();
+                        // There should be at least one folder in this list of folders.  Pick off the root folder name and use it to create the target directory
+                        string ZipFolderPathname = ListOfZipFolders[0].FullName;
+                        string[] ZipFolderRootname = ZipFolderPathname.Split('/');
+                        FolderName = ZipFolderRootname[0];
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SendMail($"Error in Job: {JobName}", "Unable to open/get Newscycle EXPORT root path from zip file " + zf + ": " + ex.ToString(), false);
+                    WriteToJobLog(JobLogMessageType.ERROR, "Unable to open/get Newscycle EXPORT root path from zip file " + zf + ": " + ex.ToString());
+                    // Try it with the default folder name, so keep going and see what happens...
+                }
+
                 DirectoryExists = Directory.Exists(SourceFolder + FolderName);
                 if (DirectoryExists)
                 {

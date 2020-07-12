@@ -28,3 +28,11 @@ C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.pdb
 C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll.config
 C:\projects\Applications\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csprojAssemblyReference.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\bin\Debug\PBSMacrosLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\bin\Debug\PBSMacrosLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.pdb

@@ -7,3 +7,11 @@ C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.csproj.CoreC
 C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.dll
 C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\bin\Debug\AutoRenew.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\bin\Debug\AutoRenew.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.pdb

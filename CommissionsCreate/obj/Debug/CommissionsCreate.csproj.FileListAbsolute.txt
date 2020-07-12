@@ -18,3 +18,12 @@ C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.dll
 C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.pdb
 C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.dll.config
 C:\projects\Applications\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.csproj.CopyComplete
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\bin\Debug\CommissionsCreate.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\bin\Debug\CommissionsCreate.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.csprojResolveAssemblyReference.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.pdb

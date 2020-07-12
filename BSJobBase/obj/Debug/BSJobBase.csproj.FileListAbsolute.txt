@@ -17,3 +17,10 @@ C:\projects\Applications\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.csproj.CoreC
 C:\projects\Applications\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.dll
 C:\projects\Applications\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.pdb
 C:\projects\Applications\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.csprojAssemblyReference.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.csprojResolveAssemblyReference.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.pdb

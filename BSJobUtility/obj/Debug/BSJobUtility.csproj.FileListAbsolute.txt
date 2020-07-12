@@ -71,3 +71,43 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceLoad.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceLoad.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\UnzipNewscycleExportFiles.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\UnzipNewscycleExportFiles.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.exe.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.exe
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\BSJobUtility.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\AutoRenew.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\CommissionsCreate.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoadAdvance.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\OfficePay.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\ParkingPayroll.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceExportLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceTotals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PBSMacrosLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PressRoomFreeLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PressRoomLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\QualificationReportLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\UnzipNewscycleExportFiles.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\WrappersLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\AutoRenew.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\CommissionsCreate.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoadAdvance.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\ManifestLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\OfficePay.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\ParkingPayroll.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceExportLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PBSInvoiceTotals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PBSMacrosLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PressRoomFreeLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PressRoomLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\QualificationReportLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\UnzipNewscycleExportFiles.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\WrappersLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csprojResolveAssemblyReference.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.exe
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.pdb

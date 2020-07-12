@@ -7,3 +7,11 @@ C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeL
 C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.dll
 C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\bin\Debug\PressRoomFreeLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\bin\Debug\PressRoomFreeLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.pdb
