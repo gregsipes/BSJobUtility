@@ -36,27 +36,58 @@ namespace UnzipNewscycleExportFiles
             {
                 WriteToJobLog(JobLogMessageType.INFO, "Unzip of Newscycle EXPORT file " + zf + " started");
 
+                // First things first.  Make a copy of the zip file; overwrite any older one.  This will allow us to manually
+                //   retry any failed extraction (and subsequent data update) should we suffer some kind of failure.
+
+                try
+                {
+                    File.Copy(zf, zf + "_COPY", true);
+                } 
+                catch (Exception ex)
+                {
+                    WriteToJobLog(JobLogMessageType.WARNING, "Unable to make a copy of Newscycle EXPORT zip file " + zf + ": " + ex.ToString());
+                }
+
                 // Get the name (w/o extension) of this zip file's root folder and delete this folder if it exists and delete any old folders.
                 bool UnzipOkay = true;
+                bool WarningsGiven = false;
+
                 string FolderName = Path.GetFileNameWithoutExtension(zf);
                 try
                 {
                     using (ZipArchive archive = ZipFile.OpenRead(zf))
                     {
                         List<ZipArchiveEntry> ListOfZipFolders = archive.Entries.Where(x => x.FullName.EndsWith("/")).ToList();
-                        // There should be at least one folder in this list of folders.  Pick off the root folder name and use it to create the target directory
-                        string ZipFolderPathname = ListOfZipFolders[0].FullName;
-                        string[] ZipFolderRootname = ZipFolderPathname.Split('/');
-                        FolderName = ZipFolderRootname[0];
+                        // There *should* be at least one folder in this list of folders.  Pick off the root folder name and use it to create the target directory
+                        if (ListOfZipFolders.Count > 0)
+                        {
+                            string ZipFolderPathname = ListOfZipFolders[0].FullName;
+                            string[] ZipFolderRootname = ZipFolderPathname.Split('/');
+                            if (ZipFolderRootname.Length > 0)
+                            {
+                                FolderName = ZipFolderRootname[0];
+                            }
+                            else
+                            {
+                                FolderName = ZipFolderPathname;
+                            }
+                        }
+                        else
+                        {
+                            WriteToJobLog(JobLogMessageType.WARNING, "Unable to find Newscycle EXPORT root path from zip file (no folders found)" + zf);
+                            WarningsGiven = true;
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    SendMail($"Error in Job: {JobName}", "Unable to open/get Newscycle EXPORT root path from zip file " + zf + ": " + ex.ToString(), false);
-                    WriteToJobLog(JobLogMessageType.ERROR, "Unable to open/get Newscycle EXPORT root path from zip file " + zf + ": " + ex.ToString());
+                    SendMail($"Warning from Job: {JobName}", "Unable to open/get Newscycle EXPORT root path from zip file " + zf + ": " + ex.ToString(), false);
+                    WriteToJobLog(JobLogMessageType.WARNING, "Unable to open/get Newscycle EXPORT root path from zip file " + zf + ": " + ex.ToString());
+                    WarningsGiven = true;
                     // Try it with the default folder name, so keep going and see what happens...
                 }
 
+                bool DeleteErrorOccurred = false;
                 DirectoryExists = Directory.Exists(SourceFolder + FolderName);
                 if (DirectoryExists)
                 {
@@ -66,9 +97,24 @@ namespace UnzipNewscycleExportFiles
                     }
                     catch (Exception ex)
                     {
-                        SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT data folder " + SourceFolder + FolderName + " " + ex.ToString(), false);
-                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newscycle EXPORT data folder " + SourceFolder + FolderName + " " + ex.ToString());
-                        UnzipOkay = false;
+                        // Interestingly enough, even with the Delete method's 2nd argument set to true (recursively delete all folders)
+                        //   we can still generate the exception "directory not empty".  When this happens, delay, then try one more time before generating 
+                        //   an error message.
+                        // Also, don't fail simply because we couldn't perform a delete.  Let the zip extraction go ahead anyway and let it 
+                        //   generate a fatal exception if it can't extract.
+                        WriteToJobLog(JobLogMessageType.WARNING, "Unable to delete Newscycle EXPORT data folder (attempt #1)" + SourceFolder + FolderName + " " + ex.ToString());
+                        WarningsGiven = true;
+                        try
+                        {
+                            System.Threading.Thread.Sleep(2000); // Wait 2 seconds before trying this again.
+                            Directory.Delete(SourceFolder + FolderName, true);
+                        }
+                        catch (Exception ex1)
+                        {
+                            DeleteErrorOccurred = true;
+                            WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newscycle EXPORT data folder (attempt #2)" + SourceFolder + FolderName + " " + ex1.ToString());
+                            //UnzipOkay = false;
+                        }
                     }
                 }
 
@@ -81,8 +127,13 @@ namespace UnzipNewscycleExportFiles
                     }
                     catch (Exception ex)
                     {
-                        SendMail($"Error in Job: {JobName}", "Unable to unzip Newscycle EXPORT data folder " + zf + " " + ex.ToString(), false);
-                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to unzip Newscycle EXPORT data folder " + zf + " " + ex.ToString());
+                        string DeleteFailureMsg = "";
+                        if (DeleteErrorOccurred)
+                        {
+                            DeleteFailureMsg = " (EXPORT data folder could not be deleted prior to extraction): ";
+                        }
+                        SendMail($"Error in Job: {JobName}", "Unable to unzip Newscycle EXPORT data folder " + zf + DeleteFailureMsg + ex.ToString(), false);
+                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to unzip Newscycle EXPORT data folder " + zf + DeleteFailureMsg + ex.ToString());
                         UnzipOkay = false;
                     }
                 }
@@ -103,9 +154,10 @@ namespace UnzipNewscycleExportFiles
                         }
                         catch (Exception ex)
                         {
-                            SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT Touch folder " + TouchFolder + " " + ex.ToString(), false);
-                            WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newscycle EXPORT Touch folder " + TouchFolder + " " + ex.ToString());
-                            UnzipOkay = false;
+                            SendMail($"Warning in Job: {JobName}", "Unable to delete Newscycle EXPORT Touch folder " + TouchFolder + " " + ex.ToString(), false);
+                            WriteToJobLog(JobLogMessageType.WARNING, "Unable to delete Newscycle EXPORT Touch folder " + TouchFolder + " " + ex.ToString());
+                            WarningsGiven = true;
+                            //UnzipOkay = false;
                         }
                     }
                 }
@@ -135,15 +187,21 @@ namespace UnzipNewscycleExportFiles
                     }
                     catch (Exception ex)
                     {
-                        SendMail($"Error in Job: {JobName}", "Unable to delete Newscycle EXPORT zip file " + zf + " " + ex.ToString(), false);
-                        WriteToJobLog(JobLogMessageType.ERROR, "Unable to delete Newxcycle EXPORT zip file " + zf + " " + ex.ToString());
-                        UnzipOkay = false;
+                        SendMail($"WARNING in Job: {JobName}", "Unable to delete Newscycle EXPORT zip file " + zf + " " + ex.ToString(), false);
+                        WriteToJobLog(JobLogMessageType.WARNING, "Unable to delete Newxcycle EXPORT zip file " + zf + " " + ex.ToString());
+                        WarningsGiven = true;
+                        //UnzipOkay = false;
                     }
                 }
 
                 if (UnzipOkay)
                 {
-                    WriteToJobLog(JobLogMessageType.INFO, "Unzip of Newscycle EXPORT file " + zf + " successfully completed");
+                    string Warnings = "";
+                    if (WarningsGiven)
+                    {
+                        Warnings = " (with Warnings)";
+                    }
+                    WriteToJobLog(JobLogMessageType.INFO, "Unzip of Newscycle EXPORT file " + zf + " successfully completed" + Warnings);
                 }
                 else
                 {
