@@ -64,7 +64,7 @@ namespace AutoRenew
         private void CopyAndProcessFile(FileInfo fileInfo)
         {
             //for some reason, this job isn't currently backing up the input, so we will blindly follow
-           // string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
+           // string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".txt";
             Int32 loadsId = 0;
 
 

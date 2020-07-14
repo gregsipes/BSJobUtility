@@ -64,7 +64,7 @@ namespace PBSMacrosLoad
                                 if (loadId != 0)
                                 {
                                     //copy file from source to destination
-                                    File.Copy(file, destinationDirectory + newFileName);
+                                    File.Copy(file, destinationDirectory + newFileName, true);
 
                                     //update load record
                                     ExecuteNonQuery(DatabaseConnectionStringNames.PBS2Macro, "dbo.Proc_Update_Loads",

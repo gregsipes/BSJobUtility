@@ -62,12 +62,12 @@ namespace PBSInvoiceTotals
 
         private void CopyAndProcessFile(FileInfo fileInfo)
         {
-            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
+            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".txt";
             Int32 loadsId = 0;
 
 
             //copy file to backup directory
-            File.Copy(fileInfo.FullName, backupFileName);
+            File.Copy(fileInfo.FullName, backupFileName, true);
             WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
 
             //update or create a load id

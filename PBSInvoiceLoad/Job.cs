@@ -76,12 +76,12 @@ namespace PBSInvoiceLoad
 
         private void CopyAndProcessFile(FileInfo fileInfo, List<Dictionary<string, object>> printTypes)
         {
-            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
+            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".txt";
             Int32 loadsId = 0;
 
 
             //copy file to backup directory
-            File.Copy(fileInfo.FullName, backupFileName);
+            File.Copy(fileInfo.FullName, backupFileName, true);
             WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
 
             //update or create a load id
@@ -113,7 +113,7 @@ namespace PBSInvoiceLoad
 
             string workingFilePath = GetConfigurationKeyValue("WorkDirectory1") + "carrinv_" + DateTime.Now.ToString("yyMMddhhmmss") + "_" + fileInfo.Name;
             //create a working copy of the file
-            File.Copy(fileInfo.FullName, workingFilePath);
+            File.Copy(fileInfo.FullName, workingFilePath, true);
 
             FileInfo workingFileInfo = new FileInfo(workingFilePath);
 
@@ -514,7 +514,7 @@ namespace PBSInvoiceLoad
             //todo: delete file from working directory
             if (pageLineNumber > 0)
             {
-                File.Copy(workingFilePath, GetConfigurationKeyValue("OutputDirectory") + workingFileInfo.Name);
+                File.Copy(workingFilePath, GetConfigurationKeyValue("OutputDirectory") + workingFileInfo.Name, true);
                 WriteToJobLog(JobLogMessageType.INFO, $"{GetConfigurationKeyValue("OutputDirectory") + workingFileInfo.Name} created.");
             }
 

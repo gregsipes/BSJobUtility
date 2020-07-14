@@ -84,12 +84,12 @@ namespace PBSInvoiceExportLoad
 
         private void CopyAndProcessFile(FileInfo fileInfo)
         {
-            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
+            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".txt";
             Int32 loadsId = 0;
 
 
             //copy file to backup directory
-            File.Copy(fileInfo.FullName, backupFileName);
+            File.Copy(fileInfo.FullName, backupFileName, true);
             WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
 
             //update or create a load id
@@ -101,7 +101,7 @@ namespace PBSInvoiceExportLoad
                                                                                         new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString() + "\\"),
                                                                                         new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                                         new SqlParameter("@pvchrBackupDir", GetConfigurationKeyValue("BackupDirectory")),
-                                                                                        new SqlParameter("@pvchrBackupFile", fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt"),
+                                                                                        new SqlParameter("@pvchrBackupFile", fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".txt"),
                                                                                         new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind)),
                                                                                         new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
                                                                                         new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
