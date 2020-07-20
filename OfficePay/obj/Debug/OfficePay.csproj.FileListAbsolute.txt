@@ -15,3 +15,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\bin\
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\obj\Debug\OfficePay.csproj.CoreCompileInputs.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\obj\Debug\OfficePay.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\obj\Debug\OfficePay.pdb
+C:\projects\Applications\BSJobUtility\OfficePay\bin\Debug\BSGlobals.dll
+C:\projects\Applications\BSJobUtility\OfficePay\bin\Debug\BSGlobals.pdb

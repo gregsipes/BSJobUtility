@@ -37,3 +37,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\ParkingPayroll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.csproj.CoreCompileInputs.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\ParkingPayroll\obj\Debug\ParkingPayroll.pdb
+C:\projects\Applications\BSJobUtility\ParkingPayroll\bin\Debug\BSGlobals.dll
+C:\projects\Applications\BSJobUtility\ParkingPayroll\bin\Debug\BSGlobals.pdb

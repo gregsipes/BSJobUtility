@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop;
 using System.Globalization;
-using BSJobBase.Classes;
+using static BSGlobals.Enums;
 using System.IO;
 
 namespace CommissionsCreate

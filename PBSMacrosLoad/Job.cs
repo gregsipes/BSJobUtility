@@ -8,6 +8,7 @@ using System.IO;
 using System.Data.SqlClient;
 using System.Data;
 using System.Reflection;
+using static BSGlobals.Enums;
 
 namespace PBSMacrosLoad
 {

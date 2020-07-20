@@ -1,5 +1,4 @@
-﻿using BSJobBase.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -38,41 +37,41 @@ namespace BSJobBase
         /// Holds an array of arguments passed into the executable
         /// </summary>
         protected string[] Args { get; set; }
-        /// <summary>
-        /// Holds the class containing the smtp mail settings
-        /// </summary>
-        public MailSettings MailSettings { get; set; }
-        /// <summary>
-        /// Holds the class containing all general settings
-        /// </summary>
-        public GeneralSettings GeneralSettings { get; set; }
-        /// <summary>
-        /// Holds the class containing FTP/SFTP settings
-        /// </summary>
-        public FTPSettings FtpSettings { get; set; }
+        ///// <summary>
+        ///// Holds the class containing the smtp mail settings
+        ///// </summary>
+        //public MailSettings MailSettings { get; set; }
+        ///// <summary>
+        ///// Holds the class containing all general settings
+        ///// </summary>
+        //public GeneralSettings GeneralSettings { get; set; }
+        ///// <summary>
+        ///// Holds the class containing FTP/SFTP settings
+        ///// </summary>
+        //public FTPSettings FtpSettings { get; set; }
 
         #endregion
 
         #region Constructor
 
-        public JobBase()
-        {
-            //setup base job settings
-            MailSettings = new MailSettings()
-            {
-                Host = GetConfigurationKeyValue("BSJobUtilitySection", "MailHost"),
-                DefaultSender = GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSender")
-            };
-            GeneralSettings = new GeneralSettings()
-            {
-                DefaultSQLCommandTimeout = int.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSQLCommandTimeout"))
-            };
-            FtpSettings = new FTPSettings()
-            {
-                ServerResponseTimeoutInSeconds = int.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "FtpSftpServerResponseTimeoutInSeconds"))
-            };
+        //public JobBase()
+        //{
+        //    //setup base job settings
+        //    MailSettings = new MailSettings()
+        //    {
+        //        Host = GetConfigurationKeyValue("BSJobUtilitySection", "MailHost"),
+        //        DefaultSender = GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSender")
+        //    };
+        //    GeneralSettings = new GeneralSettings()
+        //    {
+        //        DefaultSQLCommandTimeout = int.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSQLCommandTimeout"))
+        //    };
+        //    FtpSettings = new FTPSettings()
+        //    {
+        //        ServerResponseTimeoutInSeconds = int.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "FtpSftpServerResponseTimeoutInSeconds"))
+        //    };
 
-        }
+        //}
 
         #endregion
 
@@ -121,12 +120,12 @@ namespace BSJobBase
             }
 
             // basic logging
-            WriteToJobLog(JobLogMessageType.INFO, "Job starting");
+            WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Job starting");
         }
 
         public virtual void PostExecuteJob()
         {
-            WriteToJobLog(JobLogMessageType.INFO, "Job completed");
+            WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Job completed");
         }
 
         #endregion
@@ -135,84 +134,26 @@ namespace BSJobBase
 
         public void LogException(Exception ex)
         {
-            SendMail($"Error in Job: {JobName}", ex.ToString(), false);
-            WriteToJobLog(JobLogMessageType.ERROR, ex.ToString());
+            BSGlobals.Mail.SendMail($"Error in Job: {JobName}", ex.ToString(), false);
+            BSGlobals.DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, ex.ToString(), JobName);
         }
 
-        public void WriteToJobLog(JobLogMessageType type, string message)
+
+
+        public void WriteToJobLog(BSGlobals.Enums.JobLogMessageType type, string message)
         {
-            Console.WriteLine($"{DateTime.Now.ToString()} {type.ToString("g"),-7}  Message: {message}");
-
-
-            using (SqlCommand command = new SqlCommand())
-            {
-                try
-                {
-                    command.Connection = new SqlConnection(GetConnectionStringTo(DatabaseConnectionStringNames.EventLogs));
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.CommandText = "dbo.InsertJobLog";
-                    command.Parameters.Add(new SqlParameter("@JobName", JobName));
-                    command.Parameters.Add(new SqlParameter("@MessageType", type.ToString("d")));
-                    command.Parameters.Add(new SqlParameter("@Message", message));
-
-                    command.Connection.Open();
-                    command.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Error inserting log record. {ex.Message}");
-                }
-                finally
-                {
-                    if (command != null && command.Connection != null)
-                        command.Connection.Close();
-                }
-            }
+            BSGlobals.DataIO.WriteToJobLog(type, message, JobName);           
         }
 
-        protected void ExecuteNonQuery(DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
+        protected void ExecuteNonQuery(BSGlobals.Enums.DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
         {
-            RunQuery(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
+            BSGlobals.DataIO.ExecuteNonQuery(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
         }
 
-        protected void ExecuteNonQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        protected void ExecuteNonQuery(BSGlobals.Enums.DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
         {
-            RunQuery(connectionStringName, commandType, commandText, parameters);
-        }
-
-        private void RunQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
-        {
-            using (SqlCommand command = new SqlCommand())
-            {
-                try
-                {
-                    command.Connection = new SqlConnection(GetConnectionStringTo(connectionStringName));
-                    command.CommandType = commandType;
-                    command.CommandText = commandText;
-                    command.CommandTimeout = 0;
-
-                    if (parameters != null)
-                    {
-                        foreach (var param in parameters)
-                        {
-                            command.Parameters.Add(param);
-                        }
-                    }
-
-                    command.Connection.Open();
-                    command.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Error executing query. {ex.Message}");
-                }
-                finally
-                {
-                    if (command != null && command.Connection != null)
-                        command.Connection.Close();
-                }
-            }
-        }
+            BSGlobals.DataIO.ExecuteNonQuery(connectionStringName, commandType, commandText, parameters);
+        }       
 
 
         #region Excel
@@ -345,65 +286,16 @@ namespace BSJobBase
 
         #region Functions
 
-        protected List<Dictionary<string, object>> ExecuteSQL(DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
+        protected List<Dictionary<string, object>> ExecuteSQL(BSGlobals.Enums.DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
         {
-            return RunSQLCommand(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
+            // return RunSQLCommand(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
+            return BSGlobals.DataIO.ExecuteSQL(connectionStringName, CommandType.StoredProcedure, commandText, parameters);
         }
 
-        protected List<Dictionary<string, object>> ExecuteSQL(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        protected List<Dictionary<string, object>> ExecuteSQL(BSGlobals.Enums.DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
         {
-            return RunSQLCommand(connectionStringName, commandType, commandText, parameters);
-        }
-
-        //Change to protected if we ever need to overload. In other words, if we need to pass in something besides a sproc
-        private List<Dictionary<string, object>> RunSQLCommand(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
-        {
-
-            List<Dictionary<string, object>> rowsToReturn = new List<Dictionary<string, object>>();
-
-            using (SqlDataReader reader = ExecuteQuery(connectionStringName, commandType, commandText, parameters))
-            {
-                while (reader.Read())
-                {
-                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
-
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        dictionary.Add(reader.GetName(i), reader.GetValue(i));
-                    }
-
-                    rowsToReturn.Add(dictionary);
-                }
-            }
-
-            return rowsToReturn;
-        }
-
-        private SqlDataReader ExecuteQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
-        {
-            using (SqlCommand command = new SqlCommand())
-            {
-                command.Connection = new SqlConnection(GetConnectionStringTo(connectionStringName));
-                command.CommandType = commandType;
-                command.CommandText = commandText;
-
-                if (parameters != null)
-                {
-                    foreach (var param in parameters)
-                    {
-                        command.Parameters.Add(param);  //new SqlParameter(param.Key, param.Value)
-                    }
-                }
-                command.Connection.Open();
-
-                //https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand?redirectedfrom=MSDN&view=netframework-4.6
-                // When using CommandBehavior.CloseConnection, the connection will be closed when the 
-                // IDataReader is closed.
-                SqlDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
-
-                return reader;
-
-            }
+            // return RunSQLCommand(connectionStringName, commandType, commandText, parameters);
+            return BSGlobals.DataIO.ExecuteSQL(connectionStringName, commandType, commandText, parameters);
         }
 
         /// <summary>
@@ -413,7 +305,7 @@ namespace BSJobBase
         /// <returns></returns>
         protected string GetConfigurationKeyValue(string keyName)
         {
-            return GetConfigurationKeyValue(AppConfigSectionName, keyName);
+            return BSGlobals.Config.GetConfigurationKeyValue(AppConfigSectionName, keyName);
         }
 
         /// <summary>
@@ -424,29 +316,7 @@ namespace BSJobBase
         /// <returns></returns>
         protected string GetConfigurationKeyValue(string sectionName, string keyName)
         {
-            NameValueCollection section = null;
-            string value = null;
-
-            try
-            {
-                section = ConfigurationManager.GetSection(sectionName) as NameValueCollection;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Failed to locate section {sectionName} in configuration file.", ex);
-            }
-
-            try
-            {
-                if (section != null)
-                    value = section[keyName].ToString();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Failed to locate key {keyName} in section {sectionName} in configuration file.", ex);
-            }
-
-            return value;
+            return BSGlobals.Config.GetConfigurationKeyValue(sectionName, keyName);
         }
 
         /// <summary>
@@ -456,7 +326,7 @@ namespace BSJobBase
         /// <returns></returns>
         private static string GetConnectionString(string name)
         {
-            return ConfigurationManager.ConnectionStrings[name].ConnectionString;
+            return BSGlobals.Config.GetConnectionString(name);
         }
 
         /// <summary>
@@ -464,106 +334,27 @@ namespace BSJobBase
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static string GetConnectionStringTo(DatabaseConnectionStringNames name)
+        public static string GetConnectionStringTo(BSGlobals.Enums.DatabaseConnectionStringNames name)
         {
-            string connectionString = null;
-
-            switch (name)
-            {
-                case DatabaseConnectionStringNames.EventLogs:
-                    connectionString = GetConnectionString("eventlogs");
-                    break;
-                case DatabaseConnectionStringNames.Parking:
-                    connectionString = GetConnectionString("parking");
-                    break;
-                case DatabaseConnectionStringNames.SBSReports:
-                    connectionString = GetConnectionString("sbsreports");
-                    break;
-                case DatabaseConnectionStringNames.PBS2Macro:
-                    connectionString = GetConnectionString("pbs2macro");
-                    break;
-                case DatabaseConnectionStringNames.Commissions:
-                    connectionString = GetConnectionString("commissions");
-                    break;
-                case DatabaseConnectionStringNames.BuffNewsForBW:
-                    connectionString = GetConnectionString("buffnewsforbw");
-                    break;
-                case DatabaseConnectionStringNames.Brainworks:
-                    connectionString = GetConnectionString("brainworks");
-                    break;
-                case DatabaseConnectionStringNames.BARC:
-                    connectionString = GetConnectionString("barc");
-                    break;
-                case DatabaseConnectionStringNames.CommissionsRelated:
-                    connectionString = GetConnectionString("commissionsrelated");
-                    break;
-                case DatabaseConnectionStringNames.Wrappers:
-                    connectionString = GetConnectionString("wrappers");
-                    break;
-                case DatabaseConnectionStringNames.Manifests:
-                    connectionString = GetConnectionString("manifests");
-                    break;
-                case DatabaseConnectionStringNames.PBSInvoiceExportLoad:
-                    connectionString = GetConnectionString("pbsinvoiceexport");
-                    break;
-                case DatabaseConnectionStringNames.QualificationReportLoad:
-                    connectionString = GetConnectionString("qualificationreport");
-                    break;
-                case DatabaseConnectionStringNames.OfficePay:
-                    connectionString = GetConnectionString("officepay");
-                    break;
-                case DatabaseConnectionStringNames.AutoRenew:
-                    connectionString = GetConnectionString("autorenew");
-                    break;
-                case DatabaseConnectionStringNames.PressRoom:
-                    connectionString = GetConnectionString("pressroom");
-                    break;
-                case DatabaseConnectionStringNames.PressRoomFree:
-                    connectionString = GetConnectionString("pressroomfree");
-                    break;
-                case DatabaseConnectionStringNames.PBSInvoiceTotals:
-                    connectionString = GetConnectionString("pbsinvoicetotals");
-                    break;
-                case DatabaseConnectionStringNames.PBSInvoices:
-                    connectionString = GetConnectionString("pbsinvoices");
-                    break;
-                default:
-                    break;
-            }
-
-            return connectionString;
+            return BSGlobals.Config.GetConnectionStringTo(name);            
         }
 
 
         public static void CheckCreateDirectory(string filePath)
         {
-            CheckCreateDirectory(filePath, false);
+            BSGlobals.FileIO.CheckCreateDirectory(filePath, false);
         }
 
         public static void CheckCreateDirectory(string filePath, bool containsFileName)
         {
-            string directory = "";
-            if (containsFileName)
-                directory = Path.GetDirectoryName(filePath);
-            else
-                directory = filePath;
-
-
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+            BSGlobals.FileIO.CheckCreateDirectory(filePath, containsFileName);
         }
-      
 
         public static List<string> GetFiles(string sourceDirectory, Regex reg)
         {
-            // validate existence of directory
-            CheckCreateDirectory(sourceDirectory);
-
-            return Directory.GetFiles(sourceDirectory)
-                .Where(f => ((reg == null) ? true : reg.IsMatch(Path.GetFileName(f))))
-                .ToList();
+           return BSGlobals.FileIO.GetFiles(sourceDirectory, reg);
         }
-             
+
 
         /// <summary>
         /// Send email. See mail settings in ManagedJobsUtilitySystem section of app.config.
@@ -576,122 +367,22 @@ namespace BSJobBase
         /// <param name="bccs">Optional</param>
         protected void SendMail(string subject, string body, bool bodyIsHTML, string recipients = null, string ccs = null, string bccs = null, string attachment = null)
         {
-            try
-            {
-                using (SmtpClient client = new SmtpClient())
-                {
-
-                    client.Host = GetConfigurationKeyValue("BSJobUtilitySection", "MailHost");
-
-                    using (MailMessage message = new MailMessage())
-                    {
-                        message.From = new MailAddress(GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSender"));
-                        message.Subject = subject;
-                        message.Body = body;
-                        message.IsBodyHtml = bodyIsHTML;
-
-                        if (attachment != null)
-                        {
-                            var attach = new Attachment(attachment);
-                            message.Attachments.Add(attach);
-                        }
-
-                        // clean up recipients
-                        if (recipients == null)
-                            message.To.Add(new MailAddress(GetConfigurationKeyValue("BSJobUtilitySection", "DefaultRecipient")));
-                        else
-                        {
-                            recipients = recipients.Replace(",", ";");
-
-                            foreach (var recipient in recipients.Split(';'))
-                            {
-                                if (!string.IsNullOrEmpty(recipient))
-                                    message.To.Add(new MailAddress(recipient.Trim()));
-                            }
-                        }
-
-                        if (ccs != null)
-                        {
-                            // clean up recipients
-                            ccs = ccs.Replace(",", ";");
-
-                            foreach (var cc in ccs.Split(';'))
-                            {
-                                if (!string.IsNullOrEmpty(cc))
-                                    message.CC.Add(new MailAddress(cc.Trim()));
-                            }
-                        }
-
-                        if (bccs != null)
-                        {
-                            // clean up recipients
-                            bccs = bccs.Replace(",", ";");
-
-                            foreach (var bcc in bccs.Split(';'))
-                            {
-                                if (!String.IsNullOrEmpty(bcc))
-                                    message.Bcc.Add(new MailAddress(bcc.Trim()));
-                            }
-                        }
-
-                        client.Send(message);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
+            BSGlobals.Mail.SendMail(subject, body, bodyIsHTML, recipients, ccs, bccs, attachment);            
         }
-      
+
         protected object FormatNumber(string inputString)
         {
-            if (inputString.Trim() == "" || inputString.Trim() == "?")
-                return (object)DBNull.Value;
-            else
-            {
-                inputString = inputString.Replace("$", "").Trim();
-
-                if (inputString.EndsWith("-"))
-                    return Decimal.Parse(inputString, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign);
-                else
-                    return inputString;
-
-            }
-
+            return BSGlobals.Types.FormatNumber(inputString);
         }
 
         protected object FormatDateTime(string inputString)
         {
-            if (inputString.Trim() == "" || inputString.Trim() == "?")
-                return (object)DBNull.Value;
-            else
-            {
-                inputString = inputString.Trim();
-
-                DateTime dateTime;
-
-                if (DateTime.TryParse(inputString, out dateTime))
-                    return dateTime.ToShortDateString();
-                else
-                    return (object)DBNull.Value;
-
-            }
+            return BSGlobals.Types.FormatDateTime(inputString);
         }
 
         protected object FormatString(string inputString)
         {
-            if (inputString.Trim() == "" || inputString.Trim() == "?")
-                return (object)DBNull.Value;
-            else
-            {
-                //some strings are parsed by position, so trimming whitespace is problematic
-              //  inputString = inputString.Trim();
-
-                return inputString;
-
-            }
+            return BSGlobals.Types.FormatString(inputString);
         }
 
         #endregion

@@ -15,3 +15,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomLoad\
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomLoad\obj\Debug\PressRoomLoad.csproj.CoreCompileInputs.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomLoad\obj\Debug\PressRoomLoad.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomLoad\obj\Debug\PressRoomLoad.pdb
+C:\projects\Applications\BSJobUtility\PressRoomLoad\bin\Debug\BSGlobals.dll
+C:\projects\Applications\BSJobUtility\PressRoomLoad\bin\Debug\BSGlobals.pdb

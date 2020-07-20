@@ -6,38 +6,7 @@ using System.Threading.Tasks;
 
 namespace BSJobBase
 {
-    public enum DatabaseConnectionStringNames
-    {
-        EventLogs,
-        Parking,
-        SBSReports,
-        PBS2Macro,
-        Commissions,
-        BuffNewsForBW,
-        Brainworks,
-        CommissionsRelated,
-        BARC,
-        Wrappers,
-        Manifests,
-        PBSInvoiceExportLoad,
-        QualificationReportLoad,
-        OfficePay,
-        AutoRenew,
-        PressRoom,
-        PressRoomFree,
-        PBSInvoiceTotals,
-        PBSInvoices
-    }
-
-    public enum JobLogMessageType
-    {
-        INFO = 1,
-        WARNING = 2,
-        ERROR = 3
-    }
-
     #region Excel
-
     public enum ExcelHorizontalAlignment
     {
         Center = 3,
@@ -65,3 +34,4 @@ namespace BSJobBase
 
     #endregion
 }
+

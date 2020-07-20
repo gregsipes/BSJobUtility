@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static BSGlobals.Enums;
 
 namespace AutoRenew
 {
@@ -178,12 +179,6 @@ namespace AutoRenew
                                     if (!hasS1Segment)
                                     {
                                         S1Count++;
-
-                                        //test code
-                                        if (lineNumber >= 2383)
-                                        {
-                                            var x = 2 + 1;
-                                        }
 
                                         ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "dbo.Proc_Insert_Subscription_S1",
                                                     new SqlParameter("@loads_id", loadsId),

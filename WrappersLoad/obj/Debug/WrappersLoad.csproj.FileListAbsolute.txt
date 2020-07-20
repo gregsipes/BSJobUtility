@@ -17,3 +17,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\WrappersLoad\o
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.csproj.CoreCompileInputs.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.pdb
+C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\BSGlobals.dll
+C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\BSGlobals.pdb

@@ -24,3 +24,6 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.csproj.CoreCompileInputs.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.pdb
+C:\projects\Applications\BSJobUtility\BSJobBase\bin\Debug\BSGlobals.dll
+C:\projects\Applications\BSJobUtility\BSJobBase\bin\Debug\BSGlobals.pdb
+C:\projects\Applications\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.csproj.CopyComplete
