@@ -38,3 +38,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSMacrosLoad\obj\Debug\PBSMacrosLoad.pdb
 C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\PBSMacrosLoad\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PBSMacrosLoad\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PBSMacrosLoad\bin\Debug\BSGlobals.pdb

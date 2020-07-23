@@ -27,3 +27,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobBase\obj\
 C:\projects\Applications\BSJobUtility\BSJobBase\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\BSJobBase\bin\Debug\BSGlobals.pdb
 C:\projects\Applications\BSJobUtility\BSJobBase\obj\Debug\BSJobBase.csproj.CopyComplete
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSJobBase\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSJobBase\bin\Debug\BSGlobals.pdb

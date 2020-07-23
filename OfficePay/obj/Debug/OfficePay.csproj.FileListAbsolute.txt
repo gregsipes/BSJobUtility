@@ -17,3 +17,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\obj\
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\OfficePay\obj\Debug\OfficePay.pdb
 C:\projects\Applications\BSJobUtility\OfficePay\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\OfficePay\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\OfficePay\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\OfficePay\bin\Debug\BSGlobals.pdb

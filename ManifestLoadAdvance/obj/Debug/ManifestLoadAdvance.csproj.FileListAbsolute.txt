@@ -18,3 +18,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\ManifestLoadAd
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\ManifestLoadAdvance\obj\Debug\ManifestLoadAdvance.pdb
 C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\ManifestLoadAdvance\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\ManifestLoadAdvance\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\ManifestLoadAdvance\bin\Debug\BSGlobals.pdb

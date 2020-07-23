@@ -12,9 +12,10 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationR
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationReportLoad\bin\Debug\BSJobBase.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationReportLoad\bin\Debug\BSJobBase.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationReportLoad\bin\Debug\BSJobBase.dll.config
-C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.csprojResolveAssemblyReference.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.csproj.CoreCompileInputs.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.pdb
 C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\QualificationReportLoad\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\QualificationReportLoad\bin\Debug\BSGlobals.pdb
