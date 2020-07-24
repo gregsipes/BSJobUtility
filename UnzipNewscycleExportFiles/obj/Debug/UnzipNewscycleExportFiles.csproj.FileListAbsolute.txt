@@ -19,3 +19,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycle
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.pdb
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\UnzipNewscycleExportFiles\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\UnzipNewscycleExportFiles\bin\Debug\BSGlobals.pdb

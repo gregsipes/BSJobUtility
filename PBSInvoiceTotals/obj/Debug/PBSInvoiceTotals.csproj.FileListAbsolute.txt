@@ -17,3 +17,6 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSInvoiceTota
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.pdb
 C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\PBSInvoiceTotals\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PBSInvoiceTotals\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PBSInvoiceTotals\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PBSInvoiceTotals\obj\Debug\PBSInvoiceTotals.csprojResolveAssemblyReference.cache

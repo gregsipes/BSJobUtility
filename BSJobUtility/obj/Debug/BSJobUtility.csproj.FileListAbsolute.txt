@@ -113,3 +113,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\o
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\obj\Debug\BSJobUtility.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSJobUtility\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSJobUtility\bin\Debug\BSGlobals.pdb

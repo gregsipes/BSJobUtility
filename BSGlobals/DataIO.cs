@@ -125,7 +125,7 @@ namespace BSGlobals
             return rowsToReturn;
         }
 
-        private static SqlDataReader ExecuteQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        public static SqlDataReader ExecuteQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
         {
             using (SqlCommand command = new SqlCommand())
             {

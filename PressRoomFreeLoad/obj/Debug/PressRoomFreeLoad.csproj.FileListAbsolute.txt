@@ -17,3 +17,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeL
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomFreeLoad\obj\Debug\PressRoomFreeLoad.pdb
 C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\PressRoomFreeLoad\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PressRoomFreeLoad\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PressRoomFreeLoad\bin\Debug\BSGlobals.pdb

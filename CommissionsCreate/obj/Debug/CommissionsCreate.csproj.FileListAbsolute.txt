@@ -29,3 +29,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCre
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\CommissionsCreate\obj\Debug\CommissionsCreate.pdb
 C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\CommissionsCreate\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\CommissionsCreate\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\CommissionsCreate\bin\Debug\BSGlobals.pdb
