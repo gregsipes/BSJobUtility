@@ -18,3 +18,4 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\ManifestLoad\o
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\ManifestLoad\obj\Debug\ManifestLoad.pdb
 C:\projects\Applications\BSJobUtility\ManifestLoad\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\ManifestLoad\bin\Debug\BSGlobals.pdb
+C:\projects\Applications\BSJobUtility\ManifestLoad\obj\Debug\ManifestLoad.csprojAssemblyReference.cache

@@ -37,41 +37,7 @@ namespace BSJobBase
         /// Holds an array of arguments passed into the executable
         /// </summary>
         protected string[] Args { get; set; }
-        ///// <summary>
-        ///// Holds the class containing the smtp mail settings
-        ///// </summary>
-        //public MailSettings MailSettings { get; set; }
-        ///// <summary>
-        ///// Holds the class containing all general settings
-        ///// </summary>
-        //public GeneralSettings GeneralSettings { get; set; }
-        ///// <summary>
-        ///// Holds the class containing FTP/SFTP settings
-        ///// </summary>
-        //public FTPSettings FtpSettings { get; set; }
 
-        #endregion
-
-        #region Constructor
-
-        //public JobBase()
-        //{
-        //    //setup base job settings
-        //    MailSettings = new MailSettings()
-        //    {
-        //        Host = GetConfigurationKeyValue("BSJobUtilitySection", "MailHost"),
-        //        DefaultSender = GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSender")
-        //    };
-        //    GeneralSettings = new GeneralSettings()
-        //    {
-        //        DefaultSQLCommandTimeout = int.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "DefaultSQLCommandTimeout"))
-        //    };
-        //    FtpSettings = new FTPSettings()
-        //    {
-        //        ServerResponseTimeoutInSeconds = int.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "FtpSftpServerResponseTimeoutInSeconds"))
-        //    };
-
-        //}
 
         #endregion
 
