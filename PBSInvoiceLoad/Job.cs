@@ -125,7 +125,7 @@ namespace PBSInvoiceLoad
             string printDate = "";
             DateTime? invoiceDate = null;
             string invoiceNumber = "";
-            decimal? balanceDue = null;
+            string balanceDue = null;
             string route = "";
             string district = "";
             string truck = "";
@@ -183,7 +183,7 @@ namespace PBSInvoiceLoad
                     headerLineNumber += 100;
 
                     CreateHeaderAndBodyRecords(loadsId, headerLineNumber, groupPageNumber, printTypeName, printTypeIdentifier,
-                                                invoiceNumber, invoiceDate, billingTerms, balanceDue.ToString() ?? "", carrier, route,
+                                                invoiceNumber, invoiceDate, billingTerms, balanceDue ?? "", carrier, route,
                                                 district, depot, truck, sequence.ToString() ?? "", nameAddress1, nameAddress2, nameAddress3, nameAddress4,
                                                 retailDraw, printReturnSheet, printInvoiceCharge, printInvoiceChargeTotal, printInvoiceCredit, printInvoiceCreditTotal, bodyLines);
 
@@ -286,6 +286,12 @@ namespace PBSInvoiceLoad
                             if (printTypeIdentifier == "Invoice")
                                 invoiceNumber = line.Substring(line.IndexOf("INVOICE NO. :")).Replace("INVOICE NO. :", "").Trim();
 
+                            //test code
+                            if (invoiceNumber == "10423577")
+                            {
+                                var x = 2 + 1;
+                            }
+
                             break;
                         case 6:
                             billingTerms = line.Trim();
@@ -296,19 +302,13 @@ namespace PBSInvoiceLoad
                             {
                                 if (line.Trim().StartsWith(amountLabel["amount_due_label"].ToString()))
                                 {
-                                    balanceDue = decimal.Parse(line.Replace(amountLabel["amount_due_label"].ToString(), "").Replace(":", "").Replace(",", "").Trim());
+                                    balanceDue = line.Replace(amountLabel["amount_due_label"].ToString(), "").Replace(":", "").Replace(",", "").Trim();
                                     break;
                                 }
                             }
                             break;
                         case 10:
                             nameAddress1 = line.Trim().Substring(0, 40).Trim();
-
-                            //test code
-                            if (nameAddress1 == "RETAIL ONE")
-                            {
-                                var x = 2 + 1;
-                            }
 
                             carrier = line.Trim().Replace(nameAddress1, "").Replace("ACCOUNT     :", "").Trim();
 
@@ -372,8 +372,8 @@ namespace PBSInvoiceLoad
                                 foreach (Dictionary<string, object> printType in printTypes)
                                 {
                                         if (bool.Parse(printType["check_route_suffix_flag"].ToString()) != false &
-                                            ((bool.Parse(printType["route_suffix_alpha_flag"].ToString()) != false & !route.Substring(route.Length - 2, 1).All(char.IsNumber))
-                                                     | (bool.Parse(printType["route_suffix_alpha_flag"].ToString()) == false & route.Substring(route.Length - 2, 1).All(char.IsNumber))) &
+                                            ((bool.Parse(printType["route_suffix_alpha_flag"].ToString()) != false & !route.Substring(route.Length - 1, 1).All(char.IsNumber))
+                                                     | (bool.Parse(printType["route_suffix_alpha_flag"].ToString()) == false & route.Substring(route.Length - 1, 1).All(char.IsNumber))) &
                                              (printType["line_2_identifier_1"].ToString() == printTypeIdentifier | printType["line_2_identifier_2"].ToString() == printTypeIdentifier))
                                         {
                                             printTypeName = printType["print_type"].ToString();
@@ -433,8 +433,9 @@ namespace PBSInvoiceLoad
                         bodyLineNumber++;
                         bodyLines.Add(line);
 
-                        if (line.ToUpper().StartsWith("RETAIL DAILY DRAW") | line.ToUpper().StartsWith("RETAIL SUNDAY DRAW") | line.ToUpper().StartsWith("CORP STORE DELIVERY CREDIT") |
-                            line.ToUpper().StartsWith("DIRECT BILL DELIVERY CREDIT") | line.ToUpper().StartsWith("RETURN CREDITS") | line.ToUpper().StartsWith("USA RETAIL HONOR BOX CHARGE"))
+                        if (line.Length > 18 &&
+                            (line.Substring(17).ToUpper().StartsWith("RETAIL DAILY DRAW") | line.Substring(17).ToUpper().StartsWith("RETAIL SUNDAY DRAW") | line.Substring(17).ToUpper().StartsWith("CORP STORE DELIVERY CREDIT") |
+                            line.Substring(17).ToUpper().StartsWith("DIRECT BILL DELIVERY CREDIT") | line.ToUpper().Contains("RETURN CREDITS") | line.ToUpper().Contains("USA RETAIL HONOR BOX CHARGE")))
                         {
                             printReturnSheet = true;
                         }
@@ -476,7 +477,7 @@ namespace PBSInvoiceLoad
                 headerLineNumber += 100;
 
                 CreateHeaderAndBodyRecords(loadsId, headerLineNumber, groupPageNumber, printTypeName, printTypeIdentifier,
-                            invoiceNumber, invoiceDate, billingTerms, balanceDue.Value.ToString(), carrier, route,
+                            invoiceNumber, invoiceDate, billingTerms, balanceDue, carrier, route,
                             district, depot, truck, sequence.Value.ToString(), nameAddress1, nameAddress2, nameAddress3, nameAddress4,
                             retailDraw, printReturnSheet, printInvoiceCharge, printInvoiceChargeTotal, printInvoiceCredit, printInvoiceCreditTotal,
                             bodyLines);
