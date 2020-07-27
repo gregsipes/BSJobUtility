@@ -28,7 +28,9 @@ namespace BSGlobals
             PressRoom,
             PressRoomFree,
             PBSInvoiceTotals,
-            PBSInvoices
+            PBSInvoices,
+            DMMail,
+            DMMailFree
         }
 
         public enum JobLogMessageType

@@ -122,6 +122,12 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.PBSInvoices:
                     connectionString = GetConnectionString("pbsinvoices");
                     break;
+                case DatabaseConnectionStringNames.DMMail:
+                    connectionString = GetConnectionString("dmmail");
+                    break;
+                case DatabaseConnectionStringNames.DMMailFree:
+                    connectionString = GetConnectionString("dmmailfree");
+                    break;
                 default:
                     break;
             }
