@@ -5,7 +5,6 @@ C:\projects\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.dll
 C:\projects\Applications\BSJobUtility\DMMail\bin\Debug\BSGlobals.pdb
 C:\projects\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.pdb
 C:\projects\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.dll.config
-C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csprojAssemblyReference.cache
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CoreCompileInputs.cache
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.dll

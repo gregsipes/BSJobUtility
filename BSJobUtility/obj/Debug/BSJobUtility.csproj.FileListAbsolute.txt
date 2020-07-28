@@ -117,5 +117,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSJobUtility\b
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSJobUtility\bin\Debug\BSGlobals.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\DMMail.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\DMMail.pdb
-C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\DMMailFree.dll
-C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\DMMailFree.pdb
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestFreeLoad.dll
+C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\ManifestFreeLoad.pdb

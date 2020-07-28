@@ -98,6 +98,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.Manifests:
                     connectionString = GetConnectionString("manifests");
                     break;
+                case DatabaseConnectionStringNames.ManifestsFree:
+                    connectionString = GetConnectionString("manifestsfree");
+                    break;
                 case DatabaseConnectionStringNames.PBSInvoiceExportLoad:
                     connectionString = GetConnectionString("pbsinvoiceexport");
                     break;

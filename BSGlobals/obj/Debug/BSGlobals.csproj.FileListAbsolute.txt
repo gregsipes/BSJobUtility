@@ -1,4 +1,3 @@
-C:\projects\Applications\BSJobUtility\BSGlobals\obj\Debug\BSGlobals.csprojAssemblyReference.cache
 C:\projects\Applications\BSJobUtility\BSGlobals\obj\Debug\BSGlobals.csproj.CoreCompileInputs.cache
 C:\projects\Applications\BSJobUtility\BSGlobals\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\BSGlobals\bin\Debug\BSGlobals.pdb

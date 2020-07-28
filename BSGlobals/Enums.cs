@@ -21,6 +21,7 @@ namespace BSGlobals
             BARC,
             Wrappers,
             Manifests,
+            ManifestsFree,
             PBSInvoiceExportLoad,
             QualificationReportLoad,
             OfficePay,
