@@ -636,7 +636,7 @@ namespace PBSInvoiceLoad
         public override void SetupJob()
         {
             JobName = "PBS Invoices";
-            JobDescription = @"Parses multiple fixed width files";
+            JobDescription = @"Parses multiple fixed width files containing statements and invoices";
             AppConfigSectionName = "PBSInvoices";
         }
     }

@@ -20,3 +20,4 @@ C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\WrappersLoad\bin\Debug\BSGlobals.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\WrappersLoad\bin\Debug\BSGlobals.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\WrappersLoad\bin\Debug\BSGlobals.pdb
+C:\projects\Applications\BSJobUtility\WrappersLoad\obj\Debug\WrappersLoad.csprojAssemblyReference.cache

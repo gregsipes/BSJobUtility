@@ -125,9 +125,6 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.DMMail:
                     connectionString = GetConnectionString("dmmail");
                     break;
-                case DatabaseConnectionStringNames.DMMailFree:
-                    connectionString = GetConnectionString("dmmailfree");
-                    break;
                 default:
                     break;
             }

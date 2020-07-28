@@ -49,20 +49,6 @@ namespace DMMail
                         //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
                         //}
                     }
-
-                    if (processedFiles.Count() > 0)
-                    {
-                        StringBuilder stringBuilder = new StringBuilder();
-
-                        stringBuilder.AppendLine("Processed File(s):");
-
-                        foreach (string fileName in processedFiles)
-                        {
-                            stringBuilder.AppendLine(fileName);
-                        }
-
-                        SendMail($"{JobName} ran successfully", stringBuilder.ToString(), false, GetConfigurationKeyValue("DefaultRecipient"));
-                    }
                 }
 
             }
@@ -105,266 +91,94 @@ namespace DMMail
             //parse file and store contents
             List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
 
-            if (fileContents.Count == 0)
-            {
+            Int32 lineCounter = 0;
+            DateTime? publishDate = null;
 
+
+            if (fileContents.Count > 0)
+            {
+                foreach (string line in fileContents)
+                {
+                    lineCounter++;
+
+                    List<string> lineSegments = line.Split('|').ToList();
+
+                    if (lineSegments[0] == "D1")
+                    {
+                        ExecuteNonQuery(DatabaseConnectionStringNames.DMMail, "Proc_Insert_DMMAILData",
+                                    new SqlParameter("@loads_id", loadsId),
+                                      new SqlParameter("@RecordType", lineSegments[0]),
+                                      new SqlParameter("@ProductId", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
+                                      new SqlParameter("@EditionId", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
+                                      new SqlParameter("@PublishDate", lineSegments[3].ToString() == "" ? (object)DBNull.Value : lineSegments[3].ToString()),
+                                      new SqlParameter("@TruckId", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
+                                      new SqlParameter("@TruckName", lineSegments[5].ToString() == "" ? (object)DBNull.Value : lineSegments[5].ToString()),
+                                      new SqlParameter("@RelayTruckId", lineSegments[6].ToString() == "" ? (object)DBNull.Value : lineSegments[6].ToString()),
+                                      new SqlParameter("@RelayTruckName", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
+                                      new SqlParameter("@DropOrder", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
+                                      new SqlParameter("@DistrictManagerId", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
+                                      new SqlParameter("@BillToId", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
+                                      new SqlParameter("@RouteId", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
+                                      new SqlParameter("@SubscriptionId", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
+                                      new SqlParameter("@SubName", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()),
+                                      new SqlParameter("@Address1", lineSegments[14].ToString() == "" ? (object)DBNull.Value : lineSegments[14].ToString()),
+                                      new SqlParameter("@Address2", lineSegments[15].ToString() == "" ? (object)DBNull.Value : lineSegments[15].ToString()),
+                                      new SqlParameter("@Address3", lineSegments[16].ToString() == "" ? (object)DBNull.Value : lineSegments[16].ToString()),
+                                      new SqlParameter("@Address4", lineSegments[17].ToString() == "" ? (object)DBNull.Value : lineSegments[17].ToString()),
+                                      new SqlParameter("@Address5", lineSegments[18].ToString() == "" ? (object)DBNull.Value : lineSegments[18].ToString()),
+                                      new SqlParameter("@Phone", lineSegments[19].ToString() == "" ? (object)DBNull.Value : lineSegments[19].ToString()),
+                                      new SqlParameter("@DeliveryScheduleId", lineSegments[20].ToString() == "" ? (object)DBNull.Value : lineSegments[20].ToString()),
+                                      new SqlParameter("@BillingMethod", lineSegments[21].ToString() == "" ? (object)DBNull.Value : lineSegments[21].ToString()),
+                                      new SqlParameter("@TransTypeId", lineSegments[22].ToString() == "" ? (object)DBNull.Value : lineSegments[22].ToString()),
+                                      new SqlParameter("@SourceCode", lineSegments[23].ToString() == "" ? (object)DBNull.Value : lineSegments[23].ToString()),
+                                      new SqlParameter("@SubSourceCode", lineSegments[24].ToString() == "" ? (object)DBNull.Value : lineSegments[24].ToString()),
+                                      new SqlParameter("@ReasonCode", lineSegments[25].ToString() == "" ? (object)DBNull.Value : lineSegments[25].ToString()),
+                                      new SqlParameter("@ComplaintTime", lineSegments[26].ToString() == "" ? (object)DBNull.Value : lineSegments[26].ToString()),
+                                      new SqlParameter("@DeliveryComplaint", lineSegments[27].ToString() == "" ? (object)DBNull.Value : lineSegments[27].ToString()),
+                                      new SqlParameter("@DaysAdjust", lineSegments[28].ToString() == "" ? (object)DBNull.Value : lineSegments[28].ToString()),
+                                      new SqlParameter("@EntryDate", lineSegments[29].ToString() == "" ? (object)DBNull.Value : lineSegments[29].ToString()),
+                                      new SqlParameter("@TransDate", lineSegments[30].ToString() == "" ? (object)DBNull.Value : lineSegments[30].ToString()),
+                                      new SqlParameter("@Text1", lineSegments[31].ToString() == "" ? (object)DBNull.Value : lineSegments[31].ToString()),
+                                      new SqlParameter("@Text2", lineSegments[32].ToString() == "" ? (object)DBNull.Value : lineSegments[32].ToString()),
+                                      new SqlParameter("@Text3", lineSegments[33].ToString() == "" ? (object)DBNull.Value : lineSegments[33].ToString()),
+                                      new SqlParameter("@Text4", lineSegments[34].ToString() == "" ? (object)DBNull.Value : lineSegments[34].ToString()),
+                                      new SqlParameter("@Text5 ", lineSegments[35].ToString() == "" ? (object)DBNull.Value : lineSegments[35].ToString()),
+                                      new SqlParameter("@Copies", lineSegments[36].ToString() == "" ? (object)DBNull.Value : lineSegments[36].ToString()),
+                                      new SqlParameter("@ExpireDate", lineSegments[37].ToString() == "" ? (object)DBNull.Value : lineSegments[37].ToString()),
+                                      new SqlParameter("@RestartDate", lineSegments[38].ToString() == "" ? (object)DBNull.Value : lineSegments[38].ToString()),
+                                      new SqlParameter("@CreateUser", lineSegments[39].ToString() == "" ? (object)DBNull.Value : lineSegments[39].ToString()),
+                                      new SqlParameter("@DeliveryPlacementID", lineSegments[40].ToString() == "" ? (object)DBNull.Value : lineSegments[40].ToString()),
+                                      new SqlParameter("@Description", lineSegments[41].ToString() == "" ? (object)DBNull.Value : lineSegments[41].ToString()),
+                                      new SqlParameter("@PublicationName", lineSegments[42].ToString() == "" ? (object)DBNull.Value : lineSegments[42].ToString()),
+                                      new SqlParameter("@LastField", lineSegments[43].ToString() == "" ? (object)DBNull.Value : lineSegments[43].ToString()));
+
+                        publishDate = DateTime.Parse(lineSegments[3].ToString());
+                    }
+
+                }
             }
 
-            //Int32 routeDetailCounter = 0;
-            //Int32 advanceDetailCounter = 0;
-            //Int32 advanceTotalCounter = 0;
-            //Int32 TMDetailCounter = 0;
-            //Int32 TMTotalCounter = 0;
-            //Int32 truckTotalCounter = 0;
-            //Int32 ignoredCounter = 0;
 
-            //DateTime? runDate = null;
-            //String runType = "";
+            WriteToJobLog(JobLogMessageType.INFO, $"{lineCounter} records read for publishing date {(publishDate.HasValue ? publishDate.Value.ToShortDateString() : (object)DBNull.Value)}.");
 
-            //foreach (string line in fileContents)
-            //{
-            //    if (line != null && line.Trim().Length > 0)
-            //    {
-            //        List<string> lineSegments = line.Split('|').ToList();
+            ExecuteNonQuery(DatabaseConnectionStringNames.DMMail, "Proc_Insert_Editions",
+                                new SqlParameter("@pintLoadsID", loadsId));
 
-            //        if (lineSegments[0] == "R1")
-            //        {
-            //            routeDetailCounter++;
+            ExecuteNonQuery(DatabaseConnectionStringNames.DMMail, "Proc_Insert_Editions_No_AMPM",
+                                new SqlParameter("@pintLoadsID", loadsId));
+            WriteToJobLog(JobLogMessageType.INFO, $"Editions associated with loads_id {loadsId} saved.");
 
-            //            if (lineSegments.Count() < 41)
-            //                WriteToJobLog(JobLogMessageType.ERROR, $"Error on record # {routeDetailCounter} . Field count: {lineSegments.Count()}  Line: {line}");
-            //            else
-            //            {
+            ExecuteNonQuery(DatabaseConnectionStringNames.DMMail, "Proc_Insert_Products",
+                    new SqlParameter("@pintLoadsID", loadsId));
+            WriteToJobLog(JobLogMessageType.INFO, $"Products associated with loads_id {loadsId} saved.");
 
-            //                runDate = DateTime.Parse(lineSegments[4].ToString());
-            //                runType = lineSegments[3].ToString();
-
-            //                ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_Route_Detail",
-            //                                new SqlParameter("@loads_id", loadsId),
-            //                                new SqlParameter("@record_number", routeDetailCounter),
-            //                                new SqlParameter("@record_type", lineSegments[0].ToString() == "" ? (object)DBNull.Value : lineSegments[0].ToString()),
-            //                                new SqlParameter("@main_product_id", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
-            //                                new SqlParameter("@product_id", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
-            //                                new SqlParameter("@run_type", lineSegments[3].ToString() == "" ? (object)DBNull.Value : lineSegments[3].ToString()),
-            //                                new SqlParameter("@run_date", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
-            //                                new SqlParameter("@truck_id", lineSegments[5].ToString() == "" ? (object)DBNull.Value : lineSegments[5].ToString()),
-            //                                new SqlParameter("@truck_name", lineSegments[6].ToString() == "" ? (object)DBNull.Value : lineSegments[6].ToString()),
-            //                                new SqlParameter("@truck_drop_order", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
-            //                                new SqlParameter("@route_id_or_relay_truck_id", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
-            //                                new SqlParameter("@route_type_or_single_copy_type", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
-            //                                new SqlParameter("@route_type_indicator", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
-            //                                new SqlParameter("@depot_id", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
-            //                                new SqlParameter("@depot_drop_order", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
-            //                                new SqlParameter("@edition_or_paper_section", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()),
-            //                                new SqlParameter("@draw_total", lineSegments[14].ToString() == "" ? (object)DBNull.Value : lineSegments[14].ToString()),
-            //                                new SqlParameter("@number_of_standard_bundles", lineSegments[15].ToString() == "" ? (object)DBNull.Value : lineSegments[15].ToString()),
-            //                                new SqlParameter("@number_of_key_bundles", lineSegments[16].ToString() == "" ? (object)DBNull.Value : lineSegments[16].ToString()),
-            //                                new SqlParameter("@key_bundle_size", lineSegments[17].ToString() == "" ? (object)DBNull.Value : lineSegments[17].ToString()),
-            //                                new SqlParameter("@carrier_name", lineSegments[18].ToString() == "" ? (object)DBNull.Value : lineSegments[18].ToString()),
-            //                                new SqlParameter("@carrier_phone_number", lineSegments[19].ToString() == "" ? (object)DBNull.Value : lineSegments[19].ToString()),
-            //                                new SqlParameter("@insert_mix_combination", lineSegments[20].ToString() == "" ? (object)DBNull.Value : lineSegments[20].ToString()),
-            //                                new SqlParameter("@drop_location", lineSegments[21].ToString() == "" ? (object)DBNull.Value : lineSegments[21].ToString()),
-            //                                new SqlParameter("@drop_instructions", lineSegments[22].ToString() == "" ? (object)DBNull.Value : lineSegments[22].ToString()),
-            //                                new SqlParameter("@ad_zone", lineSegments[23].ToString() == "" ? (object)DBNull.Value : lineSegments[23].ToString()),
-            //                                new SqlParameter("@preprint_demographic", lineSegments[24].ToString() == "" ? (object)DBNull.Value : lineSegments[24].ToString()),
-            //                                new SqlParameter("@insert_exception_indicator", lineSegments[25].ToString() == "" ? (object)DBNull.Value : lineSegments[25].ToString()),
-            //                                new SqlParameter("@bulk_indicator", lineSegments[26].ToString() == "" ? (object)DBNull.Value : lineSegments[26].ToString()),
-            //                                new SqlParameter("@hand_tie_indicator", lineSegments[27].ToString() == "" ? (object)DBNull.Value : lineSegments[27].ToString()),
-            //                                new SqlParameter("@minimum_bundle_size", lineSegments[28].ToString() == "" ? (object)DBNull.Value : lineSegments[28].ToString()),
-            //                                new SqlParameter("@maximum_bundle_size", lineSegments[29].ToString() == "" ? (object)DBNull.Value : lineSegments[29].ToString()),
-            //                                new SqlParameter("@standard_bundle_size", lineSegments[30].ToString() == "" ? (object)DBNull.Value : lineSegments[30].ToString()),
-            //                                new SqlParameter("@route_name_or_single_copy_location", lineSegments[31].ToString() == "" ? (object)DBNull.Value : lineSegments[31].ToString()),
-            //                                new SqlParameter("@map_reference", lineSegments[32].ToString() == "" ? (object)DBNull.Value : lineSegments[32].ToString()),
-            //                                new SqlParameter("@map_number", lineSegments[33].ToString() == "" ? (object)DBNull.Value : lineSegments[33].ToString()),
-            //                                new SqlParameter("@multipack_id", lineSegments[34].ToString() == "" ? (object)DBNull.Value : lineSegments[34].ToString()),
-            //                                new SqlParameter("@product_route_combination_weight", lineSegments[35].ToString() == "" ? (object)DBNull.Value : lineSegments[35].ToString()),
-            //                                new SqlParameter("@total_drop_weight", lineSegments[36].ToString() == "" ? (object)DBNull.Value : lineSegments[36].ToString()),
-            //                                new SqlParameter("@standard_bundle_weight", lineSegments[37].ToString() == "" ? (object)DBNull.Value : lineSegments[37].ToString()),
-            //                                new SqlParameter("@carrier_id", lineSegments[38].ToString() == "" ? (object)DBNull.Value : lineSegments[38].ToString()),
-            //                                new SqlParameter("@chute_number", lineSegments[39].ToString() == "" ? (object)DBNull.Value : lineSegments[39].ToString()),
-            //                                new SqlParameter("@departure_order", lineSegments[40].ToString() == "" ? (object)DBNull.Value : lineSegments[40].ToString()));
-            //            }
-            //        }
-            //        else if (lineSegments[0] == "R2")
-            //        {
-            //            advanceDetailCounter++;
-
-            //            if (lineSegments.Count() < 15)
-            //                WriteToJobLog(JobLogMessageType.ERROR, $"Error on record # {advanceDetailCounter} . Field count: {lineSegments.Count()}  Line: {line}");
-            //            else
-            //            {
-            //                ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_Advance_Detail",
-            //                            new SqlParameter("@loads_id", loadsId),
-            //                           new SqlParameter("@record_number", advanceDetailCounter),
-            //                           new SqlParameter("@record_type", lineSegments[0].ToString() == "" ? (object)DBNull.Value : lineSegments[0].ToString()),
-            //                           new SqlParameter("@main_product_id", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
-            //                           new SqlParameter("@product_id", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
-            //                           new SqlParameter("@run_type", lineSegments[3].ToString() == "" ? (object)DBNull.Value : lineSegments[3].ToString()),
-            //                           new SqlParameter("@run_date", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
-            //                           new SqlParameter("@truck_id", lineSegments[5].ToString() == "" ? (object)DBNull.Value : lineSegments[5].ToString()),
-            //                           new SqlParameter("@truck_name", lineSegments[6].ToString() == "" ? (object)DBNull.Value : lineSegments[6].ToString()),
-            //                           new SqlParameter("@truck_drop_order", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
-            //                           new SqlParameter("@route_id_or_relay_truck_id", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
-            //                           new SqlParameter("@paper_section", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
-            //                           new SqlParameter("@updraw", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
-            //                           new SqlParameter("@insert_mix_combination", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
-            //                           new SqlParameter("@carrier_id", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
-            //                           new SqlParameter("@chute_number", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()),
-            //                           new SqlParameter("@departure_order", lineSegments[14].ToString() == "" ? (object)DBNull.Value : lineSegments[14].ToString()));
-            //            }
-            //        }
-            //        else if (lineSegments[0] == "R3")
-            //        {
-            //            TMDetailCounter++;
-
-            //            if (lineSegments.Count() < 21)
-            //                WriteToJobLog(JobLogMessageType.ERROR, $"Error on record # {TMDetailCounter} . Field count: {lineSegments.Count()}  Line: {line}");
-            //            else
-            //            {
-            //                ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_TM_Detail",
-            //                           new SqlParameter("@loads_id", loadsId),
-            //                           new SqlParameter("@record_number", TMDetailCounter),
-            //                           new SqlParameter("@record_type", TMDetailCounter),
-            //                           new SqlParameter("@main_product_id", lineSegments[0].ToString() == "" ? (object)DBNull.Value : lineSegments[0].ToString()),
-            //                           new SqlParameter("@product_id", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
-            //                           new SqlParameter("@run_type", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
-            //                           new SqlParameter("@run_date", lineSegments[3].ToString() == "" ? (object)DBNull.Value : lineSegments[3].ToString()),
-            //                           new SqlParameter("@truck_id", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
-            //                           new SqlParameter("@truck_name", lineSegments[5].ToString() == "" ? (object)DBNull.Value : lineSegments[5].ToString()),
-            //                           new SqlParameter("@truck_drop_order", lineSegments[6].ToString() == "" ? (object)DBNull.Value : lineSegments[6].ToString()),
-            //                           new SqlParameter("@route_id_or_relay_truck_id", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
-            //                           new SqlParameter("@tm_product_id", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
-            //                           new SqlParameter("@tm_draw_total", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
-            //                           new SqlParameter("@number_of_standard_bundles", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
-            //                           new SqlParameter("@number_of_key_bundles", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
-            //                           new SqlParameter("@totals_key_draw", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
-            //                           new SqlParameter("@minimum_bundle_size", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()),
-            //                           new SqlParameter("@maximum_bundle_size", lineSegments[14].ToString() == "" ? (object)DBNull.Value : lineSegments[14].ToString()),
-            //                           new SqlParameter("@standard_bundle_size", lineSegments[15].ToString() == "" ? (object)DBNull.Value : lineSegments[15].ToString()),
-            //                           new SqlParameter("@weight", lineSegments[16].ToString() == "" ? (object)DBNull.Value : lineSegments[16].ToString()),
-            //                           new SqlParameter("@standard_bundle_weight", lineSegments[17].ToString() == "" ? (object)DBNull.Value : lineSegments[17].ToString()),
-            //                           new SqlParameter("@carrier_id", lineSegments[18].ToString() == "" ? (object)DBNull.Value : lineSegments[18].ToString()),
-            //                           new SqlParameter("@chute_number", lineSegments[19].ToString() == "" ? (object)DBNull.Value : lineSegments[19].ToString()),
-            //                           new SqlParameter("@departure_order", lineSegments[20].ToString() == "" ? (object)DBNull.Value : lineSegments[20].ToString()));
-            //            }
-            //        }
-            //        else if (lineSegments[0] == "T1")
-            //        {
-            //            truckTotalCounter++;
-
-            //            if (lineSegments.Count() < 26)
-            //                WriteToJobLog(JobLogMessageType.ERROR, $"Error on record # {truckTotalCounter} . Field count: {lineSegments.Count()}  Line: {line}");
-            //            else
-            //            {
-            //                ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_Truck_Totals",
-            //                           new SqlParameter("@loads_id", loadsId),
-            //                           new SqlParameter("@record_number", truckTotalCounter),
-            //                           new SqlParameter("@record_type", lineSegments[0].ToString() == "" ? (object)DBNull.Value : lineSegments[0].ToString()),
-            //                           new SqlParameter("@main_product_id", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
-            //                           new SqlParameter("@product_id", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
-            //                           new SqlParameter("@run_type", lineSegments[3].ToString() == "" ? (object)DBNull.Value : lineSegments[3].ToString()),
-            //                           new SqlParameter("@run_date", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
-            //                           new SqlParameter("@truck_id", lineSegments[5].ToString() == "" ? (object)DBNull.Value : lineSegments[5].ToString()),
-            //                           new SqlParameter("@truck_name", lineSegments[6].ToString() == "" ? (object)DBNull.Value : lineSegments[6].ToString()),
-            //                           new SqlParameter("@insert_mix_combination", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
-            //                           new SqlParameter("@number_of_bundles", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
-            //                           new SqlParameter("@total_draw", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
-            //                           new SqlParameter("@key_draw", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
-            //                           new SqlParameter("@number_of_standard_bundles", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
-            //                           new SqlParameter("@number_of_key_bundles", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
-            //                           new SqlParameter("@bulk_draw_total", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()),
-            //                           new SqlParameter("@bulk_key_draw_total", lineSegments[14].ToString() == "" ? (object)DBNull.Value : lineSegments[14].ToString()),
-            //                           new SqlParameter("@number_of_bulk_standard_bundle_tops", lineSegments[15].ToString() == "" ? (object)DBNull.Value : lineSegments[15].ToString()),
-            //                           new SqlParameter("@number_of_bulk_key_bundle_tops", lineSegments[16].ToString() == "" ? (object)DBNull.Value : lineSegments[16].ToString()),
-            //                           new SqlParameter("@number_of_hand_ties", lineSegments[17].ToString() == "" ? (object)DBNull.Value : lineSegments[17].ToString()),
-            //                           new SqlParameter("@number_of_throwoffs", lineSegments[18].ToString() == "" ? (object)DBNull.Value : lineSegments[18].ToString()),
-            //                           new SqlParameter("@rounded_draw", lineSegments[19].ToString() == "" ? (object)DBNull.Value : lineSegments[19].ToString()),
-            //                           new SqlParameter("@total_weight", lineSegments[20].ToString() == "" ? (object)DBNull.Value : lineSegments[20].ToString()),
-            //                           new SqlParameter("@chute_number", lineSegments[21].ToString() == "" ? (object)DBNull.Value : lineSegments[21].ToString()),
-            //                           new SqlParameter("@drivers_name", lineSegments[22].ToString() == "" ? (object)DBNull.Value : lineSegments[22].ToString()),
-            //                           new SqlParameter("@departure_order", lineSegments[23].ToString() == "" ? (object)DBNull.Value : lineSegments[23].ToString()),
-            //                           new SqlParameter("@extra_1", lineSegments[24].ToString() == "" ? (object)DBNull.Value : lineSegments[24].ToString()),
-            //                           new SqlParameter("@extra_2", lineSegments[25].ToString() == "" ? (object)DBNull.Value : lineSegments[25].ToString()));
-            //            }
-            //        }
-            //        else if (lineSegments[0] == "T2")
-            //        {
-            //            advanceTotalCounter++;
-
-            //            if (lineSegments.Count() < 14)
-            //                WriteToJobLog(JobLogMessageType.ERROR, $"Error on record # {advanceDetailCounter} . Field count: {lineSegments.Count()}  Line: {line}");
-            //            else
-            //            {
-            //                ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_Advance_Totals",
-            //                           new SqlParameter("@loads_id", loadsId),
-            //                           new SqlParameter("@record_number", advanceTotalCounter),
-            //                           new SqlParameter("@record_type", lineSegments[0].ToString() == "" ? (object)DBNull.Value : lineSegments[0].ToString()),
-            //                           new SqlParameter("@main_product_id", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
-            //                           new SqlParameter("@product_id", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
-            //                           new SqlParameter("@run_type", lineSegments[3].ToString() == "" ? (object)DBNull.Value : lineSegments[3].ToString()),
-            //                           new SqlParameter("@run_date", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
-            //                           new SqlParameter("@truck_id", lineSegments[5].ToString() == "" ? (object)DBNull.Value : lineSegments[5].ToString()),
-            //                           new SqlParameter("@truck_name", lineSegments[6].ToString() == "" ? (object)DBNull.Value : lineSegments[6].ToString()),
-            //                           new SqlParameter("@paper_section", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
-            //                           new SqlParameter("@updraw", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
-            //                           new SqlParameter("@chute_number", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
-            //                           new SqlParameter("@drivers_name", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
-            //                           new SqlParameter("@departure_order", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
-            //                           new SqlParameter("@main_product_description", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
-            //                           new SqlParameter("@product_description", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()));
-            //            }
-            //        }
-            //        else if (lineSegments[0] == "T3")
-            //        {
-            //            TMTotalCounter++;
-
-            //            if (lineSegments.Count() < 21)
-            //                WriteToJobLog(JobLogMessageType.ERROR, $"Error on record # {TMTotalCounter} . Field count: {lineSegments.Count()}  Line: {line}");
-            //            else
-            //            {
-            //                ExecuteNonQuery(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Insert_TM_Totals",
-            //                                new SqlParameter("@loads_id", loadsId),
-            //                               new SqlParameter("@record_number", TMTotalCounter),
-            //                               new SqlParameter("@record_type", lineSegments[0].ToString() == "" ? (object)DBNull.Value : lineSegments[0].ToString()),
-            //                               new SqlParameter("@main_product_id", lineSegments[1].ToString() == "" ? (object)DBNull.Value : lineSegments[1].ToString()),
-            //                               new SqlParameter("@product_id", lineSegments[2].ToString() == "" ? (object)DBNull.Value : lineSegments[2].ToString()),
-            //                               new SqlParameter("@run_type", lineSegments[3].ToString() == "" ? (object)DBNull.Value : lineSegments[3].ToString()),
-            //                               new SqlParameter("@run_date", lineSegments[4].ToString() == "" ? (object)DBNull.Value : lineSegments[4].ToString()),
-            //                               new SqlParameter("@truck_id", lineSegments[5].ToString() == "" ? (object)DBNull.Value : lineSegments[5].ToString()),
-            //                               new SqlParameter("@truck_name", lineSegments[6].ToString() == "" ? (object)DBNull.Value : lineSegments[6].ToString()),
-            //                               new SqlParameter("@tm_product_id", lineSegments[7].ToString() == "" ? (object)DBNull.Value : lineSegments[7].ToString()),
-            //                               new SqlParameter("@total_drops", lineSegments[8].ToString() == "" ? (object)DBNull.Value : lineSegments[8].ToString()),
-            //                               new SqlParameter("@total_bundles", lineSegments[9].ToString() == "" ? (object)DBNull.Value : lineSegments[9].ToString()),
-            //                               new SqlParameter("@tm_draw_total", lineSegments[10].ToString() == "" ? (object)DBNull.Value : lineSegments[10].ToString()),
-            //                               new SqlParameter("@total_standard_bundles", lineSegments[11].ToString() == "" ? (object)DBNull.Value : lineSegments[11].ToString()),
-            //                               new SqlParameter("@total_key_bundles", lineSegments[12].ToString() == "" ? (object)DBNull.Value : lineSegments[12].ToString()),
-            //                               new SqlParameter("@tm_total_bulk_draw", lineSegments[13].ToString() == "" ? (object)DBNull.Value : lineSegments[13].ToString()),
-            //                               new SqlParameter("@total_bulk_standard_bundles", lineSegments[14].ToString() == "" ? (object)DBNull.Value : lineSegments[14].ToString()),
-            //                               new SqlParameter("@total_bulk_key_bundles", lineSegments[15].ToString() == "" ? (object)DBNull.Value : lineSegments[15].ToString()),
-            //                               new SqlParameter("@bulk_key_size", lineSegments[16].ToString() == "" ? (object)DBNull.Value : lineSegments[16].ToString()),
-            //                               new SqlParameter("@total_weight", lineSegments[17].ToString() == "" ? (object)DBNull.Value : lineSegments[17].ToString()),
-            //                               new SqlParameter("@chute_number", lineSegments[18].ToString() == "" ? (object)DBNull.Value : lineSegments[18].ToString()),
-            //                               new SqlParameter("@drivers_name", lineSegments[19].ToString() == "" ? (object)DBNull.Value : lineSegments[19].ToString()),
-            //                               new SqlParameter("@departure_order", lineSegments[20].ToString() == "" ? (object)DBNull.Value : lineSegments[20].ToString()));
-            //            }
-            //        }
-            //        else
-            //        {
-            //            ignoredCounter++;
-            //            // WriteToJobLog(JobLogMessageType.ERROR, $"Error on line: {line}");
-            //            //  throw new Exception("File incorrectly formatted, exiting process");
-            //        }
-            //    }
-           // }
-
-            WriteToJobLog(JobLogMessageType.INFO, $"{routeDetailCounter + advanceDetailCounter + advanceTotalCounter + TMDetailCounter + TMTotalCounter + truckTotalCounter} total records read for publishing date {runDate.Value.ToShortDateString() ?? ""} type {runType}");
-            WriteToJobLog(JobLogMessageType.INFO, $"{routeDetailCounter} route detail read.");
-            WriteToJobLog(JobLogMessageType.INFO, $"{advanceDetailCounter} advance detail read.");
-            WriteToJobLog(JobLogMessageType.INFO, $"{advanceTotalCounter} advance total read.");
-            WriteToJobLog(JobLogMessageType.INFO, $"{TMDetailCounter} TM product detail read.");
-            WriteToJobLog(JobLogMessageType.INFO, $"{TMTotalCounter} TM product totals read.");
-            WriteToJobLog(JobLogMessageType.INFO, $"{truckTotalCounter} truck totals read.");
-
+            ExecuteNonQuery(DatabaseConnectionStringNames.DMMail, "Proc_Insert_Loads_Latest",
+                            new SqlParameter("@pintLoadsID", loadsId),
+                            new SqlParameter("@psdatRunDate", publishDate.HasValue ? publishDate.Value.ToShortDateString() : (object)DBNull.Value),
+                            new SqlParameter("@pintRecordCount", lineCounter),
+                            new SqlParameter("@pflgSuccessful", true));
+            WriteToJobLog(JobLogMessageType.INFO, $"Load information updated.");
+           
         }
 
         public override void SetupJob()
