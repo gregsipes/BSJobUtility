@@ -44,6 +44,7 @@
             this.LBLLastRunTime.TabIndex = 16;
             this.LBLLastRunTime.Text = "<Last Run Time>";
             this.LBLLastRunTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LBLLastRunTime.Click += new System.EventHandler(this.LBLLastRunTime_Click);
             // 
             // LblAppName
             // 
@@ -55,6 +56,7 @@
             this.LblAppName.TabIndex = 15;
             this.LblAppName.Text = "<AppName>";
             this.LblAppName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.LblAppName.Click += new System.EventHandler(this.LblAppName_Click);
             // 
             // LEDActivity
             // 
@@ -66,21 +68,22 @@
             this.LEDActivity.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.LEDActivity.TabIndex = 9;
             this.LEDActivity.TabStop = false;
+            this.LEDActivity.Click += new System.EventHandler(this.LEDActivity_Click);
             // 
             // AppStatusUserControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Desktop;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.LBLLastRunTime);
             this.Controls.Add(this.LblAppName);
             this.Controls.Add(this.LEDActivity);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.MaximumSize = new System.Drawing.Size(298, 64);
-            this.MinimumSize = new System.Drawing.Size(298, 64);
+            this.MaximumSize = new System.Drawing.Size(2500, 64);
+            this.MinimumSize = new System.Drawing.Size(200, 24);
             this.Name = "AppStatusUserControl";
-            this.Size = new System.Drawing.Size(298, 64);
+            this.Size = new System.Drawing.Size(198, 62);
+            this.Click += new System.EventHandler(this.AppStatusUserControl_Click);
             ((System.ComponentModel.ISupportInitialize)(this.LEDActivity)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

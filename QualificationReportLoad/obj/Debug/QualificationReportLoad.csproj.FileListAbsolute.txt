@@ -19,3 +19,4 @@ C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\BSGlobal
 C:\projects\Applications\BSJobUtility\QualificationReportLoad\bin\Debug\BSGlobals.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\QualificationReportLoad\bin\Debug\BSGlobals.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\QualificationReportLoad\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\QualificationReportLoad\obj\Debug\QualificationReportLoad.csprojResolveAssemblyReference.cache
