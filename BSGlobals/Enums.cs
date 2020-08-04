@@ -21,6 +21,7 @@ namespace BSGlobals
             BARC,
             Wrappers,
             Manifests,
+            ManifestsFree,
             PBSInvoiceExportLoad,
             QualificationReportLoad,
             OfficePay,
@@ -28,11 +29,14 @@ namespace BSGlobals
             PressRoom,
             PressRoomFree,
             PBSInvoiceTotals,
-            PBSInvoices
+            PBSInvoices,
+            DMMail,
+            PayByScan
         }
 
         public enum JobLogMessageType
         {
+            STARTSTOP = 0,
             INFO = 1,
             WARNING = 2,
             ERROR = 3

@@ -11,3 +11,17 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\AppStatusMonit
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\AppStatusMonitor\obj\Debug\AppStatusMonitor.exe
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\AppStatusMonitor\obj\Debug\AppStatusMonitor.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AppStatusMonitor\bin\Debug\AppStatusMonitor.pdb
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusMonitor.csprojAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusControl.AppStatusUserControl.resources
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusMonitor.frmMain.resources
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusMonitor.Properties.Resources.resources
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusMonitor.csproj.GenerateResource.cache
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusMonitor.csproj.CoreCompileInputs.cache
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusMonitor.exe
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusMonitor.pdb
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\bin\Debug\AppStatusMonitor.exe.config
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\bin\Debug\AppStatusMonitor.exe
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\bin\Debug\AppStatusMonitor.pdb
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\bin\Debug\BSGlobals.dll
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\bin\Debug\BSGlobals.pdb
+C:\projects\Applications\BSJobUtility\AppStatusMonitor\obj\Debug\AppStatusMonitor.csproj.CopyComplete

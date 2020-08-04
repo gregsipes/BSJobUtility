@@ -14,7 +14,7 @@ namespace BSGlobals
                 return (object)DBNull.Value;
             else
             {
-                inputString = inputString.Replace("$", "").Trim();
+                inputString = inputString.Replace("$", "").Replace(",", "").Trim();
 
                 if (inputString.EndsWith("-"))
                     return Decimal.Parse(inputString, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowTrailingSign);

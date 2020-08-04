@@ -41,6 +41,8 @@ namespace BSJobUtility
                 _managedJob = new WrappersLoad.Job();
             else if (_jobName == "ManifestLoad")
                 _managedJob = new ManifestLoad.Job();
+            else if (_jobName == "ManifestFreeLoad")
+                _managedJob = new ManifestFreeLoad.Job();
             else if (_jobName == "ManifestLoadAdvance")
                 _managedJob = new ManifestLoadAdvance.Job();
             else if (_jobName == "PBSInvoiceExportLoad")
@@ -61,6 +63,12 @@ namespace BSJobUtility
                 _managedJob = new PBSInvoiceLoad.Job();
             else if (_jobName == "UnzipNewscycleExportFiles")
                 _managedJob = new UnzipNewscycleExportFiles.Job();
+            else if (_jobName == "DMMail")
+                _managedJob = new DMMail.Job();
+            else if (_jobName == "PayByScanLoadWegmans")
+                _managedJob = new PayByScanLoadWegmans.Job();
+            else if (_jobName == "PayByScanLoad711")
+                _managedJob = new PayByScanLoad711.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

@@ -41,9 +41,13 @@ namespace ManifestLoadAdvance
 
                         if (previouslyLoadedFile == null)
                         {
-                            WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
-                            CopyAndProcessFile(fileInfo);
-                            processedFiles.Add(fileInfo.Name);
+                            //make sure we the file is no longer being edited
+                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                            {
+                                WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                                CopyAndProcessFile(fileInfo);
+                                processedFiles.Add(fileInfo.Name);
+                            }
                         }
                         //else
                         //{

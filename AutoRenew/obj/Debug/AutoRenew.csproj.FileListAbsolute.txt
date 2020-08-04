@@ -17,6 +17,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\obj\
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.pdb
 C:\projects\Applications\BSJobUtility\AutoRenew\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\AutoRenew\bin\Debug\BSGlobals.pdb
-C:\projects\Applications\BSJobUtility\AutoRenew\obj\Debug\AutoRenew.csprojAssemblyReference.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\AutoRenew\bin\Debug\BSGlobals.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\AutoRenew\bin\Debug\BSGlobals.pdb

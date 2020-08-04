@@ -98,6 +98,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.Manifests:
                     connectionString = GetConnectionString("manifests");
                     break;
+                case DatabaseConnectionStringNames.ManifestsFree:
+                    connectionString = GetConnectionString("manifestsfree");
+                    break;
                 case DatabaseConnectionStringNames.PBSInvoiceExportLoad:
                     connectionString = GetConnectionString("pbsinvoiceexport");
                     break;
@@ -121,6 +124,12 @@ namespace BSGlobals
                     break;
                 case DatabaseConnectionStringNames.PBSInvoices:
                     connectionString = GetConnectionString("pbsinvoices");
+                    break;
+                case DatabaseConnectionStringNames.DMMail:
+                    connectionString = GetConnectionString("dmmail");
+                    break;
+                case DatabaseConnectionStringNames.PayByScan:
+                    connectionString = GetConnectionString("paybyscan");
                     break;
                 default:
                     break;
