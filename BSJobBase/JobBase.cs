@@ -86,12 +86,12 @@ namespace BSJobBase
             }
 
             // basic logging
-            WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Job starting");
+            WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting");
         }
 
         public virtual void PostExecuteJob()
         {
-            WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Job completed");
+            WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed");
         }
 
         #endregion

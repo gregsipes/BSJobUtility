@@ -30,11 +30,13 @@ namespace BSGlobals
             PressRoomFree,
             PBSInvoiceTotals,
             PBSInvoices,
-            DMMail
+            DMMail,
+            PayByScan
         }
 
         public enum JobLogMessageType
         {
+            STARTSTOP = 0,
             INFO = 1,
             WARNING = 2,
             ERROR = 3

@@ -65,6 +65,10 @@ namespace BSJobUtility
                 _managedJob = new UnzipNewscycleExportFiles.Job();
             else if (_jobName == "DMMail")
                 _managedJob = new DMMail.Job();
+            else if (_jobName == "PayByScanLoadWegmans")
+                _managedJob = new PayByScanLoadWegmans.Job();
+            else if (_jobName == "PayByScanLoad711")
+                _managedJob = new PayByScanLoad711.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

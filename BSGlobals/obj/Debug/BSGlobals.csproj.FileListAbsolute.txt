@@ -9,3 +9,4 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSGlobals\obj\
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSGlobals\obj\Debug\BSGlobals.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\BSGlobals\obj\Debug\BSGlobals.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSGlobals\obj\Debug\BSGlobals.csprojResolveAssemblyReference.cache
+C:\projects\Applications\BSJobUtility\BSGlobals\obj\Debug\BSGlobals.csprojAssemblyReference.cache

@@ -90,6 +90,14 @@
       <Project>{a175a62f-3230-409d-a1d9-6c63cf332910}</Project>
       <Name>ParkingPayroll</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PayByScanLoad711\PayByScanLoad711.csproj">
+      <Project>{0fcbaede-5d50-4998-b7a4-1733656722a6}</Project>
+      <Name>PayByScanLoad711</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PayByScanLoadWegmans\PayByScanLoadWegmans.csproj">
+      <Project>{d31351eb-64a1-48b8-a407-2c7dc0493b0b}</Project>
+      <Name>PayByScanLoadWegmans</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PBSInvoiceExportLoad\PBSInvoiceExportLoad.csproj">
       <Project>{5e72a50a-0ca6-481b-b937-c54be921d6ce}</Project>
       <Name>PBSInvoiceExportLoad</Name>

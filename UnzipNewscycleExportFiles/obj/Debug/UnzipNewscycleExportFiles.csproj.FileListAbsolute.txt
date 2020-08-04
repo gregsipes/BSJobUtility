@@ -3,7 +3,6 @@ C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\UnzipN
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.dll
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.pdb
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSJobBase.dll.config
-C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csprojAssemblyReference.cache
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csproj.CoreCompileInputs.cache
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.dll
@@ -21,3 +20,4 @@ C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSGlob
 C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\bin\Debug\BSGlobals.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\UnzipNewscycleExportFiles\bin\Debug\BSGlobals.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\UnzipNewscycleExportFiles\bin\Debug\BSGlobals.pdb
+C:\projects\Applications\BSJobUtility\UnzipNewscycleExportFiles\obj\Debug\UnzipNewscycleExportFiles.csprojAssemblyReference.cache
