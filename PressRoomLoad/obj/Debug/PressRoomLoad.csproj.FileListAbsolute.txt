@@ -19,3 +19,4 @@ C:\projects\Applications\BSJobUtility\PressRoomLoad\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\PressRoomLoad\bin\Debug\BSGlobals.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PressRoomLoad\bin\Debug\BSGlobals.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\bsjobutility\PressRoomLoad\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PressRoomLoad\obj\Debug\PressRoomLoad.csprojResolveAssemblyReference.cache

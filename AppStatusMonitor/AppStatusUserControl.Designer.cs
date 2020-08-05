@@ -69,18 +69,17 @@
             // 
             // AppStatusUserControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Desktop;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.LBLLastRunTime);
             this.Controls.Add(this.LblAppName);
             this.Controls.Add(this.LEDActivity);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.MaximumSize = new System.Drawing.Size(298, 64);
-            this.MinimumSize = new System.Drawing.Size(298, 64);
+            this.MaximumSize = new System.Drawing.Size(2500, 64);
+            this.MinimumSize = new System.Drawing.Size(200, 24);
             this.Name = "AppStatusUserControl";
-            this.Size = new System.Drawing.Size(298, 64);
+            this.Size = new System.Drawing.Size(198, 62);
             ((System.ComponentModel.ISupportInitialize)(this.LEDActivity)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

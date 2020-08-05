@@ -10,3 +10,13 @@ C:\projects\Applications\BSJobUtility\PayByScanLoadWegmans\obj\Debug\PayByScanLo
 C:\projects\Applications\BSJobUtility\PayByScanLoadWegmans\obj\Debug\PayByScanLoadWegmans.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\PayByScanLoadWegmans\obj\Debug\PayByScanLoadWegmans.dll
 C:\projects\Applications\BSJobUtility\PayByScanLoadWegmans\obj\Debug\PayByScanLoadWegmans.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\bin\Debug\PayByScanLoadWegmans.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\bin\Debug\PayByScanLoadWegmans.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\obj\Debug\PayByScanLoadWegmans.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\obj\Debug\PayByScanLoadWegmans.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PayByScanLoadWegmans\obj\Debug\PayByScanLoadWegmans.pdb

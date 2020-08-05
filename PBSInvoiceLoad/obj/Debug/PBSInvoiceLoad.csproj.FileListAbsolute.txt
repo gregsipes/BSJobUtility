@@ -17,3 +17,5 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSInvoiceLoad
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSInvoiceLoad\obj\Debug\PBSInvoiceLoad.pdb
 C:\projects\Applications\BSJobUtility\PBSInvoiceLoad\bin\Debug\BSGlobals.dll
 C:\projects\Applications\BSJobUtility\PBSInvoiceLoad\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSInvoiceLoad\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\PBSInvoiceLoad\bin\Debug\BSGlobals.pdb
