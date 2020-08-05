@@ -1,6 +1,0 @@
-C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSGlobals\bin\Release\BSGlobals.dll
-C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSGlobals\bin\Release\BSGlobals.pdb
-C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSGlobals\obj\Release\BSGlobals.csprojResolveAssemblyReference.cache
-C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSGlobals\obj\Release\BSGlobals.csproj.CoreCompileInputs.cache
-C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSGlobals\obj\Release\BSGlobals.dll
-C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSGlobals\obj\Release\BSGlobals.pdb
