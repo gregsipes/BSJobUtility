@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using AppStatusControl;
 using BSGlobals;
+
+// 08-05-20 PEB - V1.0.0.1
 
 namespace AppStatusMonitor
 {
@@ -15,8 +18,7 @@ namespace AppStatusMonitor
         int NumActivitiesPerMonitor = 15;
         int LookbackInDays = 90;
         const string JobName = "App Status Monitor";
-        List<string> AppNameList = new List<string>();
-        List<AppStatusUserControl> StatusMonitorList = new List<AppStatusUserControl>();
+        List<StatusControlType> StatusMonitorList = new List<StatusControlType>();
         int TimerUpdateIntervalInMsec = 10000; // A default value for the timer update interval, which is read from config on startup
         DateTime StartupTime = DateTime.Now;
         Size MonitorSize = new Size(0, 0);
@@ -37,7 +39,7 @@ namespace AppStatusMonitor
             timUpdateStatus.Enabled = true;
 
             SetPanelSize();
-            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Job starting", JobName);
+            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting", JobName);
         }
 
         private void SetPanelSize()
@@ -51,30 +53,31 @@ namespace AppStatusMonitor
             {
                 // First time in:  Initial timer value is 1 msec so that we get a fast initial data load.
                 //   Afterward, set the timer update interval to whatever was read from the config file
+                bool FirstTimeIn = false;
                 if (timUpdateStatus.Interval != TimerUpdateIntervalInMsec)
                 {
-                    GetAppNames(true);  // First time in, set this to true so we load app names all the way back to LookbackInSeconds
+                    FirstTimeIn = true;
                     timUpdateStatus.Interval = TimerUpdateIntervalInMsec;
                 }
-                else
-                {
-                    // Get the names of all apps in the log table (for the last Tick seconds)
-                    GetAppNames(false);  // Al subsequent calls:  Set this to false so we load app names only since the last timer tick.
-                }
 
-                // For each app, get the last N cycles and check for errors originating from within the app.
-                int NumCycles = NumActivitiesPerMonitor;
+                // Get the names of all apps in the log table (for the last Tick seconds)
+                GetAppNames(StatusMonitorList, FirstTimeIn);  // First time in, this is set to true so we load app names all the way back to LookbackInSeconds
 
-                SqlParameter[] ActivityParams = new SqlParameter[3];
-                for (int i = 0; i < AppNameList.Count; i++)
-                {
-                    //  command.Parameters.Add(new SqlParameter("@MessageType", type.ToString("d")));
-                    ActivityParams[0] = new SqlParameter("@pvchrJobName", AppNameList[i]);
-                    ActivityParams[1] = new SqlParameter("@pvintLookbackInDays", LookbackInDays);
-                    ActivityParams[2] = new SqlParameter("@pvintNumCycles", NumCycles);
-                    SqlDataReader rdr = DataIO.ExecuteQuery(Enums.DatabaseConnectionStringNames.EventLogs, CommandType.StoredProcedure, "Proc_Select_Last_N_Activities", ActivityParams); // A misnamed sproc.  Should be N, not 5
-                    UpdateMonitor(rdr, StatusMonitorList[i]);
-                }
+                // For each app, get the last N cycles and check for warnings/errors originating from within the app.
+                //   NOTE that N = 1 EXCEPT for the very first time when we will collect enough data for all configured monitor activities.
+                //     After the first time, we only need to update the latest activity since older ones will never have updates.
+                int NumCycles = (FirstTimeIn) ? NumActivitiesPerMonitor : 1;
+
+                SqlParameter[] ActivityParams = new SqlParameter[2];
+                ActivityParams[0] = new SqlParameter("@pvintLookbackInDays", LookbackInDays);
+                ActivityParams[1] = new SqlParameter("@pvintMaxActivities", NumCycles);
+                SqlDataReader rdr = DataIO.ExecuteQuery(
+                    Enums.DatabaseConnectionStringNames.EventLogs,
+                    CommandType.StoredProcedure,
+                    "Proc_Select_Last_N_Activities_All_Jobs", ActivityParams);
+
+                UpdateMonitors(rdr, StatusMonitorList, FirstTimeIn);
+
             }
             catch (Exception ex)
             {
@@ -84,7 +87,7 @@ namespace AppStatusMonitor
         }
 
 
-        private void GetAppNames(bool firstTime)
+        private void GetAppNames(List<StatusControlType> StatusControlList, bool firstTime)
         {
             try
             {
@@ -124,9 +127,13 @@ namespace AppStatusMonitor
                     // Check if this name is already on the app list.  If not,
                     //    Add it to the list
                     //    Mark that monitors need to be recreated.
-                    if (!AppNameList.Contains(appname))
+                    if (!StatusControlList.Any(n => n.AppName == appname))
                     {
-                        AppNameList.Add(appname);
+                        StatusControlList.Add(new StatusControlType()
+                        {
+                            AppName = appname,
+                            StatusMonitor = new AppStatusUserControl(NumActivitiesPerMonitor, SingleLineMode)
+                        });
                         MonitorsNeedRecreating = true;
                     }
                 }
@@ -137,29 +144,28 @@ namespace AppStatusMonitor
 
                 if (MonitorsNeedRecreating)
                 {
-                    DeleteAllMonitors();
-                    AppNameList.Sort();
-                    foreach (string name in AppNameList)
-                    {
-                        CreateMonitor(name);
-                    }
-                    ArrangeMonitors();
+                    DeleteAllMonitors(StatusControlList);
+                    StatusControlList.OrderBy(x => x.AppName);
+                    CreateMonitors(StatusControlList);
+                    ArrangeMonitors(StatusControlList);
                 }
             }
             catch (Exception ex)
             {
                 DataIO.WriteToJobLog(Enums.JobLogMessageType.ERROR, "GetAppNames: " + ex.ToString(), JobName);
-                // TBD throw new Exception("Error trying to get app names: " + ex.ToString());
             }
         }
 
-        private void ArrangeMonitors()
+        private void ArrangeMonitors(List<StatusControlType> StatusControlList)
         {
+
             try
             {
                 // Arrange the monitors to fit within the frame (with scrolling if necessary)
                 // What's the width of the panel interior and the monitor control?
                 //   And how many controls can we fit within the panel's width?
+                // Monitor size is the same for all monitors. Save it for later use.
+                MonitorSize = new Size(StatusControlList[0].StatusMonitor.Width, StatusControlList[0].StatusMonitor.Height);
                 int panelx = pnlMonitors.Width;
                 int numpanelsacross = panelx / MonitorSize.Width;
                 if (numpanelsacross == 0)
@@ -175,7 +181,7 @@ namespace AppStatusMonitor
                     {
                         if (i * numpanelsacross + j < StatusMonitorList.Count)
                         {
-                            AppStatusUserControl uc = StatusMonitorList[j + i * numpanelsacross];
+                            AppStatusUserControl uc = StatusControlList[j + i * numpanelsacross].StatusMonitor;
                             uc.Left = j * MonitorSize.Width;
                             uc.Top = i * MonitorSize.Height;
                         }
@@ -190,25 +196,21 @@ namespace AppStatusMonitor
             }
         }
 
-        private void CreateMonitor(string name)
+        private void CreateMonitors(List<StatusControlType> StatusControlList)
         {
             try
             {
-                // Create an application monitor, and render it visible
-                AppStatusUserControl uc = new AppStatusUserControl(NumActivitiesPerMonitor, SingleLineMode)
+                // Create the application monitors
+
+                for (int i = 0; i < StatusControlList.Count; i++)
                 {
-                    AppName = name,
-                    Visible = true
-                };
-                StatusMonitorList.Add(uc);
-                this.pnlMonitors.Controls.Add(uc);
+                    StatusControlType sc = StatusControlList[i];
+                    this.pnlMonitors.Controls.Add(sc.StatusMonitor);
 
-                // Monitor size is the same for all monitors. Save it for later use.
-                MonitorSize = new Size(uc.Width, uc.Height);
-
-                // Add a mouseclick event handler so we can use it to toggle between display modes
-                //uc.ucMouse_Click += new EventHandler((sender, e) => ucMouse_Click(sender, e));
-                uc.ucMouse_Click += ucMouse_Click;
+                    // Add a mouseclick event handler so we can use it to toggle between display modes
+                    //uc.ucMouse_Click += new EventHandler((sender, e) => ucMouse_Click(sender, e));
+                    sc.StatusMonitor.ucMouse_Click += ucMouse_Click;
+                }
 
             }
             catch (Exception ex)
@@ -218,32 +220,31 @@ namespace AppStatusMonitor
             }
         }
 
-        private void DeleteAllMonitors()
+        private void DeleteAllMonitors(List<StatusControlType> StatusControlList)
         {
             // Destroy all monitors
             try
             {
-            //foreach (AppStatusUserControl uc in pnlMonitors.Controls)  Can't use this approach because we're deleting controls and will skip some as the control list compresses
-            for (int i = pnlMonitors.Controls.Count - 1; i >= 0; i--)
-            {
-                if (pnlMonitors.Controls[i] is AppStatusUserControl)
+                //foreach (AppStatusUserControl uc in pnlMonitors.Controls)  Can't use this approach because we're deleting controls and will skip some as the control list compresses
+                for (int i = pnlMonitors.Controls.Count - 1; i >= 0; i--)
                 {
-                    AppStatusUserControl uc = (AppStatusUserControl)pnlMonitors.Controls[i];
-                    pnlMonitors.Controls.Remove(uc);
-                    //uc.Dispose(); // Is this needed?  
+                    if (pnlMonitors.Controls[i] is AppStatusUserControl)
+                    {
+                        AppStatusUserControl uc = (AppStatusUserControl)pnlMonitors.Controls[i];
+                        pnlMonitors.Controls.Remove(uc);
+                    }
                 }
-            }
-            StatusMonitorList.Clear();
-            pnlMonitors.Refresh();
+                pnlMonitors.Refresh();
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 DataIO.WriteToJobLog(Enums.JobLogMessageType.ERROR, "DeleteAllMonitors: " + ex.ToString(), JobName);
                 // TBD throw new Exception("Error trying to delete all monitors: " + ex.ToString());
             }
         }
 
-        private void UpdateMonitor(SqlDataReader rdr, AppStatusUserControl appStatusUserControl)
+        private void UpdateMonitors(SqlDataReader rdr, List<StatusControlType> StatusControlList, bool firstTimeIn)
         {
             // Update the selected data monitor
 
@@ -252,144 +253,248 @@ namespace AppStatusMonitor
             //   - A list of all warnings and errors from the jobs that ran during any of those dates
             //   - The app's very last starting/completed message to determine if the app is still running
 
+            // TBD Once we are past initialization we need to determine if the query is pointing to the same job start
+            //   as the last query.  If not we need to push all activities down one and insert the new one at the beginning
+            //   of this job's activity list.
+
             try
             {
                 // First result:  The list of the last N activity dates
-                List<DateTime> ActivityDates = new List<DateTime>();
+                List<LastNRunsType> ActivityDates = new List<LastNRunsType>();
                 while (rdr.Read())
                 {
-                    ActivityDates.Add((DateTime)rdr["LogDate"]);
+                    DateTime js = new DateTime(1900, 01, 01);
+                    try
+                    {
+                        js = (DateTime)rdr["JobStart"];  // A NULL Date will create an exception
+                    }
+                    catch { }
+                    ActivityDates.Add(new LastNRunsType
+                    {
+                        JobStart = js,
+                        JobName = rdr["JobName"].ToString()
+                    });
                 }
 
                 // Second result:  The list of all warnings and errors (containing LogDate, MessageType and Message)
-                List<IssuesType> IssuesList = new List<IssuesType>();
+                List<WarningsErrorsType> IssuesList = new List<WarningsErrorsType>();
                 rdr.NextResult();
                 while (rdr.Read())
                 {
-                    IssuesType issue = new IssuesType
+                    DateTime js = new DateTime(1900, 01, 01);
+                    try
                     {
-                        LogDate = (DateTime)rdr["LogDate"],
-                        MessageType = (int)rdr["MessageType"],
-                        Message = rdr["Message"].ToString()
-                    };
-                    IssuesList.Add(issue);
+                        js = (DateTime)rdr["LogDate"];  // A NULL Date will create an exception
+                    }
+                    catch { }
+                    IssuesList.Add(new WarningsErrorsType
+                    {
+                        LogDate = js,
+                        MessageType = (Enums.JobLogMessageType)rdr["MessageType"],
+                        Message = rdr["Message"].ToString(),
+                        JobName = rdr["JobName"].ToString()
+                    });
                 }
+                IssuesList = IssuesList.OrderBy(x => x.JobName).ThenBy(y => y.LogDate).ToList();
 
                 // Third result:  The app's last starting or completed message.  This will be either zero or one record in length
-                bool AppIsRunning = false;
-                DateTime LastExecutionTime = new DateTime(1900, 01, 01);
+                List<LatestMessageType> LatestMessageList = new List<LatestMessageType>();
                 rdr.NextResult();
                 while (rdr.Read())
                 {
-                    AppIsRunning = (rdr["Message"].ToString() == "Job starting") ? true : false;
-                    LastExecutionTime = (DateTime)rdr["LogDate"];
+                    DateTime js = new DateTime(1900, 01, 01);
+                    try
+                    {
+                        js = (DateTime)rdr["LogDate"];  // A NULL Date will create an exception
+                    }
+                    catch { }
+                    LatestMessageList.Add(new LatestMessageType
+                    {
+                        Message = rdr["Message"].ToString(),
+                        LogDate = js,
+                        JobName = rdr["JobName"].ToString()
+                    });
                 }
+                LatestMessageList = LatestMessageList.OrderBy(x => x.JobName).ThenBy(y => y.LogDate).ToList();
                 rdr.Close();
 
-                Color color = (AppIsRunning) ? Color.White : Color.Blue;
-                appStatusUserControl.SetLEDColor(AppStatusUserControl.LEDs.LEDActivity, 0, color);
-
-                // Determine which activities had errors or warnings
-                List<LEDStatusesType> LEDStatuses = ComputeLEDStatuses(appStatusUserControl, ActivityDates, IssuesList);
-
-                // and light the appropriate leds the appropriate color.
-                for (int i = 0; i < LEDStatuses.Count; i++)
+                // At this point the JobNames listed in the above lists should be in sync with the StatusControlList passed into this function.
+                //   That is, they should all be in sort order.  However, some of the lists read from the database could have missing job names
+                //   so we have to carefully go through these lists.
+                for (int i = 0; i < StatusControlList.Count; i++)
                 {
-                    appStatusUserControl.SetLEDColor(AppStatusUserControl.LEDs.LEDStatus, i, LEDStatuses[i].LEDColor);
+                    // Determine which activities had errors or warnings
+                    StatusControlType uc = StatusControlList[i];
+                    List<WarningsErrorsType> AppIssues = new List<WarningsErrorsType>(IssuesList.FindAll(J => J.JobName == uc.AppName));
+                    List<LastNRunsType> AppActivities = new List<LastNRunsType>(ActivityDates.FindAll(J => J.JobName == uc.AppName));
+                    List<LatestMessageType> AppRunTimeMessage = new List<LatestMessageType>(LatestMessageList.FindAll(J => J.JobName == uc.AppName));
+
+                    // Set LED colors based on no errors (green), warnings (yellow) or errors (red)
+                    List<LEDStatusesType> LEDStatuses = ComputeLEDStatuses(uc.StatusMonitor, AppActivities, AppIssues, firstTimeIn);
+
+                    // Set activity LED color and light the appropriate leds the appropriate color.
+                    Color color = (LatestMessageList[i].Message.ToLower() == "job starting") ? Color.White : Color.Blue;
+                    uc.StatusMonitor.SetLEDColor(AppStatusUserControl.LEDs.LEDActivity, 0, color);
+
+                    // Set the current runtime value to the last execution time in the log
+                    uc.StatusMonitor.RunTime = (AppRunTimeMessage.Count > 0) ? AppRunTimeMessage[0].LogDate : new DateTime(1900, 01, 01);
+                    uc.StatusMonitor.AppName = uc.AppName;
                 }
-                appStatusUserControl.ClearLEDs(LEDStatuses.Count); // This clears (turns off) any remaining LEDs.
-
-                // Set the current runtime value to the last execution time in the log
-
-                appStatusUserControl.RunTime = LastExecutionTime;
             }
             catch (Exception ex)
             {
-                DataIO.WriteToJobLog(Enums.JobLogMessageType.ERROR, "Failed to correctly update monitor " + appStatusUserControl.AppName + ": " + ex.ToString(), JobName);
+                DataIO.WriteToJobLog(Enums.JobLogMessageType.ERROR, "Failed to correctly update monitor: " + ex.ToString(), JobName);
                 // TBD throw new Exception("Error trying to update monitor: " + ex.ToString());
             }
 
         }
 
-        private List<LEDStatusesType> ComputeLEDStatuses(AppStatusUserControl appStatusUserControl, List<DateTime> activityDates, List<IssuesType> issuesList)
+        private List<LEDStatusesType> ComputeLEDStatuses(AppStatusUserControl appStatusUserControl, List<LastNRunsType> activityDates, List<WarningsErrorsType> issuesList, bool firstTime)
         {
             // Take the list of issues and bounce them across the list of activity dates to determine in which date range the issue arose.
             //   Return the appropriate LED color for each activity date
-            // TBD - This can be optimized.  Old LED statuses will never change; only newer ones and any that are currently ongoing.  
-            //   We should take advantage of that to eliminate the redundant efforts to rebuild LED statuses with every update.
+            // This has been optimized.  Old LED statuses will never change; only newer ones and any that are currently ongoing.  
+            //   We took advantage of that to eliminate the redundant efforts to rebuild LED statuses with every update.
+            //   Essentially, the called provides the list activityDates with only the latest activity.
 
             List<LEDStatusesType> LEDStatusList = new List<LEDStatusesType>();
-            for (int i = 0; i < activityDates.Count; i++)
-            {
-                LEDStatusList.Add(new LEDStatusesType());
-            }
-
             try
             {
-                // Find out which activity this issue belongs to
-                for (int j = 0; j < issuesList.Count; j++)
-                {
-                    IssuesType issue = issuesList[j];
-                    for (int i = 0; i < activityDates.Count - 1; i++)
-                    {
-                        // is it activity [i]?
-                        string Messages = "";
-                        if ((issue.LogDate <= activityDates[i]) && (issue.LogDate >= activityDates[i + 1]))
-                        {
-                            // Why yes it is!  Set the activity's LED to either yellow (if it was green) or red (unconditionally) based on the message type.  
-                            Messages = activityDates[i].ToShortDateString() + " " + activityDates[i].ToShortTimeString();
-                            issue.LEDNum = i;
-                            issuesList[j] = issue;  // Save this; we'll use it when hovering over a LED
-                            LEDStatusesType ledstatus = LEDStatusList[i];
-                            switch (issue.MessageType)
-                            {
-                                case 1:
-                                    ledstatus.LEDColor = Color.Green;
-                                    break;
-                                case 2:
-                                    if (ledstatus.LEDColor == Color.Green)
-                                    {
-                                        ledstatus.LEDColor = Color.Yellow;
-                                    }
-                                    break;
-                                case 3:
-                                    ledstatus.LEDColor = Color.Red;
-                                    break;
-                                default:
-                                    break;
-                            }
 
-                            // Save the message as well...
-                            Messages += "\r\n" + issue.Message;  // TBD .Messages is Unnecessary, get rid of it in the class
-                            // And save the status message back to the control for later tool tipping
-                            LEDStatusList[i] = ledstatus;  // TBD Unnecessary
-                            appStatusUserControl.SetLEDMessage(i, Messages);
-                            break;
+                // Initialize:  Assume there are no issues associated with each activity date in the list (i.e, color will be black or green)
+                //   There are NumActivitiesPerMonitor LEDs to color Black, Green, Yellow or Red
+                List<Color> ledcolors = new List<Color>();
+                List<string> messages = new List<string>();
+
+                for (int i = 0; i < activityDates.Count; i++)
+                {
+                    ledcolors.Add(Color.Green);
+                    messages.Add(activityDates[i].JobStart.ToShortDateString() + " " + activityDates[i].JobStart.ToShortTimeString());
+                }
+                for (int i = activityDates.Count; i < NumActivitiesPerMonitor; i++)
+                {
+                    ledcolors.Add(Color.Black);
+                    messages.Add("");
+                }
+
+                // The ActivityDates list is in sorted order by activitydate.  Walk through the list
+                //  and determine the message and color that should be applied to each specific LED in the list.  
+
+                int lastindex = -1;
+                for (int i = 0; i < issuesList.Count; i++)
+                {
+                    // Find the activity (i.e., the LED index) associated with this issue.  It's the activity whose JobStart value
+                    //   is just less than (or equal to) the issue's timestamp.
+
+                    int index = activityDates.FindIndex(x => x.JobStart <= issuesList[i].LogDate);
+
+                    // If this issue is not part of the previous activity, then set the previous activity's message
+                    if ((index != lastindex) && (lastindex != -1))
+                    {
+                        appStatusUserControl.SetLEDMessage(lastindex, messages[lastindex]);
+                    }
+
+                    // For any issue, set the LED color accordingly and update the warning/error message for this LED
+                    //  NOTE that there can be multiple warning/error messages associated with this LED
+                    if (index >= 0)
+                    {
+                        switch (issuesList[i].MessageType)
+                        {
+                            case Enums.JobLogMessageType.STARTSTOP:
+                                break;  // We don't care about the start/stop messages
+                            case Enums.JobLogMessageType.INFO:
+                                break;  // We don't care about Info
+                            case Enums.JobLogMessageType.WARNING:
+                                ledcolors[index] = (ledcolors[index] == Color.Green) ? Color.Yellow : ledcolors[index]; // Turn the LED yellow if still green
+                                break;
+                            case Enums.JobLogMessageType.ERROR:
+                                ledcolors[index] = Color.Red;  // Always turn the LED red on error
+                                break;
+                            default:
+                                break;
                         }
+                        messages[index] += "\r\n" + issuesList[i].Message;
+                        lastindex = index;
+
+                        // last one
+                        if (i == issuesList.Count - 1)
+                        {
+                            appStatusUserControl.SetLEDMessage(lastindex, messages[lastindex]);
+                        }
+                    }
+                }
+
+                // Optimization:  After the initial load, only the latest activity will ever have updated messages so only update that activity.
+                int activitycount = (firstTime) ? NumActivitiesPerMonitor : 1;
+                {
+                    for (int i = 0; i < activitycount; i++)
+                    {
+                        appStatusUserControl.SetLEDColor(AppStatusUserControl.LEDs.LEDStatus, i, ledcolors[i]);
                     }
                 }
             }
             catch (Exception ex)
             {
-                DataIO.WriteToJobLog(Enums.JobLogMessageType.ERROR, "ComputeLEDStatuses: " + ex.ToString(), appStatusUserControl.AppName);
+                DataIO.WriteToJobLog(Enums.JobLogMessageType.ERROR, "ComputeLEDStatuses: " + ex.ToString(), JobName);
                 // TBD throw new Exception("Error trying to update LED status: " + ex.ToString());
             }
+
             return (LEDStatusList);
         }
 
-        private class IssuesType
+        private void ToggleDisplay(List<StatusControlType> StatusControlList)
         {
-            public DateTime LogDate { get; set; }
-            public int MessageType { get; set; }
-            public string Message { get; set; }
-            public int LEDNum { get; set; }
-
-            public IssuesType()
+            // Toggle the display between single line and multiline
+            // This will be the preferred way - faster than deleting/recreating the monitors
+            for (int i = 0; i < StatusMonitorList.Count; i++)
             {
-                LogDate = DateTime.Now;
-                MessageType = 0;
-                Message = "";
-                LEDNum = -1;
+                AppStatusUserControl uc = StatusMonitorList[i].StatusMonitor;
+                uc.ToggleDisplayMode();
+            }
+            ArrangeMonitors(StatusControlList);
+        }
+
+        #region events
+        private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            DateTime StopTime = DateTime.Now;
+            double ElapsedTime = ((TimeSpan)(StopTime - StartupTime)).TotalSeconds;
+            TimeSpan t = TimeSpan.FromSeconds(ElapsedTime);
+            string result = string.Format("{0:D2}h:{1:D2}m:{2:D2}.{3:D3}s", t.Hours, t.Minutes, t.Seconds, t.Milliseconds);
+            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Runtime: " + result, JobName);
+            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed", JobName);
+        }
+
+        private void frmMain_ResizeEnd(object sender, EventArgs e)
+        {
+            // At the end of a form resize, redistribute the existing monitors
+            SetPanelSize();
+            ArrangeMonitors(StatusMonitorList);
+        }
+
+        private void ucMouse_Click(object sender, EventArgs e)
+        {
+            ToggleDisplay(StatusMonitorList);
+        }
+
+        private void pnlMonitors_Click(object sender, EventArgs e)
+        {
+            ToggleDisplay(StatusMonitorList);
+        }
+
+        #endregion
+
+        #region classes
+
+        private class StatusControlType
+        {
+            public string AppName { get; set; }
+            public AppStatusUserControl StatusMonitor { get; set; }
+
+            public StatusControlType()
+            {
+                AppName = "";
+                StatusMonitor = null; // new AppStatusUserControl();
             }
         }
 
@@ -402,64 +507,29 @@ namespace AppStatusMonitor
             }
         }
 
-        private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
+        private class LastNRunsType
         {
-            DateTime StopTime = DateTime.Now;
-            double ElapsedTime = ((TimeSpan)(StopTime - StartupTime)).TotalSeconds;
-            TimeSpan t = TimeSpan.FromSeconds(ElapsedTime);
-            string result = string.Format("{0:D2}h:{1:D2}m:{2:D2}.{3:D3}s", t.Hours, t.Minutes, t.Seconds, t.Milliseconds);
-            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Runtime: " + result, JobName);
-            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Job completed", JobName);
+            public DateTime JobStart { get; set; }
+            public string JobName { get; set; }
         }
 
-        private void frmMain_ResizeEnd(object sender, EventArgs e)
+        private class WarningsErrorsType
         {
-            // At the end of a form resize, redistribute the existing monitors
-            SetPanelSize();
-            ArrangeMonitors();
+            public DateTime LogDate { get; set; }
+            public Enums.JobLogMessageType MessageType { get; set; }
+            public string Message { get; set; }
+            public string JobName { get; set; }
+            public int LEDNum { get; set; }
         }
 
-        private void AppStatusMonitor_Hover(object sender, EventArgs e)
+        private class LatestMessageType
         {
-            // TBD THIS IS OBSOLETE (NEVER HIT AND NOT NEEDED)
-            // Mouse just hovered over a LED.  Get the LED's index and the name of the app that triggered this event
-            AppStatusUserControl uc = (AppStatusUserControl)sender;
-            int lednum = uc.LEDNum;
-            string appname = uc.AppName;
-            string msg = uc.GetLEDMessage(lednum);
+            public DateTime LogDate { get; set; }
+            public string Message { get; set; }
+            public string JobName { get; set; }
         }
 
-        private void ucMouse_Click(object sender, EventArgs e)
-        {
-            ToggleDisplay();
-        }
+        #endregion
 
-        private void pnlMonitors_Click(object sender, EventArgs e)
-        {
-            ToggleDisplay();
-        }
-
-        private void ToggleDisplay()
-        {
-            // Toggle the display between single line and multiline
-#if false
-            // TBD This will be the preferred way - faster
-            for (int i = 0; i < StatusMonitorList.Count; i++)
-            {
-                AppStatusUserControl uc = StatusMonitorList[i];
-                uc.ToggleDisplayMode();
-            }
-#else
-            // This needs to be optimized as above - this method has way more overhead
-            SingleLineMode = !SingleLineMode;
-            DeleteAllMonitors();
-            AppNameList.Sort();
-            foreach (string name in AppNameList)
-            {
-                CreateMonitor(name);
-            }
-            ArrangeMonitors();
-#endif
-        }
     }
 }

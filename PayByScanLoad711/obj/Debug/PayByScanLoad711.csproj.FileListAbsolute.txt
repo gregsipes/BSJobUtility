@@ -9,4 +9,3 @@ C:\projects\Applications\BSJobUtility\PayByScanLoad711\bin\Debug\BSJobBase.dll.c
 C:\projects\Applications\BSJobUtility\PayByScanLoad711\obj\Debug\PayByScanLoad711.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\PayByScanLoad711\obj\Debug\PayByScanLoad711.dll
 C:\projects\Applications\BSJobUtility\PayByScanLoad711\obj\Debug\PayByScanLoad711.pdb
-C:\projects\Applications\BSJobUtility\PayByScanLoad711\obj\Debug\PayByScanLoad711.csprojAssemblyReference.cache

@@ -60,7 +60,6 @@ namespace AppStatusControl
 
             SingleLine = singleLine;
             CreateLEDs(numLedsToBuild);
-            //ucMouse_Click += new EventHandler(OnMouse_Click);
             ucMouse_Click += OnMouse_Click;
 
             // Some dynamics:  Logic to stretch/shape this control based on the number of LEDs, text width and
@@ -144,9 +143,9 @@ namespace AppStatusControl
             ClearLEDs(firstLED, NumLEDsToBuild);
         }
 
-        public void ClearLEDs (int firstLED, int lastLED)
+        public void ClearLEDs(int firstLED, int lastLED)
         {
-            for (int i = firstLED; i < lastLED; i++)  
+            for (int i = firstLED; i < lastLED; i++)
             {
                 SetLEDColor(LEDs.LEDStatus, i, Color.Black);
             }
@@ -185,7 +184,7 @@ namespace AppStatusControl
                     pic.BackColor = LEDcolor;
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 // TBD - No exception should ever occur here unless we run out of streams or some odd thing like that.            
             }
@@ -231,7 +230,8 @@ namespace AppStatusControl
                 try
                 {
                     dt = DateTime.Parse(LBLLastRunTime.Text);
-                } catch (Exception ex)
+                }
+                catch
                 {
                     dt = DateTime.MinValue;
                 }
@@ -251,7 +251,7 @@ namespace AppStatusControl
             }
         }
 
-#region Events
+        #region Events
         private void Mouse_Hover(object sender, EventArgs e)
         {
             // Generate a tool tip if this LED has attached messages
@@ -278,30 +278,6 @@ namespace AppStatusControl
             // Expose a mouse click to the outside
             ucMouse_Click(sender, e);
         }
-
-        private void LEDActivity_Click(object sender, EventArgs e)
-        {
-            //
-            OnMouse_Click(sender, e);
-        }
-
-        private void LblAppName_Click(object sender, EventArgs e)
-        {
-            //
-            OnMouse_Click(sender, e);
-        }
-
-        private void LBLLastRunTime_Click(object sender, EventArgs e)
-        {
-            //
-            OnMouse_Click(sender, e);
-        }
         #endregion
-
-        private void AppStatusUserControl_Click(object sender, EventArgs e)
-        {
-            //
-            OnMouse_Click(sender, e);
-        }
     }
 }

@@ -9,4 +9,3 @@ C:\projects\Applications\BSJobUtility\ManifestFreeLoad\obj\Debug\ManifestFreeLoa
 C:\projects\Applications\BSJobUtility\ManifestFreeLoad\obj\Debug\ManifestFreeLoad.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\ManifestFreeLoad\obj\Debug\ManifestFreeLoad.dll
 C:\projects\Applications\BSJobUtility\ManifestFreeLoad\obj\Debug\ManifestFreeLoad.pdb
-C:\projects\Applications\BSJobUtility\ManifestFreeLoad\obj\Debug\ManifestFreeLoad.csprojAssemblyReference.cache

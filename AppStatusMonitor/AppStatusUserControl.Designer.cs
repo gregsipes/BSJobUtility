@@ -44,7 +44,6 @@
             this.LBLLastRunTime.TabIndex = 16;
             this.LBLLastRunTime.Text = "<Last Run Time>";
             this.LBLLastRunTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.LBLLastRunTime.Click += new System.EventHandler(this.LBLLastRunTime_Click);
             // 
             // LblAppName
             // 
@@ -56,7 +55,6 @@
             this.LblAppName.TabIndex = 15;
             this.LblAppName.Text = "<AppName>";
             this.LblAppName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.LblAppName.Click += new System.EventHandler(this.LblAppName_Click);
             // 
             // LEDActivity
             // 
@@ -68,7 +66,6 @@
             this.LEDActivity.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.LEDActivity.TabIndex = 9;
             this.LEDActivity.TabStop = false;
-            this.LEDActivity.Click += new System.EventHandler(this.LEDActivity_Click);
             // 
             // AppStatusUserControl
             // 
@@ -83,7 +80,6 @@
             this.MinimumSize = new System.Drawing.Size(200, 24);
             this.Name = "AppStatusUserControl";
             this.Size = new System.Drawing.Size(198, 62);
-            this.Click += new System.EventHandler(this.AppStatusUserControl_Click);
             ((System.ComponentModel.ISupportInitialize)(this.LEDActivity)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
