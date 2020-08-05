@@ -58,7 +58,7 @@ namespace PayByScanLoadWegmans
                         }
                         //else
                         //{
-                        //    ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoiceExportLoad, "Proc_Insert_Loads_Not_Loaded",
+                        //    ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Insert_Loads_Not_Loaded",
                         //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
                         //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                         //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
@@ -79,19 +79,13 @@ namespace PayByScanLoadWegmans
 
         private void CopyAndProcessFile(FileInfo fileInfo, Dictionary<string, object> loadFormat)
         {
-            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".txt";
+            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name.Replace(".csv", "") + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".csv";
             Int32 loadsId = 0;
 
 
             //copy file to backup directory
             File.Copy(fileInfo.FullName, backupFileName, true);
             WriteToJobLog(JobLogMessageType.INFO, "File copied to " + backupFileName);
-
-
-            ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Update_Loads_Backup",
-                                new SqlParameter("@pintLoadsID", loadsId),
-                                new SqlParameter("@pvchrBackupDirectory", GetConfigurationKeyValue("BackupDirectory")),
-                                new SqlParameter("@pvchrBackupFile", fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".txt"));
 
 
             //update or create a load id
@@ -105,6 +99,11 @@ namespace PayByScanLoadWegmans
             loadsId = Int32.Parse(result["loads_id"].ToString());
             WriteToJobLog(JobLogMessageType.INFO, $"Loads ID: {loadsId}");
 
+
+            ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Update_Loads_Backup",
+                    new SqlParameter("@pintLoadsID", loadsId),
+                    new SqlParameter("@pvchrBackupDirectory", GetConfigurationKeyValue("BackupDirectory")),
+                    new SqlParameter("@pvchrBackupFile", fileInfo.Name.Replace(".csv", "") + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".csv"));
 
             //parse file and store contents
             List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
@@ -139,7 +138,7 @@ namespace PayByScanLoadWegmans
                 lineNumber++;
             }
 
-            WriteToJobLog(JobLogMessageType.INFO, $"{lineNumber - 1} total records read.");
+            WriteToJobLog(JobLogMessageType.INFO, $"{lineNumber - 2} total records read.");
 
             ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Insert_Wegmans",
                                 new SqlParameter("@pintLoadsID", loadsId),
@@ -151,9 +150,15 @@ namespace PayByScanLoadWegmans
 
             ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Update_Loads_Data_Record_Count",
                     new SqlParameter("@pintLoadsID", loadsId),
-                    new SqlParameter("@pintDataRecordCount", lineNumber - 1),
+                    new SqlParameter("@pintDataRecordCount", lineNumber - 2),
                     new SqlParameter("@pflgSuccessfulLoad", true));
 
+            WriteToJobLog(JobLogMessageType.INFO, $"Load information updated.");
+
+            ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Delete_Wegmans_Work",
+                    new SqlParameter("@pintLoadsID", loadsId));
+
+            WriteToJobLog(JobLogMessageType.INFO, $"Work records deleted.");
 
         }
     }

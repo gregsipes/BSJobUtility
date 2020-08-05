@@ -184,7 +184,7 @@ namespace AppStatusControl
                     pic.BackColor = LEDcolor;
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 // TBD - No exception should ever occur here unless we run out of streams or some odd thing like that.            
             }
@@ -231,7 +231,7 @@ namespace AppStatusControl
                 {
                     dt = DateTime.Parse(LBLLastRunTime.Text);
                 }
-                catch (Exception ex)
+                catch
                 {
                     dt = DateTime.MinValue;
                 }
