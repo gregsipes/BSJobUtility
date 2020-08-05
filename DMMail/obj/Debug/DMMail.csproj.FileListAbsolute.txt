@@ -9,3 +9,4 @@ C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CoreCompile
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.dll
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.pdb
+C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csprojAssemblyReference.cache
