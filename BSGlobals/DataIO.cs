@@ -104,51 +104,64 @@ namespace BSGlobals
 
         private static List<Dictionary<string, object>> ExecuteSQLQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
         {
-
-            List<Dictionary<string, object>> rowsToReturn = new List<Dictionary<string, object>>();
-
-            using (SqlDataReader reader = ExecuteQuery(connectionStringName, commandType, commandText, parameters))
+            try
             {
-                while (reader.Read())
+                List<Dictionary<string, object>> rowsToReturn = new List<Dictionary<string, object>>();
+
+                using (SqlDataReader reader = ExecuteQuery(connectionStringName, commandType, commandText, parameters))
                 {
-                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
-
-                    for (int i = 0; i < reader.FieldCount; i++)
+                    while (reader.Read())
                     {
-                        dictionary.Add(reader.GetName(i), reader.GetValue(i));
+                        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            dictionary.Add(reader.GetName(i), reader.GetValue(i));
+                        }
+
+                        rowsToReturn.Add(dictionary);
                     }
-
-                    rowsToReturn.Add(dictionary);
                 }
-            }
 
-            return rowsToReturn;
+                return rowsToReturn;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error executing query with Dictionary. {ex.Message}");
+            }
         }
 
         public static SqlDataReader ExecuteQuery(DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
         {
-            using (SqlCommand command = new SqlCommand())
+            try
             {
-                command.Connection = new SqlConnection(Config.GetConnectionStringTo(connectionStringName));
-                command.CommandType = commandType;
-                command.CommandText = commandText;
-
-                if (parameters != null)
+                using (SqlCommand command = new SqlCommand())
                 {
-                    foreach (var param in parameters)
+                    command.Connection = new SqlConnection(Config.GetConnectionStringTo(connectionStringName));
+                    command.CommandType = commandType;
+                    command.CommandText = commandText;
+
+                    if (parameters != null)
                     {
-                        command.Parameters.Add(param);  //new SqlParameter(param.Key, param.Value)
+                        foreach (var param in parameters)
+                        {
+                            command.Parameters.Add(param);  //new SqlParameter(param.Key, param.Value)
+                        }
                     }
+                    command.Connection.Open();
+
+                    //https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand?redirectedfrom=MSDN&view=netframework-4.6
+                    // When using CommandBehavior.CloseConnection, the connection will be closed when the 
+                    // IDataReader is closed.
+                    SqlDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
+
+                    return reader;
                 }
-                command.Connection.Open();
-
-                //https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand?redirectedfrom=MSDN&view=netframework-4.6
-                // When using CommandBehavior.CloseConnection, the connection will be closed when the 
-                // IDataReader is closed.
-                SqlDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
-
-                return reader;
-
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error executing query with DataReader. {ex.Message}");
             }
         }
     }
