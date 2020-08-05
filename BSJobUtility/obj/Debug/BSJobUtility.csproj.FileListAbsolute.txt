@@ -123,3 +123,11 @@ C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PayByScanLoad711.dl
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PayByScanLoadWegmans.dll
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PayByScanLoad711.pdb
 C:\projects\Applications\BSJobUtility\BSJobUtility\bin\Debug\PayByScanLoadWegmans.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\DMMail.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\ManifestFreeLoad.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PayByScanLoad711.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PayByScanLoadWegmans.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\DMMail.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\ManifestFreeLoad.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PayByScanLoad711.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\BSJobUtility\bin\Debug\PayByScanLoadWegmans.pdb
