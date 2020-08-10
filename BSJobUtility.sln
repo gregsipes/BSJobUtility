@@ -51,10 +51,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayByScanLoadWegmans", "Pay
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PayByScanLoad711", "PayByScanLoad711\PayByScanLoad711.csproj", "{0FCBAEDE-5D50-4998-B7A4-1733656722A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrepackInsertLoad", "PrepackInsertLoad\PrepackInsertLoad.csproj", "{6BF0E083-AC26-4C65-A539-8823C65C3F7B}"
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -152,6 +151,10 @@ Global
 		{0FCBAEDE-5D50-4998-B7A4-1733656722A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FCBAEDE-5D50-4998-B7A4-1733656722A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FCBAEDE-5D50-4998-B7A4-1733656722A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF0E083-AC26-4C65-A539-8823C65C3F7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF0E083-AC26-4C65-A539-8823C65C3F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF0E083-AC26-4C65-A539-8823C65C3F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF0E083-AC26-4C65-A539-8823C65C3F7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,8 +179,12 @@ Global
 		{8C9F48E7-4657-4917-A999-838260BF1784} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{D31351EB-64A1-48B8-A407-2C7DC0493B0B} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{0FCBAEDE-5D50-4998-B7A4-1733656722A6} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{6BF0E083-AC26-4C65-A539-8823C65C3F7B} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

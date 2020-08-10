@@ -131,6 +131,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.PayByScan:
                     connectionString = GetConnectionString("paybyscan");
                     break;
+                case DatabaseConnectionStringNames.PrepackInsertLoad:
+                    connectionString = GetConnectionString("prepackinserts");
+                    break;
                 default:
                     break;
             }

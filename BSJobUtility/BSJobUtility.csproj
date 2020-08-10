@@ -114,6 +114,10 @@
       <Project>{564e163f-1504-4c49-8cde-251aa50b5e44}</Project>
       <Name>PBSMacrosLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PrepackInsertLoad\PrepackInsertLoad.csproj">
+      <Project>{6bf0e083-ac26-4c65-a539-8823c65c3f7b}</Project>
+      <Name>PrepackInsertLoad</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PressRoomFreeLoad\PressRoomFreeLoad.csproj">
       <Project>{fd252a6f-65a4-4e97-93ff-7eb0ad5f5a0c}</Project>
       <Name>PressRoomFreeLoad</Name>
