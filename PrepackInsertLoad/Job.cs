@@ -99,18 +99,13 @@ namespace PrepackInsertLoad
             string mixName = "";
             string quantity = "";
             Int32 lineNumber = 1;
+
             //parse file and store contents
             List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
 
 
             foreach (string line in fileContents)
             {
-                //test code
-                //if (line.Contains("2PKG0719-0005  122.0000     9,896 14052        2,070 ORVILLES **ORVILLES WRAP"))
-                //{
-                //    var x = 2 + 1;
-                //}
-
                 if (line.Trim() != "")
                 {
                     if (line.Contains("ALL EDITIONS, ")) //this means that we are on a new page
