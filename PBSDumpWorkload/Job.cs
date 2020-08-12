@@ -124,6 +124,25 @@ namespace PBSDumpWorkload
                                  new SqlParameter("@pintLoadsDumpControlID", loadsId),
                                  new SqlParameter("@pvchrBNTimeStamp", fileInfo.LastWriteTime));
 
+            ProcessFile(fileInfo);
+
+        }
+
+        private void ProcessFile(FileInfo fileInfo)
+        {
+            WriteToJobLog(JobLogMessageType.INFO, $"Reading {fileInfo.Name}");
+
+            if (fileInfo.Length > 0)
+            {
+                List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
+
+                foreach (string line in fileContents)
+                {
+                    List<string> segments = line.Split('|').ToList();
+
+
+                }
+            }
         }
     }
 }
