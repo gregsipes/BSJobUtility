@@ -71,6 +71,8 @@ namespace BSJobUtility
                 _managedJob = new PayByScanLoad711.Job();
             else if (_jobName == "PrepackInsertLoad")
                 _managedJob = new PrepackInsertLoad.Job();
+            else if (_jobName == "PBSDumpWorkload")
+                _managedJob = new PBSDumpWorkload.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

@@ -98,6 +98,10 @@
       <Project>{d31351eb-64a1-48b8-a407-2c7dc0493b0b}</Project>
       <Name>PayByScanLoadWegmans</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBSDumpWorkload\PBSDumpWorkload.csproj">
+      <Project>{7cd71798-c122-4145-a08e-506a88273108}</Project>
+      <Name>PBSDumpWorkload</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PBSInvoiceExportLoad\PBSInvoiceExportLoad.csproj">
       <Project>{5e72a50a-0ca6-481b-b937-c54be921d6ce}</Project>
       <Name>PBSInvoiceExportLoad</Name>

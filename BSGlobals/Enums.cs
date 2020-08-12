@@ -32,7 +32,8 @@ namespace BSGlobals
             PBSInvoices,
             DMMail,
             PayByScan,
-            PrepackInsertLoad
+            PrepackInsertLoad,
+            CircDumpWork
         }
 
         public enum JobLogMessageType
