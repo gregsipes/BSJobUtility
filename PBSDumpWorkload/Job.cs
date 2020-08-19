@@ -412,10 +412,48 @@ namespace PBSDumpWorkload
 
                 dictionary.Add("FieldLength", 0); //this will get updated in the next loop
                 dictionary.Add("ColumnName", segments[0].ToString());
+
+                columnDefinitions.Add(dictionary);
             }
 
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, CommandType.Text,
+                                                                    "SELECT ORDINAL_POSITION, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = 'CircDump_Work' AND TABLE_NAME = '@TableName'",
+                                                                    new SqlParameter("@TableName", table["TableName"].ToString());
 
-
+            foreach (Dictionary<string, object> result in results)
+            {
+                foreach (Dictionary<string, object> columnDefinition in columnDefinitions)
+                {
+                    if (columnDefinition["ColumnName"].ToString() == result["COLUMN_NAME"].ToString())
+                    {
+                        switch (result["DATA_TYPE"].ToString())
+                        {
+                            case "int":
+                                columnDefinition["FieldLength"] = 12;
+                                break;
+                            case "bigint":
+                                columnDefinition["FieldLength"] = 19;
+                                break;
+                            case "datetime":
+                            case "smalldatetime":
+                                columnDefinition["FieldLength"] = 24;
+                                break;
+                            case "bit":
+                                columnDefinition["FieldLength"] = 1;
+                                break;
+                            case "money":
+                                columnDefinition["FieldLength"] = 30;
+                                break;
+                            case "decimal":
+                                columnDefinition["FieldLength"] = 41;
+                                break;
+                            case "tinyint":
+                                columnDefinition["FieldLength"] = 5;
+                                break;
+                        }
+                    }
+                }
+            }
 
         }
     }
