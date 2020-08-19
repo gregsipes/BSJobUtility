@@ -286,12 +286,6 @@ namespace PBSInvoiceLoad
                             if (printTypeIdentifier == "Invoice")
                                 invoiceNumber = line.Substring(line.IndexOf("INVOICE NO. :")).Replace("INVOICE NO. :", "").Trim();
 
-                            //test code
-                            if (invoiceNumber == "10423577")
-                            {
-                                var x = 2 + 1;
-                            }
-
                             break;
                         case 6:
                             billingTerms = line.Trim();

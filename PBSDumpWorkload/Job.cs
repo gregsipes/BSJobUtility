@@ -1,6 +1,7 @@
 ﻿using BSJobBase;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -318,12 +319,103 @@ namespace PBSDumpWorkload
                     //Here is where the actual data import takes place, via a bulk insert.
                     if (atleastOneWorkToLoad)
                     {
+                        string bulkInsertDirectory = GetConfigurationKeyValue("OutputDirectory") + GetConfigurationKeyValue("Abbreviation") + "\\" + DateTime.Now.ToString("yyyymmddhhnnssms") + "\\";
+                        Directory.CreateDirectory(bulkInsertDirectory);
+                        Directory.CreateDirectory(bulkInsertDirectory + "Config\\");
+                        Directory.CreateDirectory(bulkInsertDirectory + "Data\\");
 
+                        WriteToJobLog(JobLogMessageType.INFO, $"Bulk insert related files will be created in {bulkInsertDirectory}Config\\");
+                        WriteToJobLog(JobLogMessageType.INFO, $".data files will be copied to {bulkInsertDirectory}Data\\");
+
+
+                        foreach (Dictionary<string, object> table in tables)
+                        {
+                            ImportTable(table, fileInfo, loadsId);
+                        }
                     }
 
 
                 }
             }
+
+        }
+
+        private void ImportTable(Dictionary<string, object> table, FileInfo fileInfo, Int32 loadsId)
+        {
+            string errorFile = fileInfo.DirectoryName + table["FileNameWithoutExtension"] + ".error";
+
+            if (File.Exists(errorFile))
+            {
+                WriteToJobLog(JobLogMessageType.ERROR, $"Table {table["TableName"]}: .error file ({errorFile}) exists");
+
+                //todo: add file to list of files to delete
+
+                string errorContents = File.ReadAllText(errorFile);
+                throw new Exception($"Table {table["TableName"]}: Error in dump from Circulation: {errorContents}");
+
+            }
+
+            string timeStampFile = fileInfo.DirectoryName + table["FileNameWithoutExtension"] + ".timestamp";
+            
+            //todo: add file to list of files to delete
+
+            WriteToJobLog(JobLogMessageType.INFO, $"Verifying {timeStampFile} ");
+
+            string timeStampFileContents = File.ReadAllText(timeStampFile);
+
+            DateTime timeStampDate;
+            if (!DateTime.TryParse(timeStampFile, out timeStampDate))
+                throw new Exception($"Unable to determine table's timestamp ({timeStampFileContents}) for table");
+            else if (fileInfo.LastAccessTime != timeStampDate)
+                throw new Exception($"Table's timestamp ({timeStampDate.ToString()}) does not match dump control's timestamp ({fileInfo.LastAccessTime}) for table {table["TableName"]}");
+
+            WriteToJobLog(JobLogMessageType.INFO, $"Preparing to load {table["TableName"]}");
+
+            if (Int32.Parse(table["LoadsTableID"].ToString()) == 0)
+            {
+                //todo: this must not get hit; the parameters in the code don't match the sproc
+               Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "Proc_Insert_BN_Loads_Tables",
+                                                                new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
+                                                                new SqlParameter("@pbintLoadsDumpControlID", loadsId),
+                                                                new SqlParameter("@pvchrTableDumpStartDateTime", table["TableDumpStartDateTime"].ToString()),
+                                                                new SqlParameter("@pvchrFromDate", table["FromDate"].ToString()),
+                                                                new SqlParameter("@pvchrArchiveEndingDate", table["ArchiveEndingDate"].ToString()),
+                                                                new SqlParameter("@pflgUpdateTranNumberControlFileAfterPopulate", table["UpdateTranNumberFileAfterSuccessfulPopulate"].ToString())).FirstOrDefault();
+                table["LoadsTableID"] = result["loads_table_id"];
+            }
+            else
+            {
+                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, "Proc_Update_BN_Loads_Tables",
+                                                             new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
+                                                             new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
+                                                             new SqlParameter("@pvchrFile", fileInfo.Name),
+                                                             new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
+            }
+
+            WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({fileInfo.LastAccessTime})");
+
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{fileInfo.LastAccessTime}'");
+
+            string headerFile = fileInfo.DirectoryName + table["FileNameWithoutExtension"] + ".heading";
+
+            //todo: add file to list of files to delete
+
+            WriteToJobLog(JobLogMessageType.INFO, $"Reading {headerFile}");
+
+            List<string> fileContents = File.ReadAllLines(headerFile).ToList();
+            List<Dictionary<string, object>> columnDefinitions = new List<Dictionary<string, object>>();
+
+            foreach (string line in fileContents)
+            {
+                List<string> segments = line.Split('|').ToList();
+                Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+                dictionary.Add("FieldLength", 0); //this will get updated in the next loop
+                dictionary.Add("ColumnName", segments[0].ToString());
+            }
+
+
+
 
         }
     }

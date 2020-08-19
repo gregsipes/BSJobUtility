@@ -140,6 +140,18 @@ namespace PayByScanLoadWegmans
 
             WriteToJobLog(JobLogMessageType.INFO, $"{lineNumber - 2} total records read.");
 
+            //if any new upc codes exist, send a warning email to manually update the editions field in the upc_codes table, linking to the appropriate edition
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.PayByScan, "Proc_Select_New_UPC_Codes",
+                                 new SqlParameter("@pintLoadsID", loadsId)).ToList();
+
+            if (results.Count() > 0)
+            {
+                List<string> codes = results.Select(r => r["item_description"].ToString()).ToList();
+                string newUPCCodes = String.Join(",", codes);
+                SendMail("PayByScan Wegmans - new UPC Code(s) detected", $"New Wegmans UPC code(s) ({newUPCCodes}) has been added to PayByScan.  Please update the editions field in the UPC_Codes table to link it to the appropriate edition.", false);
+            }
+            
+
             ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Insert_Wegmans",
                                 new SqlParameter("@pintLoadsID", loadsId),
                                 new SqlParameter("@pvchrPBSInvoiceExportServerInstance", GetConfigurationKeyValue("RemoteServerInstance")),
