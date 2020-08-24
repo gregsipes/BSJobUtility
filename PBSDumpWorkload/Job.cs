@@ -418,7 +418,7 @@ namespace PBSDumpWorkload
 
             List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, CommandType.Text,
                                                                     "SELECT ORDINAL_POSITION, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = 'CircDump_Work' AND TABLE_NAME = '@TableName'",
-                                                                    new SqlParameter("@TableName", table["TableName"].ToString());
+                                                                    new SqlParameter("@TableName", table["TableName"].ToString()));
 
             foreach (Dictionary<string, object> result in results)
             {

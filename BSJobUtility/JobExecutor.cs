@@ -73,6 +73,8 @@ namespace BSJobUtility
                 _managedJob = new PrepackInsertLoad.Job();
             else if (_jobName == "PBSDumpWorkload")
                 _managedJob = new PBSDumpWorkload.Job();
+            else if (_jobName == "TestJob")
+                _managedJob = new TestJob.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

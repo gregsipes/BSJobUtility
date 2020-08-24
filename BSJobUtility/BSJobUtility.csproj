@@ -134,6 +134,10 @@
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestJob\TestJob.csproj">
+      <Project>{428258fe-950a-4ffd-883c-7faea65e05b3}</Project>
+      <Name>TestJob</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UnzipNewscycleExportFiles\UnzipNewscycleExportFiles.csproj">
       <Project>{5908ef09-95b9-4ec0-91c2-a404c8545853}</Project>
       <Name>UnzipNewscycleExportFiles</Name>

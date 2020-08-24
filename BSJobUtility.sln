@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrepackInsertLoad", "Prepac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBSDumpWorkload", "PBSDumpWorkload\PBSDumpWorkload.csproj", "{7CD71798-C122-4145-A08E-506A88273108}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestJob", "TestJob\TestJob.csproj", "{428258FE-950A-4FFD-883C-7FAEA65E05B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +163,10 @@ Global
 		{7CD71798-C122-4145-A08E-506A88273108}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CD71798-C122-4145-A08E-506A88273108}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CD71798-C122-4145-A08E-506A88273108}.Release|Any CPU.Build.0 = Release|Any CPU
+		{428258FE-950A-4FFD-883C-7FAEA65E05B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{428258FE-950A-4FFD-883C-7FAEA65E05B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{428258FE-950A-4FFD-883C-7FAEA65E05B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{428258FE-950A-4FFD-883C-7FAEA65E05B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -187,6 +193,7 @@ Global
 		{0FCBAEDE-5D50-4998-B7A4-1733656722A6} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{6BF0E083-AC26-4C65-A539-8823C65C3F7B} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{7CD71798-C122-4145-A08E-506A88273108} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{428258FE-950A-4FFD-883C-7FAEA65E05B3} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}
