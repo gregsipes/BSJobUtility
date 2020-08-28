@@ -137,6 +137,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.CircDumpWork:
                     connectionString = GetConnectionString("circdumpwork");
                     break;
+                case DatabaseConnectionStringNames.PBSDumpAWork:
+                    connectionString = GetConnectionString("pbsdumpawork");
+                    break;
                 default:
                     break;
             }

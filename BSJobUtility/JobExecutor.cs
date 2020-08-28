@@ -14,19 +14,29 @@ namespace BSJobUtility
 
         public JobExecutor(string jobName, string[] args)
         {
-            _jobName = jobName;
+            try
+            {
+                _jobName = jobName;
 
-            // setup job
-            SetupJob();
+                // setup job
+                SetupJob();
 
-            // pre execution
-            PreExecution(args);
+                // pre execution
+                PreExecution(args);
 
-            // execute job
-            ExecuteJob();
+                // execute job
+                ExecuteJob();
 
-            // post execution
-            PostExecution();
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                // post execution
+                PostExecution();
+            }
         }
 
         private void SetupJob()
