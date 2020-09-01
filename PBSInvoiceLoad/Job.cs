@@ -37,34 +37,37 @@ namespace PBSInvoiceLoad
                     {
                         FileInfo fileInfo = new FileInfo(file);
 
-                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Select_Loads_If_Processed",
+                        if (fileInfo.Length > 0) //ignore empty files
+                        {
+
+                            Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "dbo.Proc_Select_Loads_If_Processed",
                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                 new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
 
-                        if (previouslyLoadedFile == null)
-                        {
-                            //make sure we the file is no longer being edited
-                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                            if (previouslyLoadedFile == null)
                             {
-                                WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                                //make sure we the file is no longer being edited
+                                if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                                {
+                                    WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
 
-                                CopyAndProcessFile(fileInfo, printTypes);
+                                    CopyAndProcessFile(fileInfo, printTypes);
 
+                                }
                             }
+                            //else
+                            //{
+                            //    ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "Proc_Insert_Loads_Not_Loaded",
+                            //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
+                            //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                            //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                            //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                            //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
+                            //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
+                            //}
                         }
-                        //else
-                        //{
-                        //    ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "Proc_Insert_Loads_Not_Loaded",
-                        //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
-                        //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                        //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
-                        //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
-                        //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
-                        //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
-                        //}
                     }
-
                 }
 
             }
@@ -159,6 +162,7 @@ namespace PBSInvoiceLoad
             Int64 invoiceCount = 0;
             Int64 statementCount = 0;
             Int64 totalCount = 0;
+            Int64 totalRecordCount = 0;
 
             List<string> headerLines = new List<string>();
             List<string> bodyLines = new List<string>();
@@ -172,6 +176,7 @@ namespace PBSInvoiceLoad
 
             foreach (string line in fileContents)
             {
+                totalRecordCount++;
 
                 if (line.StartsWith("PRINT DATE:"))
                 {
@@ -464,7 +469,7 @@ namespace PBSInvoiceLoad
                 }
             }
 
-            WriteToJobLog(JobLogMessageType.INFO, $"{pageLineNumber} records read");
+            WriteToJobLog(JobLogMessageType.INFO, $"{totalRecordCount} records read");
 
             if (pageLineNumber > 0)
             {
@@ -500,8 +505,7 @@ namespace PBSInvoiceLoad
 
             WriteToJobLog(JobLogMessageType.INFO, "Load information updated.");
 
-            //todo: delete file from working directory
-            if (pageLineNumber > 0)
+            if (totalRecordCount > 0)
             {
                 File.Copy(workingFilePath, GetConfigurationKeyValue("OutputDirectory") + workingFileInfo.Name, true);
                 WriteToJobLog(JobLogMessageType.INFO, $"{GetConfigurationKeyValue("OutputDirectory") + workingFileInfo.Name} created.");

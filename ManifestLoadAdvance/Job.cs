@@ -34,31 +34,35 @@ namespace ManifestLoadAdvance
                     {
                         FileInfo fileInfo = new FileInfo(file);
 
-                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Select_Loads_If_Processed",
+                        if (fileInfo.Length > 0) //ignore empty files
+                        {
+
+                            Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.Manifests, "dbo.Proc_Select_Loads_If_Processed",
                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                 new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
 
-                        if (previouslyLoadedFile == null)
-                        {
-                            //make sure we the file is no longer being edited
-                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                            if (previouslyLoadedFile == null)
                             {
-                                WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
-                                CopyAndProcessFile(fileInfo);
-                                processedFiles.Add(fileInfo.Name);
+                                //make sure we the file is no longer being edited
+                                if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                                {
+                                    WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                                    CopyAndProcessFile(fileInfo);
+                                    processedFiles.Add(fileInfo.Name);
+                                }
                             }
+                            //else
+                            //{
+                            //    ExecuteNonQuery(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads_Not_Loaded",
+                            //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
+                            //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                            //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                            //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                            //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
+                            //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
+                            //}
                         }
-                        //else
-                        //{
-                        //    ExecuteNonQuery(DatabaseConnectionStringNames.Wrappers, "Proc_Insert_Loads_Not_Loaded",
-                        //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
-                        //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                        //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
-                        //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
-                        //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
-                        //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
-                        //}
                     }
 
                     if (processedFiles.Count() > 0)
