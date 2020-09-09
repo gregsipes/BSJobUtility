@@ -10,13 +10,15 @@ namespace BSJobUtility
     public class JobExecutor : IDisposable
     {
         private readonly string _jobName;
+        private readonly string _group;
         private JobBase _managedJob;
 
-        public JobExecutor(string jobName, string[] args)
+        public JobExecutor(string jobName, string group, string[] args)
         {
             try
             {
                 _jobName = jobName;
+                _group = group;
 
                 // setup job
                 SetupJob();
@@ -82,7 +84,9 @@ namespace BSJobUtility
             else if (_jobName == "PrepackInsertLoad")
                 _managedJob = new PrepackInsertLoad.Job();
             else if (_jobName == "PBSDumpWorkload")
-                _managedJob = new PBSDumpWorkload.Job();
+                _managedJob = new PBSDumpWorkload.Job() { GroupName = _group };
+            else if (_jobName == "CircDumpWorkload")
+                 _managedJob = new CircDumpWorkLoad.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

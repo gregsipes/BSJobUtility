@@ -11,6 +11,7 @@ namespace BSJobUtility
         static int Main(string[] args)
         {
             string jobName = "";
+            string group = "0";
 
             // determine from command line arguments which job to execute
             if (args.Count() == 0)
@@ -34,6 +35,8 @@ namespace BSJobUtility
                     } //run job
                     else if (args[i] == "/j")
                         jobName = args[i + 1];
+                    else if (args[i] == "/g")
+                        group =args[i + 1].Trim();
                 }
             }
             catch (Exception ex)
@@ -48,7 +51,7 @@ namespace BSJobUtility
                 Console.WriteLine("Unable to determine job name, nothing to do.");
             else
             {
-                int exitCode = ExecuteJob(jobName, args);
+                int exitCode = ExecuteJob(jobName, group, args);
                 Console.WriteLine(string.Format("Exit code: {0}", exitCode.ToString()));
                 return exitCode;
             }
@@ -72,14 +75,15 @@ namespace BSJobUtility
             Console.WriteLine(tab + "/j" + tab + "Number of job to execute.");
             Console.WriteLine();
             Console.WriteLine("Example: BSJobUtility.exe /j ParkingPayroll");
+            Console.WriteLine("Example: BSJobUtility.exe /j CircDumpWorkload /g 1");
             Console.WriteLine();
         }
 
-        private static int ExecuteJob(string jobName, string[] args)
+        private static int ExecuteJob(string jobName, string groupNumber, string[] args)
         {
             try
             {
-                JobExecutor jobExecutor = new JobExecutor(jobName, args);
+                JobExecutor jobExecutor = new JobExecutor(jobName, groupNumber,  args);
 
                 if (jobExecutor != null)
                     jobExecutor.Dispose();

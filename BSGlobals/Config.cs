@@ -140,6 +140,12 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.PBSDumpAWork:
                     connectionString = GetConnectionString("pbsdumpawork");
                     break;
+                case DatabaseConnectionStringNames.PBSDumpBWork:
+                    connectionString = GetConnectionString("pbsdumpbwork");
+                    break;
+                case DatabaseConnectionStringNames.PBSDumpCWork:
+                    connectionString = GetConnectionString("pbsdumpcwork");
+                    break;
                 default:
                     break;
             }

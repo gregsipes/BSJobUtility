@@ -34,7 +34,9 @@ namespace BSGlobals
             PayByScan,
             PrepackInsertLoad,
             CircDumpWork,
-            PBSDumpAWork
+            PBSDumpAWork,
+            PBSDumpBWork,
+            PBSDumpCWork
         }
 
         public enum JobLogMessageType
