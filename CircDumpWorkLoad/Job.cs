@@ -261,7 +261,7 @@ namespace CircDumpWorkLoad
 
                 if (atleastOneWorkToLoad)
                 {
-                    string bulkInsertDirectory = GetConfigurationKeyValue("OutputDirectory") + GetConfigurationKeyValue("Abbreviation") + "\\" + GroupNumber.ToString() + "\\" + DateTime.Now.ToString("yyyyMMddHHmmsstt") + "\\";
+                    string bulkInsertDirectory = GetConfigurationKeyValue("OutputDirectory") + GetConfigurationKeyValue("Abbreviation") + GroupNumber.ToString() + "\\" + DateTime.Now.ToString("yyyyMMddHHmmsstt") + "\\";
                     Directory.CreateDirectory(bulkInsertDirectory);
                     Directory.CreateDirectory(bulkInsertDirectory + "Config\\");
                     Directory.CreateDirectory(bulkInsertDirectory + "Data\\");
