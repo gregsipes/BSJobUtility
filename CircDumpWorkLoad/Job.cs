@@ -40,6 +40,7 @@ namespace CircDumpWorkLoad
         //23. Check to make sure that all of the records were correctly inserted by comparing the count file and the last record inserted into the table
         //24. Creates a touch file at \\Omaha\DumpTouch\CircDump\WorkLoad\DumpControl<timestamp>.timestamp
         //25. Cleanups all related files
+        //This is step 1 in the import process. Step 2 is CircDumpPopulate. Step 3 is CircDumpPostGroup 
 
         public int GroupNumber { get; set; }
 

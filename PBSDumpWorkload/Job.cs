@@ -40,6 +40,7 @@ namespace PBSDumpWorkload
         //23. Check to make sure that all of the records were correctly inserted by comparing the count file and the last record inserted into the table
         //24. Creates a touch file at \\Omaha\DumpTouch\CircDump\WorkLoad\DumpControl<timestamp>.timestamp
         //25. Cleanups all related files
+        //This is step 1 in the import process. Step 2 is PBSDumpPopulate. Step 3 is PBSDumpPostGroup
 
         public string GroupName { get; set; }
 
@@ -103,7 +104,8 @@ namespace PBSDumpWorkload
                 //}
 
                 //get the input files that are ready for processing
-                List<string> files = Directory.GetFiles($"{GetConfigurationKeyValue("InputDirectory")}{GroupName}\\", "dumpcontrol*.timestamp").ToList();
+                string inputDirectory = String.Format(GetConfigurationKeyValue("InputDirectory"), GroupName);
+                List<string> files = Directory.GetFiles($"{inputDirectory}\\", "dumpcontrol*.timestamp").ToList();
 
                 if (files != null && files.Count() > 0)
                 {
@@ -211,16 +213,18 @@ namespace PBSDumpWorkload
                     tables.Add(table);
 
                     //delete touch file
-                    if (File.Exists(GetConfigurationKeyValue("TableTouchDirectory") + table["TableName"] + ".successful"))
-                        File.Delete(GetConfigurationKeyValue("TableTouchDirectory") + table["TableName"] + ".successful");
+                    string tableTouchDirectory = String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName);
+                    if (File.Exists(tableTouchDirectory + table["TableName"] + ".successful"))
+                        File.Delete(tableTouchDirectory + table["TableName"] + ".successful");
 
                     //create group folder path if doesn't exist
-                    if (!Directory.Exists(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"]))
-                        Directory.CreateDirectory(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"]);
+                    string groupTouchDirectory = String.Format(GetConfigurationKeyValue("GroupTouchDirectory"), GroupName);
+                    if (!Directory.Exists(groupTouchDirectory + table["GroupNumber"]))
+                        Directory.CreateDirectory(groupTouchDirectory + table["GroupNumber"]);
 
                     //if the file already exists, delete it
-                    if (File.Exists(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"] + "\\" + table["TableName"] + ".successful"))
-                        File.Delete(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"] + "\\" + table["TableName"] + ".successful");
+                    if (File.Exists(groupTouchDirectory + table["GroupNumber"] + "\\" + table["TableName"] + ".successful"))
+                        File.Delete(groupTouchDirectory + table["GroupNumber"] + "\\" + table["TableName"] + ".successful");
 
                 }
             }
@@ -294,7 +298,8 @@ namespace PBSDumpWorkload
 
                 if (atleastOneWorkToLoad)
                 {
-                    string bulkInsertDirectory = GetConfigurationKeyValue("OutputDirectory") + GetConfigurationKeyValue("Abbreviation") + GroupName + "\\" + DateTime.Now.ToString("yyyyMMddHHmmsstt") + "\\";
+                    string abbreviation = String.Format(GetConfigurationKeyValue("Abbreviation"), GroupName);
+                    string bulkInsertDirectory = GetConfigurationKeyValue("OutputDirectory") + abbreviation + "\\" + DateTime.Now.ToString("yyyyMMddHHmmsstt") + "\\";
                     Directory.CreateDirectory(bulkInsertDirectory);
                     Directory.CreateDirectory(bulkInsertDirectory + "Config\\");
                     Directory.CreateDirectory(bulkInsertDirectory + "Data\\");
@@ -551,7 +556,7 @@ namespace PBSDumpWorkload
         {
             string touchDirectory = GetConfigurationKeyValue("WorkLoadTouchDirectory");
             File.Create(touchDirectory + processedFileName);
-            WriteToJobLog(JobLogMessageType.INFO, $"Created work loaad touch file {processedFileName}");
+            WriteToJobLog(JobLogMessageType.INFO, $"Created work load touch file {processedFileName}");
 
         }
 
