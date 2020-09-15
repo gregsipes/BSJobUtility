@@ -87,7 +87,7 @@ namespace BSJobUtility
                 _managedJob = new PBSDumpWorkload.Job() { GroupName = _group };
             else if (_jobName == "CircDumpWorkload")
                 _managedJob = new CircDumpWorkLoad.Job() { GroupNumber = Convert.ToInt32(_group) };
-            else if (_jobName = "CircDumpPopulate")
+            else if (_jobName == "CircDumpPopulate")
                 _managedJob = new CircDumpPopulate.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();

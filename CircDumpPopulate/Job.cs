@@ -44,8 +44,8 @@ namespace CircDumpPopulate
                     }
 
                     //update tran date control file
-                    if (updateTranDateAfterSuccessfulPopulate)
-                        UpdateTranDateControlFile();
+                 //  if (updateTranDateAfterSuccessfulPopulate)
+                        //UpdateTranDateControlFile();
                 }
 
 

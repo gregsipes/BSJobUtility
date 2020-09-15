@@ -105,7 +105,9 @@ namespace PressRoomLoad
 
                 if (line != null && line.Trim().Length > 0)
                 {
-                    if (line.StartsWith("PUBLISHING DATE:"))
+                    if (line.Contains("NO RECORDS FOUND"))
+                        break;
+                    else if (line.StartsWith("PUBLISHING DATE:"))
                         publishDate = Convert.ToDateTime(line.Replace("PUBLISHING DATE:", "").Trim());
                     else if (line.StartsWith("EDITION:"))
                         edition = line.Replace("EDITION:", "").Trim();
