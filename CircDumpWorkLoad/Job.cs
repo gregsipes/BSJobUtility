@@ -57,6 +57,7 @@ namespace CircDumpWorkLoad
             {
 
                 //check for any touch files. If they exist, send email with contents, then delete (is this even needed?)
+                //UPDATE: I believe this was done to avoid reprocessing the same files. I don't see how this would cause an issue, so the functionality will be ommitted  - GDS
                 //if (Directory.Exists(GetConfigurationKeyValue("DumpTouchDirectory")))
                 //{
                 //    List<string> processedTouchFiles = new List<string>();
@@ -97,7 +98,7 @@ namespace CircDumpWorkLoad
                     {
                         FileInfo fileInfo = new FileInfo(file);
 
-                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "dbo.Proc_Select_BN_Loads_DumpControl_If_Processed",
+                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "dbo.Proc_Select_BN_Loads_DumpControl_If_Processed",
                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                 new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
@@ -133,7 +134,7 @@ namespace CircDumpWorkLoad
 
             //create load record
             Int32 loadsId = 0;
-            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "dbo.Proc_Insert_BN_Loads_DumpControl",
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "dbo.Proc_Insert_BN_Loads_DumpControl",
                             new SqlParameter("@pdatTimeStamp", fileInfo.LastWriteTime),
                             new SqlParameter("@pvchrOriginalDir", fileInfo.DirectoryName),
                             new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
@@ -145,9 +146,9 @@ namespace CircDumpWorkLoad
             loadsId = Int32.Parse(result["loads_id"].ToString());
             WriteToJobLog(JobLogMessageType.INFO, $"Loads Dump Control ID: {loadsId}");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, "Proc_Update_BN_Loads_DumpControl_BNTimeStamp",
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_DumpControl_BNTimeStamp",
                                  new SqlParameter("@pintLoadsDumpControlID", loadsId),
-                                 new SqlParameter("@pvchrBNTimeStamp", fileInfo.LastWriteTime));
+                                 new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents));
 
             ProcessFile(fileInfo.FullName, loadsId, DateTime.Parse(timeStampFileContents));
 
@@ -184,17 +185,17 @@ namespace CircDumpWorkLoad
 
                     tables.Add(table);
 
-                    //delete touch file
-                    if (File.Exists(GetConfigurationKeyValue("TableTouchDirectory") + table["TableName"] + ".successful"))
-                        File.Delete(GetConfigurationKeyValue("TableTouchDirectory") + table["TableName"] + ".successful");
+                    ////delete touch file
+                    //if (File.Exists(GetConfigurationKeyValue("TableTouchDirectory") + table["TableName"] + ".successful"))
+                    //    File.Delete(GetConfigurationKeyValue("TableTouchDirectory") + table["TableName"] + ".successful");
 
-                    //create group folder path if doesn't exist
-                    if (!Directory.Exists(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"]))
-                        Directory.CreateDirectory(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"]);
+                    ////create group folder path if doesn't exist
+                    //if (!Directory.Exists(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"]))
+                    //    Directory.CreateDirectory(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"]);
 
-                    //if the file already exists, delete it
-                    if (File.Exists(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"] + "\\" + table["TableName"] + ".successful"))
-                        File.Delete(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"] + "\\" + table["TableName"] + ".successful");
+                    ////if the file already exists, delete it
+                    //if (File.Exists(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"] + "\\" + table["TableName"] + ".successful"))
+                    //    File.Delete(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"] + "\\" + table["TableName"] + ".successful");
 
                 }
             }
@@ -203,13 +204,13 @@ namespace CircDumpWorkLoad
             {
                 //07/12/20 PEB - Added support for CircDump as part of the Newscycle Cloud migration.
                 //Append the group number to this record so it's unique to the group of CircDump datasets
-                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, "Proc_Update_BN_Loads_DumpControl_OriginalFile",
+                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_DumpControl_OriginalFile",
                                                                 new SqlParameter("@pintLoadsDumpControlID", loadsId),
-                                                                new SqlParameter("@pvchrOriginalFile", fileName.Substring(fileName.LastIndexOf("\\") + 1)));
+                                                                new SqlParameter("@pvchrOriginalFile", fileName.Substring(fileName.LastIndexOf("\\") + 1) + "_" + GroupNumber.ToString()));
                 
 
                 //This sproc gets "populate immediately" flag for each group.  For CircDump this flag is 0 for all groups.
-                Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "Proc_Select_BN_Groups",
+                Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Select_BN_Groups",
                                                                 new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"])).FirstOrDefault();
 
                 if (result == null)
@@ -229,7 +230,7 @@ namespace CircDumpWorkLoad
 
                 bool atleastOneWorkToLoad = false;
 
-                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, "Proc_Update_BN_Loads_DumpControl_Group_Number",
+                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_DumpControl_Group_Number",
                         new SqlParameter("@pintLoadsDumpControlID", loadsId),
                         new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"].ToString()));
 
@@ -241,7 +242,7 @@ namespace CircDumpWorkLoad
                     {
                         atleastOneWorkToLoad = true;
 
-                        result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "Proc_Insert_BN_Loads_Tables",
+                        result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Insert_BN_Loads_Tables",
                                              new SqlParameter("@pvchrTableName", table["TableName"]),
                                              new SqlParameter("@pbintLoadsDumpControlID", loadsId),
                                              new SqlParameter("@pvchrTableDumpStartDateTime", table["TableDumpStartDateTime"].ToString()),
@@ -277,13 +278,13 @@ namespace CircDumpWorkLoad
                 }
 
                 //create workload touch file
-                CreateWorkloadTouchFile(fileInfo.Name);
+              //  CreateWorkloadTouchFile(fileInfo.Name);
 
                 //delete files
                 if (bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
                     DeleteFiles(filesToDelete);
 
-                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, "dbo.Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag",
+                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "dbo.Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag",
                                        new SqlParameter("@pintLoadsDumpControlID", loadsId));
             }
         }
@@ -328,7 +329,7 @@ namespace CircDumpWorkLoad
             if (Int32.Parse(table["LoadsTableID"].ToString()) == 0)
             {
                 //todo: this must not get hit; the parameters in the code don't match the sproc
-                //Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "Proc_Insert_BN_Loads_Tables",
+                //Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Insert_BN_Loads_Tables",
                 //                                                 new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
                 //                                                 new SqlParameter("@pbintLoadsDumpControlID", loadsId),
                 //                                                 new SqlParameter("@pvchrTableDumpStartDateTime", table["TableDumpStartDateTime"].ToString()),
@@ -339,7 +340,7 @@ namespace CircDumpWorkLoad
             }
             else
             {
-                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, "Proc_Update_BN_Loads_Tables",
+                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables",
                                                              new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
                                                              new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
                                                              new SqlParameter("@pvchrFile", fileInfo.Name),
@@ -348,7 +349,7 @@ namespace CircDumpWorkLoad
 
             WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({timeStampDate})");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampDate}'");
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampDate}'");
 
             string headerFile = fileInfo.DirectoryName + "\\" + table["FileNameWithoutExtension"] + ".heading";
 
@@ -376,7 +377,7 @@ namespace CircDumpWorkLoad
                 }
             }
 
-            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, CommandType.Text,
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, CommandType.Text,
                                                                     "SELECT ORDINAL_POSITION, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = 'CircDump_Work' AND TABLE_NAME = @TableName",
                                                                     new SqlParameter("@TableName", table["TableName"].ToString()));
 
@@ -429,7 +430,7 @@ namespace CircDumpWorkLoad
 
             Int64 recordCount = Int64.Parse(File.ReadAllText(countFile).ToString());
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
                                         new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"]),
                                         new SqlParameter("@pintDataRowsCopied", recordCount));
 
@@ -476,7 +477,7 @@ namespace CircDumpWorkLoad
             WriteToJobLog(JobLogMessageType.INFO, $"Error file = {bulkInsertErrorFile}");
             WriteToJobLog(JobLogMessageType.INFO, $"Format file = {bulkInsertFormatFile}");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, CommandType.Text, $"BULK INSERT {table["TableName"].ToString()} FROM '{bulkInsertDataFile}' WITH (FORMATFILE='{bulkInsertFormatFile}', ERRORFILE='{bulkInsertErrorFile}')");
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, CommandType.Text, $"BULK INSERT {table["TableName"].ToString()} FROM '{bulkInsertDataFile}' WITH (FORMATFILE='{bulkInsertFormatFile}', ERRORFILE='{bulkInsertErrorFile}')");
 
             WriteToJobLog(JobLogMessageType.INFO, $"Checking status of bulk insert import");
 
@@ -485,11 +486,11 @@ namespace CircDumpWorkLoad
 
             WriteToJobLog(JobLogMessageType.INFO, $"Deleting ignored record (last record), if read by bulk insert");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampFileContents}' AND IgnoredRecordFlag = 1");
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampFileContents}' AND IgnoredRecordFlag = 1");
 
             WriteToJobLog(JobLogMessageType.INFO, "Reading last record sequence");
 
-            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "Proc_Select_RecordSequence_Maximum",
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Select_RecordSequence_Maximum",
                                                              new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
                                                              new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents)).FirstOrDefault();
 
@@ -508,20 +509,20 @@ namespace CircDumpWorkLoad
             //if (populateImmediatelyAfterLoad)
             //{
             //    PopulateTable(table["TableName"].ToString(), Int64.Parse(table["LoadsTableID"].ToString()), tables);
-            //    ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWork, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pbintLoadsTablesID", table["LoadsTableId"].ToString()));
+                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
             //}
 
             return filesToDelete;
 
         }
 
-        private void CreateWorkloadTouchFile(string processedFileName)
-        {
-            string touchDirectory = GetConfigurationKeyValue("WorkLoadTouchDirectory");
-            File.Create(touchDirectory + processedFileName);
-            WriteToJobLog(JobLogMessageType.INFO, $"Created work loaad touch file {processedFileName}");
+        //private void CreateWorkloadTouchFile(string processedFileName)
+        //{
+        //    string touchDirectory = GetConfigurationKeyValue("WorkLoadTouchDirectory");
+        //    File.Create(touchDirectory + processedFileName);
+        //    WriteToJobLog(JobLogMessageType.INFO, $"Created work loaad touch file {processedFileName}");
 
-        }
+        //}
 
         private void DeleteFiles(List<string> files)
         {

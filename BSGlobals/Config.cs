@@ -134,8 +134,11 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.PrepackInsertLoad:
                     connectionString = GetConnectionString("prepackinserts");
                     break;
-                case DatabaseConnectionStringNames.CircDumpWork:
-                    connectionString = GetConnectionString("circdumpwork");
+                case DatabaseConnectionStringNames.CircDumpWorkLoad:
+                    connectionString = GetConnectionString("circdumpwork_load");
+                    break;
+                case DatabaseConnectionStringNames.CircDumpWorkPopulate:
+                    connectionString = GetConnectionString("circdumpwork_populate");
                     break;
                 case DatabaseConnectionStringNames.PBSDumpAWork:
                     connectionString = GetConnectionString("pbsdumpawork");

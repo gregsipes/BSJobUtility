@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace CircDumpPopulate
         public override void SetupJob()
         {
             JobName = "Circ Dump Populate";
-            JobDescription = "Transfers data from a work (staging) database to a final table. This is step 2 in the PBS import process.";
+            JobDescription = "Transfers data from a work (staging) database to a final table (PBSDump). This is step 2 in the PBS import process.";
             AppConfigSectionName = "CircDumpPopulate";
         }
 
@@ -26,10 +27,10 @@ namespace CircDumpPopulate
             try
             {
 
-                List<Dictionary<string, object>> dumpControls = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "Proc_Select_BN_Distinct_DumpControl_To_Populate",
+                List<Dictionary<string, object>> dumpControls = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkPopulate, "Proc_Select_BN_Distinct_DumpControl_To_Populate",
                                                                                new SqlParameter("@pintGroupNumber", GroupNumber)).ToList();
 
-                bool updateTranDateAfterSuccessfulPopulate = false;
+              //  bool updateTranDateAfterSuccessfulPopulate = false;
 
                 if (dumpControls != null && dumpControls.Count() > 0)
                 {
@@ -39,13 +40,13 @@ namespace CircDumpPopulate
 
                         if (tablesToPopulate.Count() == 0)
                             WriteToJobLog(JobLogMessageType.INFO, $"No tables need to be populated for group number {GroupNumber}, loadds_dumpcontrol_id = {dumpControl["loads_dumpcontrol_id"].ToString()}");
-                        else if (Convert.ToBoolean(dumpControl["flgUpdateTranDateAfterSuccessfulPopulate"].ToString()))
-                            updateTranDateAfterSuccessfulPopulate = true;
+                        //else if (Convert.ToBoolean(dumpControl["flgUpdateTranDateAfterSuccessfulPopulate"].ToString()))
+                        //    updateTranDateAfterSuccessfulPopulate = true; //this is never true
                     }
 
                     //update tran date control file
-                 //  if (updateTranDateAfterSuccessfulPopulate)
-                        //UpdateTranDateControlFile();
+                    //  if (updateTranDateAfterSuccessfulPopulate)
+                    //UpdateTranDateControlFile();
                 }
 
 
@@ -61,7 +62,7 @@ namespace CircDumpPopulate
 
         private List<string> DetermineTablesToPopulate(Int64 dumpControlId)
         {
-            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "Proc_Select_BN_Loads_Tables",
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkPopulate, "Proc_Select_BN_Loads_Tables",
                                                                                 new SqlParameter("@pbintLoadsDumpControlID", dumpControlId)).ToList();
 
             List<string> tablesToUpdate = new List<string>();
@@ -76,7 +77,7 @@ namespace CircDumpPopulate
                         WriteToJobLog(JobLogMessageType.INFO, $"{result["table_name"].ToString()} successful in previous populate");
                     else
                     {
-                        Dictionary<string, object> populateAttempts = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWork, "Proc_Update_BN_Loads_Tables_Number_Of_Populate_Attempts",
+                        Dictionary<string, object> populateAttempts = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkPopulate, "Proc_Update_BN_Loads_Tables_Number_Of_Populate_Attempts",
                                                                                         new SqlParameter("@pbintLoadsTablesID", result["loads_tables_id"].ToString()),
                                                                                         new SqlParameter("@pintGroupNumber", GroupNumber)).FirstOrDefault();
 
@@ -86,7 +87,7 @@ namespace CircDumpPopulate
                                 WriteToJobLog(JobLogMessageType.INFO, $"{result["table_name"].ToString()} UNSUCCESSFUL in previous populate, but retrying populate");
 
                             //call to actually move the data
-                            PopulateTable(Convert.ToInt64(result["loads_tables_id"].ToString()), result["table_name"].ToString(), Convert.ToBoolean(result["update_trannumber_control_file_after_populate_flag"].ToString()));
+                            PopulateTable(Convert.ToInt64(result["loads_tables_id"].ToString()), result["table_name"].ToString());
 
                             tablesToUpdate.Add(result["table_name"].ToString());
                         }
@@ -99,7 +100,7 @@ namespace CircDumpPopulate
                                 //todo: send email?
                             }
                         }
-                   }
+                    }
                 }
             }
 
@@ -108,9 +109,59 @@ namespace CircDumpPopulate
 
         }
 
-        private void PopulateTable(Int64 loadsTableId, string tableName, bool updateTranNumberControlFileAfterPopulate)
+        private void PopulateTable(Int64 loadsTableId, string tableName)
         {
-            //todo:
+            bool hasError = false;
+
+            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} bypassing purge");
+
+            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} populating");
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkPopulate, $"Proc_Populate_{tableName}",
+                                                                    new SqlParameter("@pbintLoadsTablesID", loadsTableId)).FirstOrDefault();
+
+            if (result["error_message"].ToString() != "")
+            {
+                hasError = true;
+                WriteToJobLog(JobLogMessageType.ERROR, result["error_message"].ToString());
+            }
+
+
+            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} bypassing verify");
+            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} delete work records");
+
+             result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkPopulate, "Proc_Delete_Table",
+                                                        new SqlParameter("@pbintLoadsTablesID", loadsTableId)).FirstOrDefault();
+
+            if (result["error_message"].ToString() != "")
+            {
+                hasError = true;
+                WriteToJobLog(JobLogMessageType.ERROR, result["error_message"].ToString());
+            }
+
+
+            if (!hasError)
+            {
+                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkPopulate, "Proc_Update_BN_Loads_Tables_Populate_Successful_Flag",
+                                                        new SqlParameter("@pbintLoadsTablesID", loadsTableId));
+
+                //delete unsuccessful touch file if one exists
+                //if (File.Exists($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.unsuccessful"))
+                //    File.Delete($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.unsuccessful");
+
+                ////create a successul file (this is the file that gets cleaned up in the next step of the process (CircDumpPost)
+                //File.Create($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.successful");
+
+            }
+            else
+            {
+                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkPopulate, "Proc_Update_BN_Loads_Tables_Populate_Error_Flag",
+                                        new SqlParameter("@pbintLoadsTablesID", loadsTableId));
+
+                SendMail($"{JobName} - Error", result["error_message"].ToString(), false);
+            }
+
         }
+
+
     }
 }

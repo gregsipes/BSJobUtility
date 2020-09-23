@@ -88,9 +88,9 @@ namespace BSJobUtility
             else if (_jobName == "CircDumpWorkload")
                 _managedJob = new CircDumpWorkLoad.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "CircDumpPopulate")
-                _managedJob = new CircDumpPopulate.Job();
+                _managedJob = new CircDumpPopulate.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "CircDumpPost")
-                _managedJob = new CircDumpPost.Job();
+                _managedJob = new CircDumpPost.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

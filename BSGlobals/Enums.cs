@@ -33,7 +33,8 @@ namespace BSGlobals
             DMMail,
             PayByScan,
             PrepackInsertLoad,
-            CircDumpWork,
+            CircDumpWorkLoad,
+            CircDumpWorkPopulate,
             PBSDumpAWork,
             PBSDumpBWork,
             PBSDumpCWork
