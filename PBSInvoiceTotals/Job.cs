@@ -142,7 +142,12 @@ namespace PBSInvoiceTotals
                             if (decimal.TryParse(line.Substring(30, 15).Trim(), out controlTotal))
                             {
                                 string description = line.Substring(0, line.IndexOf(".")).Trim();
-                                decimal processTotal = decimal.Parse(line.Substring(46).Trim().Replace(",", ""));
+                                decimal processTotal = 0;
+
+                                if (line.Length > 60)
+                                    processTotal = decimal.Parse(line.Substring(46, 15).Trim().Replace(",", ""));
+                                else
+                                    processTotal = decimal.Parse(line.Substring(46).Trim().Replace(",", ""));
 
                                 controlProcessRecordNumber++;
 
