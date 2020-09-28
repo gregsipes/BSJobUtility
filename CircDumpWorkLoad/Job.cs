@@ -90,16 +90,22 @@ namespace CircDumpWorkLoad
 
                 //check for any touch files before executing
                 bool touchFileFound = false;
-                List<string> files = Directory.GetFiles($"{GetConfigurationKeyValue("TouchFileDirectory")}", "dumpcontrol*.touch").ToList();
 
-                if (files != null && files.Count() > 0)
+                List<string> files = new List<string>();
+
+                if (Directory.Exists($"{GetConfigurationKeyValue("TouchFileDirectory")}"))
                 {
-                    foreach (string file in files)
+                    files = Directory.GetFiles($"{GetConfigurationKeyValue("TouchFileDirectory")}", "dumpcontrol*.touch").ToList();
+
+                    if (files != null && files.Count() > 0)
                     {
-                        touchFileFound = true;
-                        //only delete the file if it's the last group
-                        if (GroupNumber == 6)
-                            File.Delete(file);
+                        foreach (string file in files)
+                        {
+                            touchFileFound = true;
+                            //only delete the file if it's the last group
+                            if (GroupNumber == 6)
+                                File.Delete(file);
+                        }
                     }
                 }
 
