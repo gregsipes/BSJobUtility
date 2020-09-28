@@ -88,31 +88,49 @@ namespace CircDumpWorkLoad
                 //    }
                 //}
 
-                //get the input files that are ready for processing
-                List<string> files = Directory.GetFiles($"{GetConfigurationKeyValue("InputDirectory")}{GroupNumber.ToString()}\\" , "dumpcontrol*.timestamp").ToList();
+                //check for any touch files before executing
+                bool touchFileFound = false;
+                List<string> files = Directory.GetFiles($"{GetConfigurationKeyValue("TouchFileDirectory")}", "dumpcontrol*.touch").ToList();
 
                 if (files != null && files.Count() > 0)
                 {
                     foreach (string file in files)
                     {
-                        FileInfo fileInfo = new FileInfo(file);
+                        touchFileFound = true;
+                        //only delete the file if it's the last group
+                        if (GroupNumber == 6)
+                            File.Delete(file);
+                    }
+                }
 
-                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "dbo.Proc_Select_BN_Loads_DumpControl_If_Processed",
-                                                                new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                                                                new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
+                if (touchFileFound)
+                {
+                    //get the input files that are ready for processing
+                    files = Directory.GetFiles($"{GetConfigurationKeyValue("InputDirectory")}{GroupNumber.ToString()}\\", "dumpcontrol*.timestamp").ToList();
 
-
-                        if (previouslyLoadedFile == null)
+                    if (files != null && files.Count() > 0)
+                    {
+                        foreach (string file in files)
                         {
-                            //make sure the file is no longer being edited
-                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                            FileInfo fileInfo = new FileInfo(file);
+
+                            Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "dbo.Proc_Select_BN_Loads_DumpControl_If_Processed",
+                                                                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                                                                    new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
+
+
+                            if (previouslyLoadedFile == null)
                             {
-                                WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
-                                InsertLoad(fileInfo);
+                                //make sure the file is no longer being edited
+                                if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                                {
+                                    WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                                    InsertLoad(fileInfo);
+                                }
                             }
                         }
-                    }
 
+                    }
                 }
 
             }
@@ -206,7 +224,7 @@ namespace CircDumpWorkLoad
                 ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_DumpControl_OriginalFile",
                                                                 new SqlParameter("@pintLoadsDumpControlID", loadsId),
                                                                 new SqlParameter("@pvchrOriginalFile", fileName.Substring(fileName.LastIndexOf("\\") + 1) + "_" + GroupNumber.ToString()));
-                
+
 
                 //This sproc gets "populate immediately" flag for each group.  For CircDump this flag is 0 for all groups.
                 Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Select_BN_Groups",
@@ -277,7 +295,7 @@ namespace CircDumpWorkLoad
                 }
 
                 //create workload touch file
-              //  CreateWorkloadTouchFile(fileInfo.Name);
+                //  CreateWorkloadTouchFile(fileInfo.Name);
 
                 //delete files
                 if (bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
@@ -508,7 +526,7 @@ namespace CircDumpWorkLoad
             //if (populateImmediatelyAfterLoad)
             //{
             //    PopulateTable(table["TableName"].ToString(), Int64.Parse(table["LoadsTableID"].ToString()), tables);
-                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
             //}
 
             return filesToDelete;
