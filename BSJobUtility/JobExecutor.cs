@@ -89,8 +89,8 @@ namespace BSJobUtility
                 _managedJob = new CircDumpWorkLoad.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "CircDumpPopulate")
                 _managedJob = new CircDumpPopulate.Job() { GroupNumber = Convert.ToInt32(_group) };
-            else if (_jobName == "CircDumpPost")
-                _managedJob = new CircDumpPost.Job() { GroupNumber = Convert.ToInt32(_group) };
+            //else if (_jobName == "CircDumpPost")  //with the refractoring that has been done, this job/step should no longer be needed
+            //    _managedJob = new CircDumpPost.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else
