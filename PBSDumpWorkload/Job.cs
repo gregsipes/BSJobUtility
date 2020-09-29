@@ -14,34 +14,6 @@ namespace PBSDumpWorkload
 {
     public class Job : JobBase
     {
-        //steps for job
-        //1. Checks \\circfs\backup\circdump\data\1\ for any dumpcontrol*.timestamp
-        //2. For each file found, check to see if it was previously loaded 
-        //3. If a file was found, create a record in BN_Loads_DumpControl table(this acts similar to the Loads table in other jobs)
-        //4. Parses the dumpcontrol*.data file for a list of the files to import 
-        //5. Deletes the touch file at \\Omaha\DumpTouch\CircDump\Table\<tableName>.successful(does this really ever exist?)
-        //6. Create a new folder at \\Omaha\DumpTouch\CircDump\Group\<groupNumber>
-        //7. Deleted the touch file at \\Omaha\DumpTouch\CircDump\Group\<groupNumber>   (does this really ever exist?)
-        //8. Create a loads record for each file to be processed
-        //9. Create a bulk insert directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_1\<timestamp>
-        //10. Create bulk insert config directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_1\<timestamp>\Config
-        //11. Create bulk insert config directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_1\<timestamp>\Data
-        //12. Check for an error file if one exists \\circfs\backup\circdump\data\1\<tableName>.error. Exit and throw exception if one is found
-        //13. Parse the file's matching timestamp file \\circfs\backup\circdump\data\1\<tableName>.timestamp. Make sure this matches the the timestamp in the dumpcontrol*.timestamp file
-        //14. Delete any records from the destination table with a matching timestamp
-        //15. Read in matching file specific header file to get a list of the column names 
-        //16. Query the database for a list of column names to build the field lengths for neach column. This will then be used to build the bulk insert format file
-        //17. Parse the count file at \\circfs\backup\circdump\data\1\<tableName>.count
-        //18. Build bulk insert files, both the format and error files at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_1\<timestamp>\<tableName>.error and \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_1\<timestamp>\<tableName>.format
-        //19. Copy data file from \\circfs\backup\circdump\data\1\<tableName>.data to \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_1\<timestamp>\Data\<tableName>.data
-        //20. Run bulk insert
-        //21. Check for new error file at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_1\<timestamp>\<tableName>.error, throw exception and exit if one is found
-        //22. Remove last record from insert, since this is a control record
-        //23. Check to make sure that all of the records were correctly inserted by comparing the count file and the last record inserted into the table
-        //24. Creates a touch file at \\Omaha\DumpTouch\CircDump\WorkLoad\DumpControl<timestamp>.timestamp
-        //25. Cleanups all related files
-        //This is step 1 in the import process. Step 2 is PBSDumpPopulate. Step 3 is PBSDumpPostGroup
-
         public string GroupName { get; set; }
 
         private DatabaseConnectionStringNames VersionSpecificConnectionString { get; set; }
@@ -70,78 +42,67 @@ namespace PBSDumpWorkload
         {
             try
             {
+                //check for any touch files before executing
+                bool touchFileFound = false;
 
-                //check for any touch files. If they exist, send email with contents, then delete (is this even needed?)
-                //if (Directory.Exists(GetConfigurationKeyValue("DumpTouchDirectory")))
-                //{
-                //    List<string> processedTouchFiles = new List<string>();
-                //    List<string> touchFiles = Directory.GetFiles(GetConfigurationKeyValue("DumpTouchDirectory"), GetConfigurationKeyValue("DumpTouchFile")).ToList();
+                List<string> files = new List<string>();
 
-                //    foreach (string file in touchFiles)
-                //    {
-                //        FileInfo fileInfo = new FileInfo(file);
-                //        if (fileInfo.Name != "." && fileInfo.Name != ".." && processedTouchFiles.Where(p => p == file).Count() == 0)
-                //        {
-                //            List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
-                //            StringBuilder stringBuilder = new StringBuilder();
-
-                //            foreach (string line in fileContents)
-                //            {
-                //                if (line.Trim() != "")
-                //                    stringBuilder.AppendLine(line);
-                //            }
-
-                //         //   SendMail($"{GetConfigurationKeyValue("DumpTouchDescription")} Started {fileInfo.LastWriteTime.ToString()}", stringBuilder.ToString(), false);
-
-
-                //            processedTouchFiles.Add(file);
-
-                //            //todo: uncomment for production
-                //            //File.Delete(file);
-                //            WriteToJobLog(JobLogMessageType.INFO, $"Deleted file {file}");
-                //        }
-                //    }
-                //}
-
-                //get the input files that are ready for processing
-                string inputDirectory = String.Format(GetConfigurationKeyValue("InputDirectory"), GroupName);
-                List<string> files = Directory.GetFiles($"{inputDirectory}\\", "dumpcontrol*.timestamp").ToList();
-
-                if (files != null && files.Count() > 0)
+                if (Directory.Exists(String.Format(GetConfigurationKeyValue("TouchFileDirectory"), GroupName)))
                 {
-                    foreach (string file in files)
+                    files = Directory.GetFiles(String.Format(GetConfigurationKeyValue("TouchFileDirectory"), GroupName), "dumpcontrol*.touch").ToList();
+
+                    if (files != null && files.Count() > 0)
                     {
-                        FileInfo fileInfo = new FileInfo(file);
-
-                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(VersionSpecificConnectionString, "dbo.Proc_Select_BN_Loads_DumpControl_If_Processed",
-                                                                new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                                                                new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind)),
-                                                                new SqlParameter("@pvchrOriginalDirectory", fileInfo.Directory.FullName + "\\")).FirstOrDefault();
-
-
-                        if (previouslyLoadedFile == null)
+                        foreach (string file in files)
                         {
-                            //make sure the file is no longer being edited
-                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
-                            {
-                                WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
-                                InsertLoad(fileInfo);
-                            }
+                            touchFileFound = true;
+                            //only delete the file if it's the last group
+                            if (GroupName == "C" && bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
+                                File.Delete(file);
                         }
-                        //else
-                        //{
-                        //    ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Insert_Loads_Not_Loaded",
-                        //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
-                        //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                        //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
-                        //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
-                        //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
-                        //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
-                        //}
                     }
-
                 }
 
+                if (touchFileFound)
+                {
+                    //get the input files that are ready for processing
+                    string inputDirectory = String.Format(GetConfigurationKeyValue("InputDirectory"), GroupName);
+                    files = Directory.GetFiles($"{inputDirectory}\\", "dumpcontrol*.timestamp").ToList();
+
+                    if (files != null && files.Count() > 0)
+                    {
+                        foreach (string file in files)
+                        {
+                            FileInfo fileInfo = new FileInfo(file);
+
+                            Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(VersionSpecificConnectionString, "dbo.Proc_Select_BN_Loads_DumpControl_If_Processed",
+                                                                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                                                                    new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
+
+
+                            if (previouslyLoadedFile == null)
+                            {
+                                //make sure the file is no longer being edited
+                                if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                                {
+                                    WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                                    InsertLoad(fileInfo);
+                                }
+                            }
+                            //else
+                            //{
+                            //    ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Insert_Loads_Not_Loaded",
+                            //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
+                            //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                            //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                            //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                            //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
+                            //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
+                            //}
+                        }
+
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -174,7 +135,7 @@ namespace PBSDumpWorkload
 
             ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_DumpControl_BNTimeStamp",
                                  new SqlParameter("@pintLoadsDumpControlID", loadsId),
-                                 new SqlParameter("@pvchrBNTimeStamp", fileInfo.LastWriteTime));
+                                 new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents));
 
             ProcessFile(fileInfo.FullName, loadsId, DateTime.Parse(timeStampFileContents));
 
@@ -212,34 +173,19 @@ namespace PBSDumpWorkload
 
                     tables.Add(table);
 
-                    //delete touch file
-                    string tableTouchDirectory = String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName);
-                    if (File.Exists(tableTouchDirectory + table["TableName"] + ".successful"))
-                        File.Delete(tableTouchDirectory + table["TableName"] + ".successful");
-
-                    //create group folder path if doesn't exist
-                    string groupTouchDirectory = String.Format(GetConfigurationKeyValue("GroupTouchDirectory"), GroupName);
-                    if (!Directory.Exists(groupTouchDirectory + table["GroupNumber"]))
-                        Directory.CreateDirectory(groupTouchDirectory + table["GroupNumber"]);
-
-                    //if the file already exists, delete it
-                    if (File.Exists(groupTouchDirectory + table["GroupNumber"] + "\\" + table["TableName"] + ".successful"))
-                        File.Delete(groupTouchDirectory + table["GroupNumber"] + "\\" + table["TableName"] + ".successful");
-
                 }
             }
 
             if (tables.Count > 0)
             {
 
-                //This sproc gets "populate immediately" flag for each group.  For CircDump this flag is 0 for all groups.
+                //This sproc gets "populate immediately" flag for each group.
                 Dictionary<string, object> result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_BN_Groups",
                                                                 new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"])).FirstOrDefault();
 
                 if (result == null)
                 {
                     WriteToJobLog(JobLogMessageType.ERROR, $"Group number ({tables[0]["GroupNumber"]} not found)");
-                    //todo: should we send an email? Is this ever a real case?
                     return;
                 }
 
@@ -249,45 +195,49 @@ namespace PBSDumpWorkload
                 else
                     WriteToJobLog(JobLogMessageType.INFO, $"For group number {tables[0]["GroupNumber"]} , all records selected");
 
-                bool populateImmediatelyAfterLoad = bool.Parse(result["populate_immediately_after_load_flag"].ToString()); //this is always false
+                bool populateImmediatelyAfterLoad = bool.Parse(result["populate_immediately_after_load_flag"].ToString()); //PBSDumpA = false, PBSDumpB and PBSDumpC = true
 
                 bool atleastOneWorkToLoad = false;
 
-                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_DumpControl_Group_Number_TranDate",
-                                                new SqlParameter("", ""),
-                                                new SqlParameter("", ""),
-                                                new SqlParameter("", ""),
-                                                new SqlParameter("", ""));
-
-
-                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_DumpControl_Group_Number",
-                                                    new SqlParameter("@pintLoadsDumpControlID", loadsId),
-                                                    new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"]));
-
-
-                //create the table records and return the loads_id for each
-                foreach (Dictionary<string, object> table in tables)
+                if (populateImmediatelyAfterLoad)
                 {
-                    if (table["FileNameWithoutExtension"].ToString() != "")
-                    {
-                        atleastOneWorkToLoad = true;
+                    atleastOneWorkToLoad = true;
 
-
-                        result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Insert_BN_Loads_Tables",
-                                              new SqlParameter("@pvchrTableName", table["TableName"]),
-                                              new SqlParameter("@pbintLoadsDumpControlID", loadsId),
-                                              new SqlParameter("@pvchrTableDumpStartDateTime", table["TableDumpStartDateTime"].ToString()),
-                                              new SqlParameter("@pvchrFromDate", table["FromDate"].ToString()),
-                                              new SqlParameter("@pvchrArchiveEndingDate", table["ArchiveEndingDate"].ToString()),
-                                              new SqlParameter("@pflgUpdateTranNumberControlFileAfterPopulate", table["UpdateTranNumberFileAfterSuccessfulPopulate"].ToString())).FirstOrDefault();
-
-
-                        table["LoadsTableID"] = result["loads_tables_id"].ToString();
-                    }
+                    ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_DumpControl_Group_Number_TranDate",
+                                                    new SqlParameter("@pintLoadsDumpControlID", loadsId),
+                                                    new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"]),
+                                                    new SqlParameter("@pvchrTranDate", tables[0]["FromDate"]),
+                                                    new SqlParameter("@pflgUpdateTranDateAfterSuccessfulPopulate", Convert.ToBoolean(tables[0]["UpdateTranDateAfterSuccessfulPopulate"].ToString())));
                 }
+                else //this only gets hit for PBSDumpA
+                {
+                    
+                    ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_DumpControl_Group_Number",
+                                                        new SqlParameter("@pintLoadsDumpControlID", loadsId),
+                                                        new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"]),
+                                                        new SqlParameter("@pflgUpdateTranDateAfterSuccessfulPopulate", tables[0]["UpdateTranDateAfterSuccessfulPopulate"].ToString()));
 
 
-                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Insert_BN_DumpControl_Post_Load", new SqlParameter("", loadsId));
+                    //create the table records and return the loads_id for each
+                    foreach (Dictionary<string, object> table in tables)
+                    {
+                        if (table["FileNameWithoutExtension"].ToString() != "")
+                        {
+                            atleastOneWorkToLoad = true;
+                            
+                            result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Insert_BN_Loads_Tables",
+                                                  new SqlParameter("@pvchrTableName", table["TableName"]),
+                                                  new SqlParameter("@pbintLoadsDumpControlID", loadsId),
+                                                  new SqlParameter("@pvchrTableDumpStartDateTime", table["TableDumpStartDateTime"].ToString()),
+                                                  new SqlParameter("@pvchrFromDate", table["FromDate"].ToString())).FirstOrDefault();
+
+                            table["LoadsTableID"] = result["loads_tables_id"].ToString();
+                        }
+                    }
+
+
+                    ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Insert_BN_DumpControl_Post_Load", new SqlParameter("@pbintLoadsDumpControlID", loadsId));
+                }
 
                 //Here is where the actual data import takes place, via a bulk insert.
                 List<string> filesToDelete = new List<string>();
@@ -314,7 +264,7 @@ namespace PBSDumpWorkload
                 }
 
                 //create workload touch file
-                CreateWorkloadTouchFile(fileInfo.Name);
+               // CreateWorkloadTouchFile(fileInfo.Name);
 
                 //delete files
                 if (bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
@@ -324,8 +274,6 @@ namespace PBSDumpWorkload
                                        new SqlParameter("@pintLoadsDumpControlID", loadsId));
             }
         }
-
-        //   }
 
         private List<string> ImportTable(Dictionary<string, object> table, FileInfo fileInfo, Int32 loadsId, string bulkInsertDirectory, bool populateImmediatelyAfterLoad, DateTime dumpControlTimeStamp, List<Dictionary<string, object>> tables)
         {
@@ -362,26 +310,12 @@ namespace PBSDumpWorkload
 
             WriteToJobLog(JobLogMessageType.INFO, $"Preparing to load {table["TableName"]}");
 
-            if (Int32.Parse(table["LoadsTableID"].ToString()) == 0)
-            {
-                //todo: this must not get hit; the parameters in the code don't match the sproc
-                //Dictionary<string, object> result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Insert_BN_Loads_Tables",
-                //                                                 new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
-                //                                                 new SqlParameter("@pbintLoadsDumpControlID", loadsId),
-                //                                                 new SqlParameter("@pvchrTableDumpStartDateTime", table["TableDumpStartDateTime"].ToString()),
-                //                                                 new SqlParameter("@pvchrFromDate", table["FromDate"].ToString()),
-                //                                                 new SqlParameter("@pvchrArchiveEndingDate", table["ArchiveEndingDate"].ToString()),
-                //                                                 new SqlParameter("@pflgUpdateTranNumberControlFileAfterPopulate", table["UpdateTranNumberFileAfterSuccessfulPopulate"].ToString())).FirstOrDefault();
-                //table["LoadsTableID"] = result["loads_table_id"];
-            }
-            else
-            {
-                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables",
+             ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables",
                                                              new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
                                                              new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
                                                              new SqlParameter("@pvchrFile", fileInfo.Name),
                                                              new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
-            }
+            
 
             WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({timeStampDate})");
 
@@ -542,21 +476,13 @@ namespace PBSDumpWorkload
             }
 
 
-            //if (populateImmediatelyAfterLoad)
-            //{
-            //    PopulateTable(table["TableName"].ToString(), Int64.Parse(table["LoadsTableID"].ToString()), tables);
-            //    ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pbintLoadsTablesID", table["LoadsTableId"].ToString()));
-            //}
+            if (populateImmediatelyAfterLoad) //for PBSDumpB and PBSDumpC only
+            {
+                PopulateTable(table["TableName"].ToString(), Int64.Parse(table["LoadsTableID"].ToString()), tables);
+                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pbintLoadsTablesID", table["LoadsTableId"].ToString()));
+            }
 
             return filesToDelete;
-
-        }
-
-        private void CreateWorkloadTouchFile(string processedFileName)
-        {
-            string touchDirectory = GetConfigurationKeyValue("WorkLoadTouchDirectory");
-            File.Create(touchDirectory + processedFileName);
-            WriteToJobLog(JobLogMessageType.INFO, $"Created work load touch file {processedFileName}");
 
         }
 
@@ -572,8 +498,8 @@ namespace PBSDumpWorkload
             }
         }
 
-        //private void PopulateTable(string tableName, Int64 loadsTableId, List<Dictionary<string, object>> tables)
-        //{
+       private void PopulateTable(string tableName, Int64 loadsTableId, List<Dictionary<string, object>> tables)
+        {
         //    WriteToJobLog(JobLogMessageType.INFO, $"{tableName} populating");
 
         //    ExecuteNonQuery(VersionSpecificConnectionString, $"Proc_Populate_{tableName}",
@@ -581,7 +507,7 @@ namespace PBSDumpWorkload
 
         //    WriteToJobLog(JobLogMessageType.INFO, $"{tableName} successful");
 
-        //}
+        }
 
 
         private string PadField(string value, int length)

@@ -16,30 +16,30 @@ namespace CircDumpWorkLoad
     {
         //steps for job
         //1. Check for a new touch file at \\circfs\backup\circdump\touch\. This file gets extracted last by the UnzipNewscycleExportFiles job, ensuring that the rest of the batch of files are ready for processing. 
-        //1. Checks \\circfs\backup\circdump\data\<groupNumber>\ for any dumpcontrol*.timestamp
-        //2. For each file found, check to see if it was previously loaded 
-        //3. If a file was found, create a record in BN_Loads_DumpControl table(this acts similar to the Loads table in other jobs)
-        //4. Parses the dumpcontrol*.data file for a list of the files to import 
-        //5. Deletes the touch file at \\Omaha\DumpTouch\CircDump\Table\<tableName>.successful(does this really ever exist?)
-        //6. Create a new folder at \\Omaha\DumpTouch\CircDump\Group\<groupNumber>
-        //7. Deleted the touch file at \\Omaha\DumpTouch\CircDump\Group\<groupNumber>   (does this really ever exist?)
-        //8. Create a loads record for each file to be processed
-        //9. Create a bulk insert directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>
-        //10. Create bulk insert config directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Config
-        //11. Create bulk insert config directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Data
-        //12. Check for an error file if one exists \\circfs\backup\circdump\data\<groupNumber>\<tableName>.error. Exit and throw exception if one is found
-        //13. Parse the file's matching timestamp file \\circfs\backup\circdump\data\<groupNumber>\<tableName>.timestamp. Make sure this matches the the timestamp in the dumpcontrol*.timestamp file
-        //14. Delete any records from the destination table with a matching timestamp
-        //15. Read in matching file specific header file to get a list of the column names 
-        //16. Query the database for a list of column names to build the field lengths for neach column. This will then be used to build the bulk insert format file
-        //17. Parse the count file at \\circfs\backup\circdump\data\<groupNumber>\<tableName>.count
-        //18. Build bulk insert files, both the format and error files at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.error and \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.format
-        //19. Copy data file from \\circfs\backup\circdump\data\1\<tableName>.data to \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Data\<tableName>.data
-        //20. Run bulk insert
-        //21. Check for new error file at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.error, throw exception and exit if one is found
-        //22. Remove last record from insert, since this is a control record
-        //23. Check to make sure that all of the records were correctly inserted by comparing the count file and the last record inserted into the table
-        //24. Cleanups all related files
+        //2. Checks \\circfs\backup\circdump\data\<groupNumber>\ for any dumpcontrol*.timestamp
+        //3. For each file found, check to see if it was previously loaded 
+        //4. If a file was found, create a record in BN_Loads_DumpControl table(this acts similar to the Loads table in other jobs)
+        //5. Parses the dumpcontrol*.data file for a list of the files to import 
+        //6. Deletes the touch file at \\Omaha\DumpTouch\CircDump\Table\<tableName>.successful(does this really ever exist?)
+        //7. Create a new folder at \\Omaha\DumpTouch\CircDump\Group\<groupNumber>
+        //8. Deleted the touch file at \\Omaha\DumpTouch\CircDump\Group\<groupNumber>   (does this really ever exist?)
+        //9. Create a loads record for each file to be processed
+        //10. Create a bulk insert directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>
+        //11. Create bulk insert config directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Config
+        //12. Create bulk insert config directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Data
+        //13. Check for an error file if one exists \\circfs\backup\circdump\data\<groupNumber>\<tableName>.error. Exit and throw exception if one is found
+        //14. Parse the file's matching timestamp file \\circfs\backup\circdump\data\<groupNumber>\<tableName>.timestamp. Make sure this matches the the timestamp in the dumpcontrol*.timestamp file
+        //15. Delete any records from the destination table with a matching timestamp
+        //16. Read in matching file specific header file to get a list of the column names 
+        //17. Query the database for a list of column names to build the field lengths for neach column. This will then be used to build the bulk insert format file
+        //18. Parse the count file at \\circfs\backup\circdump\data\<groupNumber>\<tableName>.count
+        //19. Build bulk insert files, both the format and error files at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.error and \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.format
+        //20. Copy data file from \\circfs\backup\circdump\data\1\<tableName>.data to \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Data\<tableName>.data
+        //21. Run bulk insert
+        //22. Check for new error file at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.error, throw exception and exit if one is found
+        //23. Remove last record from insert, since this is a control record
+        //24. Check to make sure that all of the records were correctly inserted by comparing the count file and the last record inserted into the table
+        //25. Cleanups all related files
         //This is step 1 in the import process. Step 2 is CircDumpPopulate. Step 3 is CircDumpPostGroup. Step 3 is no longer needed.
 
         public int GroupNumber { get; set; }
@@ -71,7 +71,7 @@ namespace CircDumpWorkLoad
                         {
                             touchFileFound = true;
                             //only delete the file if it's the last group
-                            if (GroupNumber == 6)
+                            if (GroupNumber == 6 && bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
                                 File.Delete(file);
                         }
                     }
@@ -299,26 +299,12 @@ namespace CircDumpWorkLoad
 
             WriteToJobLog(JobLogMessageType.INFO, $"Preparing to load {table["TableName"]}");
 
-            if (Int32.Parse(table["LoadsTableID"].ToString()) == 0)
-            {
-                //todo: this must not get hit; the parameters in the code don't match the sproc
-                //Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Insert_BN_Loads_Tables",
-                //                                                 new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
-                //                                                 new SqlParameter("@pbintLoadsDumpControlID", loadsId),
-                //                                                 new SqlParameter("@pvchrTableDumpStartDateTime", table["TableDumpStartDateTime"].ToString()),
-                //                                                 new SqlParameter("@pvchrFromDate", table["FromDate"].ToString()),
-                //                                                 new SqlParameter("@pvchrArchiveEndingDate", table["ArchiveEndingDate"].ToString()),
-                //                                                 new SqlParameter("@pflgUpdateTranNumberControlFileAfterPopulate", table["UpdateTranNumberFileAfterSuccessfulPopulate"].ToString())).FirstOrDefault();
-                //table["LoadsTableID"] = result["loads_table_id"];
-            }
-            else
-            {
-                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables",
+             ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables",
                                                              new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
                                                              new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
                                                              new SqlParameter("@pvchrFile", fileInfo.Name),
                                                              new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
-            }
+            
 
             WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({timeStampDate})");
 
