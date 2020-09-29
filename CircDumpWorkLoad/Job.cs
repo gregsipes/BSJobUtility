@@ -15,6 +15,7 @@ namespace CircDumpWorkLoad
     public class Job : JobBase
     {
         //steps for job
+        //1. Check for a new touch file at \\circfs\backup\circdump\touch\. This file gets extracted last by the UnzipNewscycleExportFiles job, ensuring that the rest of the batch of files are ready for processing. 
         //1. Checks \\circfs\backup\circdump\data\<groupNumber>\ for any dumpcontrol*.timestamp
         //2. For each file found, check to see if it was previously loaded 
         //3. If a file was found, create a record in BN_Loads_DumpControl table(this acts similar to the Loads table in other jobs)
@@ -54,39 +55,6 @@ namespace CircDumpWorkLoad
         {
             try
             {
-
-                //check for any touch files. If they exist, send email with contents, then delete (is this even needed?)
-                //UPDATE: I believe this was done to avoid reprocessing the same files. I don't see how this would cause an issue, so the functionality will be ommitted  - GDS
-                //if (Directory.Exists(GetConfigurationKeyValue("DumpTouchDirectory")))
-                //{
-                //    List<string> processedTouchFiles = new List<string>();
-                //    List<string> touchFiles = Directory.GetFiles(GetConfigurationKeyValue("DumpTouchDirectory"), GetConfigurationKeyValue("DumpTouchFile")).ToList();
-
-                //    foreach (string file in touchFiles)
-                //    {
-                //        FileInfo fileInfo = new FileInfo(file);
-                //        if (fileInfo.Name != "." && fileInfo.Name != ".." && processedTouchFiles.Where(p => p == file).Count() == 0)
-                //        {
-                //            List<string> fileContents = File.ReadAllLines(fileInfo.FullName).ToList();
-                //            StringBuilder stringBuilder = new StringBuilder();
-
-                //            foreach (string line in fileContents)
-                //            {
-                //                if (line.Trim() != "")
-                //                    stringBuilder.AppendLine(line);
-                //            }
-
-                //         //   SendMail($"{GetConfigurationKeyValue("DumpTouchDescription")} Started {fileInfo.LastWriteTime.ToString()}", stringBuilder.ToString(), false);
-
-
-                //            processedTouchFiles.Add(file);
-
-                //            //todo: uncomment for production
-                //            //File.Delete(file);
-                //            WriteToJobLog(JobLogMessageType.INFO, $"Deleted file {file}");
-                //        }
-                //    }
-                //}
 
                 //check for any touch files before executing
                 bool touchFileFound = false;
@@ -208,18 +176,6 @@ namespace CircDumpWorkLoad
 
                     tables.Add(table);
 
-                    ////delete touch file
-                    //if (File.Exists(GetConfigurationKeyValue("TableTouchDirectory") + table["TableName"] + ".successful"))
-                    //    File.Delete(GetConfigurationKeyValue("TableTouchDirectory") + table["TableName"] + ".successful");
-
-                    ////create group folder path if doesn't exist
-                    //if (!Directory.Exists(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"]))
-                    //    Directory.CreateDirectory(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"]);
-
-                    ////if the file already exists, delete it
-                    //if (File.Exists(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"] + "\\" + table["TableName"] + ".successful"))
-                    //    File.Delete(GetConfigurationKeyValue("GroupTouchDirectory") + table["GroupNumber"] + "\\" + table["TableName"] + ".successful");
-
                 }
             }
 
@@ -239,7 +195,6 @@ namespace CircDumpWorkLoad
                 if (result == null)
                 {
                     WriteToJobLog(JobLogMessageType.ERROR, $"Group number ({tables[0]["GroupNumber"]} not found)");
-                    //todo: should we send an email? Is this ever a real case?
                     return;
                 }
 
@@ -300,9 +255,6 @@ namespace CircDumpWorkLoad
                     }
                 }
 
-                //create workload touch file
-                //  CreateWorkloadTouchFile(fileInfo.Name);
-
                 //delete files
                 if (bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
                     DeleteFiles(filesToDelete);
@@ -311,8 +263,6 @@ namespace CircDumpWorkLoad
                                        new SqlParameter("@pintLoadsDumpControlID", loadsId));
             }
         }
-
-        //   }
 
         private List<string> ImportTable(Dictionary<string, object> table, FileInfo fileInfo, Int32 loadsId, string bulkInsertDirectory, bool populateImmediatelyAfterLoad, DateTime dumpControlTimeStamp, List<Dictionary<string, object>> tables)
         {
@@ -528,24 +478,11 @@ namespace CircDumpWorkLoad
                 throw new Exception(message);
             }
 
-
-            //if (populateImmediatelyAfterLoad)
-            //{
-            //    PopulateTable(table["TableName"].ToString(), Int64.Parse(table["LoadsTableID"].ToString()), tables);
             ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
-            //}
 
             return filesToDelete;
 
         }
-
-        //private void CreateWorkloadTouchFile(string processedFileName)
-        //{
-        //    string touchDirectory = GetConfigurationKeyValue("WorkLoadTouchDirectory");
-        //    File.Create(touchDirectory + processedFileName);
-        //    WriteToJobLog(JobLogMessageType.INFO, $"Created work loaad touch file {processedFileName}");
-
-        //}
 
         private void DeleteFiles(List<string> files)
         {
