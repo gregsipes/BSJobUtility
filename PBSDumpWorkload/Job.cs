@@ -347,8 +347,13 @@ namespace PBSDumpWorkload
                 }
             }
 
+            if (table["TableName"].ToString() == "Messages")
+            {
+                var x = 2 + 1;
+            }
+
             List<Dictionary<string, object>> results = ExecuteSQL(VersionSpecificConnectionString, CommandType.Text,
-                                                                    "SELECT ORDINAL_POSITION, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = 'CircDump_Work' AND TABLE_NAME = @TableName",
+                                                                    $"SELECT ORDINAL_POSITION, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = 'PBSDump{GroupName}_Work' AND TABLE_NAME = @TableName",
                                                                     new SqlParameter("@TableName", table["TableName"].ToString()));
 
             int loopCounter = 0;
@@ -358,7 +363,7 @@ namespace PBSDumpWorkload
 
                 foreach (Dictionary<string, object> columnDefinition in columnDefinitions)
                 {
-                    if (columnDefinition["ColumnName"].ToString() == column["COLUMN_NAME"].ToString())
+                    if (columnDefinition["ColumnName"].ToString().ToLower() == column["COLUMN_NAME"].ToString().ToLower())
                     {
                         columnDefinition["ColumnIndex"] = loopCounter;
 
@@ -447,6 +452,7 @@ namespace PBSDumpWorkload
             WriteToJobLog(JobLogMessageType.INFO, $"Error file = {bulkInsertErrorFile}");
             WriteToJobLog(JobLogMessageType.INFO, $"Format file = {bulkInsertFormatFile}");
 
+
             ExecuteNonQuery(VersionSpecificConnectionString, CommandType.Text, $"BULK INSERT {table["TableName"].ToString()} FROM '{bulkInsertDataFile}' WITH (FORMATFILE='{bulkInsertFormatFile}', ERRORFILE='{bulkInsertErrorFile}')");
 
             WriteToJobLog(JobLogMessageType.INFO, $"Checking status of bulk insert import");
@@ -500,12 +506,12 @@ namespace PBSDumpWorkload
 
        private void PopulateTable(string tableName, Int64 loadsTableId, List<Dictionary<string, object>> tables)
         {
-        //    WriteToJobLog(JobLogMessageType.INFO, $"{tableName} populating");
+            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} populating");
 
-        //    ExecuteNonQuery(VersionSpecificConnectionString, $"Proc_Populate_{tableName}",
-        //                                new SqlParameter("@pbintLoadsTablesID", loadsTableId));
+            ExecuteNonQuery(VersionSpecificConnectionString, $"Proc_Populate_{tableName}",
+                                        new SqlParameter("@pbintLoadsTablesID", loadsTableId));
 
-        //    WriteToJobLog(JobLogMessageType.INFO, $"{tableName} successful");
+            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} successful");
 
         }
 
