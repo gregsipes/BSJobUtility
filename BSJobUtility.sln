@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircDumpWorkLoad", "CircDum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircDumpPopulate", "CircDumpPopulate\CircDumpPopulate.csproj", "{58A03971-0C97-42BC-9B51-FB93DB910BD0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurchaseOrders", "PurchaseOrders\PurchaseOrders.csproj", "{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +181,10 @@ Global
 		{58A03971-0C97-42BC-9B51-FB93DB910BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58A03971-0C97-42BC-9B51-FB93DB910BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58A03971-0C97-42BC-9B51-FB93DB910BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -208,6 +214,7 @@ Global
 		{428258FE-950A-4FFD-883C-7FAEA65E05B3} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{0C8C80C8-B156-4211-9566-B1531E86C906} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{58A03971-0C97-42BC-9B51-FB93DB910BD0} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{DEDDECC7-69D9-4924-8596-018BFA1B4BDE} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}

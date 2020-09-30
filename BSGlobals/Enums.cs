@@ -37,7 +37,7 @@ namespace BSGlobals
             CircDumpWorkPopulate,
             PBSDumpAWork,
             PBSDumpBWork,
-            PBSDumpCWork
+            PBSDumpCWork,
             Purchasing
         }
 
