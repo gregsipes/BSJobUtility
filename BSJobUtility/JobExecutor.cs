@@ -10,23 +10,35 @@ namespace BSJobUtility
     public class JobExecutor : IDisposable
     {
         private readonly string _jobName;
+        private readonly string _group;
         private JobBase _managedJob;
 
-        public JobExecutor(string jobName, string[] args)
+        public JobExecutor(string jobName, string group, string[] args)
         {
-            _jobName = jobName;
+            try
+            {
+                _jobName = jobName;
+                _group = group;
 
-            // setup job
-            SetupJob();
+                // setup job
+                SetupJob();
 
-            // pre execution
-            PreExecution(args);
+                // pre execution
+                PreExecution(args);
 
-            // execute job
-            ExecuteJob();
+                // execute job
+                ExecuteJob();
 
-            // post execution
-            PostExecution();
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                // post execution
+                PostExecution();
+            }
         }
 
         private void SetupJob()
@@ -69,6 +81,18 @@ namespace BSJobUtility
                 _managedJob = new PayByScanLoadWegmans.Job();
             else if (_jobName == "PayByScanLoad711")
                 _managedJob = new PayByScanLoad711.Job();
+            else if (_jobName == "PrepackInsertLoad")
+                _managedJob = new PrepackInsertLoad.Job();
+            else if (_jobName == "PBSDumpWorkload")
+                _managedJob = new PBSDumpWorkload.Job() { GroupName = _group };
+            else if (_jobName == "CircDumpWorkload")
+                _managedJob = new CircDumpWorkLoad.Job() { GroupNumber = Convert.ToInt32(_group) };
+            else if (_jobName == "CircDumpPopulate")
+                _managedJob = new CircDumpPopulate.Job() { GroupNumber = Convert.ToInt32(_group) };
+            //else if (_jobName == "CircDumpPost")  //with the refractoring that has been done, this job/step should no longer be needed
+            //    _managedJob = new CircDumpPost.Job() { GroupNumber = Convert.ToInt32(_group) };
+            else if (_jobName == "TestJob")
+                _managedJob = new TestJob.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 

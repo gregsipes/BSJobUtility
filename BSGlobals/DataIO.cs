@@ -136,7 +136,7 @@ namespace BSGlobals
         {
             try
             {
-                using (SqlCommand command = new SqlCommand())
+                using (SqlCommand command = new SqlCommand() { CommandTimeout = 0 })
                 {
                     command.Connection = new SqlConnection(Config.GetConnectionStringTo(connectionStringName));
                     command.CommandType = commandType;

@@ -208,6 +208,24 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.PayByScan:
                     connectionString = GetConnectionString("paybyscan");
                     break;
+                case DatabaseConnectionStringNames.PrepackInsertLoad:
+                    connectionString = GetConnectionString("prepackinserts");
+                    break;
+                case DatabaseConnectionStringNames.CircDumpWorkLoad:
+                    connectionString = GetConnectionString("circdumpwork_load");
+                    break;
+                case DatabaseConnectionStringNames.CircDumpWorkPopulate:
+                    connectionString = GetConnectionString("circdumpwork_populate");
+                    break;
+                case DatabaseConnectionStringNames.PBSDumpAWork:
+                    connectionString = GetConnectionString("pbsdumpawork");
+                    break;
+                case DatabaseConnectionStringNames.PBSDumpBWork:
+                    connectionString = GetConnectionString("pbsdumpbwork");
+                    break;
+                case DatabaseConnectionStringNames.PBSDumpCWork:
+                    connectionString = GetConnectionString("pbsdumpcwork");
+                    break;
                 case DatabaseConnectionStringNames.Purchasing:
                     connectionString = GetConnectionString("purchasing");
                     break;

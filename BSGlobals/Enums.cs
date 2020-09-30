@@ -32,6 +32,12 @@ namespace BSGlobals
             PBSInvoices,
             DMMail,
             PayByScan,
+            PrepackInsertLoad,
+            CircDumpWorkLoad,
+            CircDumpWorkPopulate,
+            PBSDumpAWork,
+            PBSDumpBWork,
+            PBSDumpCWork,
             Purchasing
         }
 

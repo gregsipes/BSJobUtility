@@ -38,6 +38,11 @@ namespace BSJobBase
         /// </summary>
         protected string[] Args { get; set; }
 
+        /// <summary>
+        /// Holds the flag indicating that the 'Job Started' log entry has been created, since we only want to create an entry if actual processing has been done or the config entry is set to true
+        /// </summary>
+        private bool JobStartedLog { get; set; }
+
 
         #endregion
 
@@ -86,20 +91,36 @@ namespace BSJobBase
             }
 
             // basic logging
-            WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting");
+            if (bool.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "LogEmptyRuns")) == true)
+            {
+                WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting");
+                JobStartedLog = true;
+            }
         }
 
         public virtual void PostExecuteJob()
         {
-            WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed");
+            if (bool.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "LogEmptyRuns")) == true || JobStartedLog == true)
+                WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed");
         }
 
         #endregion
 
         #region Methods
 
+        private void CheckForJobStartedLog()
+        {
+            if (!JobStartedLog)
+            {
+                JobStartedLog = true;
+                WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting");
+            }
+        }
+
         public void LogException(Exception ex)
         {
+            CheckForJobStartedLog();
+
             BSGlobals.Mail.SendMail($"Error in Job: {JobName}", ex.ToString(), false);
             BSGlobals.DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, ex.ToString(), JobName);
         }
@@ -108,6 +129,8 @@ namespace BSJobBase
 
         public void WriteToJobLog(BSGlobals.Enums.JobLogMessageType type, string message)
         {
+            CheckForJobStartedLog();
+
             BSGlobals.DataIO.WriteToJobLog(type, message, JobName);           
         }
 

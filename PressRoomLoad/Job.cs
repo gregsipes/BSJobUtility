@@ -25,30 +25,33 @@ namespace PressRoomLoad
                     {
                         FileInfo fileInfo = new FileInfo(file);
 
-                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.PressRoom, "dbo.Proc_Select_Loads_If_Processed",
-                                                                new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                                                                new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
-
-
-                        if (previouslyLoadedFile == null)
+                        if (fileInfo.Length > 0)
                         {
-                            //make sure we the file is no longer being edited
-                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                            Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.PressRoom, "dbo.Proc_Select_Loads_If_Processed",
+                                                                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                                                                    new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
+
+
+                            if (previouslyLoadedFile == null)
                             {
-                                WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
-                                CopyAndProcessFile(fileInfo);
+                                //make sure we the file is no longer being edited
+                                if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                                {
+                                    WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                                    CopyAndProcessFile(fileInfo);
+                                }
                             }
+                            //else
+                            //{
+                            //    ExecuteNonQuery(DatabaseConnectionStringNames.PressRoom, "Proc_Insert_Loads_Not_Loaded",
+                            //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
+                            //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                            //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                            //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                            //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
+                            //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
+                            //}
                         }
-                        //else
-                        //{
-                        //    ExecuteNonQuery(DatabaseConnectionStringNames.PressRoom, "Proc_Insert_Loads_Not_Loaded",
-                        //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
-                        //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                        //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
-                        //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
-                        //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
-                        //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
-                        //}
                     }
 
                 }
@@ -102,7 +105,9 @@ namespace PressRoomLoad
 
                 if (line != null && line.Trim().Length > 0)
                 {
-                    if (line.StartsWith("PUBLISHING DATE:"))
+                    if (line.Contains("NO RECORDS FOUND"))
+                        break;
+                    else if (line.StartsWith("PUBLISHING DATE:"))
                         publishDate = Convert.ToDateTime(line.Replace("PUBLISHING DATE:", "").Trim());
                     else if (line.StartsWith("EDITION:"))
                         edition = line.Replace("EDITION:", "").Trim();

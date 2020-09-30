@@ -62,6 +62,14 @@
       <Project>{814ddf3f-573f-4ea8-a7a1-e789e4608b9b}</Project>
       <Name>BSJobBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CircDumpPopulate\CircDumpPopulate.csproj">
+      <Project>{58a03971-0c97-42bc-9b51-fb93db910bd0}</Project>
+      <Name>CircDumpPopulate</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CircDumpWorkLoad\CircDumpWorkLoad.csproj">
+      <Project>{0c8c80c8-b156-4211-9566-b1531e86c906}</Project>
+      <Name>CircDumpWorkLoad</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CommissionsCreate\CommissionsCreate.csproj">
       <Project>{9927a52d-b824-47ec-8653-cf444c79f7d8}</Project>
       <Name>CommissionsCreate</Name>
@@ -98,6 +106,10 @@
       <Project>{d31351eb-64a1-48b8-a407-2c7dc0493b0b}</Project>
       <Name>PayByScanLoadWegmans</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBSDumpWorkload\PBSDumpWorkload.csproj">
+      <Project>{7cd71798-c122-4145-a08e-506a88273108}</Project>
+      <Name>PBSDumpWorkload</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PBSInvoiceExportLoad\PBSInvoiceExportLoad.csproj">
       <Project>{5e72a50a-0ca6-481b-b937-c54be921d6ce}</Project>
       <Name>PBSInvoiceExportLoad</Name>
@@ -114,6 +126,10 @@
       <Project>{564e163f-1504-4c49-8cde-251aa50b5e44}</Project>
       <Name>PBSMacrosLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PrepackInsertLoad\PrepackInsertLoad.csproj">
+      <Project>{6bf0e083-ac26-4c65-a539-8823c65c3f7b}</Project>
+      <Name>PrepackInsertLoad</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PressRoomFreeLoad\PressRoomFreeLoad.csproj">
       <Project>{fd252a6f-65a4-4e97-93ff-7eb0ad5f5a0c}</Project>
       <Name>PressRoomFreeLoad</Name>
@@ -125,6 +141,10 @@
     <ProjectReference Include="..\QualificationReportLoad\QualificationReportLoad.csproj">
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TestJob\TestJob.csproj">
+      <Project>{428258fe-950a-4ffd-883c-7faea65e05b3}</Project>
+      <Name>TestJob</Name>
     </ProjectReference>
     <ProjectReference Include="..\UnzipNewscycleExportFiles\UnzipNewscycleExportFiles.csproj">
       <Project>{5908ef09-95b9-4ec0-91c2-a404c8545853}</Project>

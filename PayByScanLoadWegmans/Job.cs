@@ -39,33 +39,37 @@ namespace PayByScanLoadWegmans
                     {
                         FileInfo fileInfo = new FileInfo(file);
 
-                        Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.PayByScan, "dbo.Proc_Select_Loads_If_Processed",
+                        if (fileInfo.Length > 0) //ignore empty files
+                        {
+
+                            Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.PayByScan, "dbo.Proc_Select_Loads_If_Processed",
                                                                 new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                 new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
 
-                        if (previouslyLoadedFile == null)
-                        {
-                            //make sure we the file is no longer being edited
-                            if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                            if (previouslyLoadedFile == null)
                             {
-                                WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
-                                CopyAndProcessFile(fileInfo, loadFormat);
-                            }
-                            else
-                                WriteToJobLog(JobLogMessageType.INFO, "There's a chance the file is still getting updated, so we'll pick it up next run");
+                                //make sure we the file is no longer being edited
+                                if ((DateTime.Now - fileInfo.LastWriteTime).TotalMinutes > Int32.Parse(GetConfigurationKeyValue("SleepTimeout")))
+                                {
+                                    WriteToJobLog(JobLogMessageType.INFO, $"{fileInfo.FullName} found");
+                                    CopyAndProcessFile(fileInfo, loadFormat);
+                                }
+                                else
+                                    WriteToJobLog(JobLogMessageType.INFO, "There's a chance the file is still getting updated, so we'll pick it up next run");
 
+                            }
+                            //else
+                            //{
+                            //    ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Insert_Loads_Not_Loaded",
+                            //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
+                            //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
+                            //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
+                            //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                            //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
+                            //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
+                            //}
                         }
-                        //else
-                        //{
-                        //    ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Insert_Loads_Not_Loaded",
-                        //                    new SqlParameter("@pvchrOriginalDir", fileInfo.Directory.ToString()),
-                        //                    new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
-                        //                    new SqlParameter("@pdatLastModified", fileInfo.LastWriteTime),
-                        //                    new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
-                        //                    new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower()),
-                        //                    new SqlParameter("@pvchrLoadVersion", Assembly.GetExecutingAssembly().GetName().Version.ToString()));
-                        //}
                     }
                 }
 
@@ -139,6 +143,18 @@ namespace PayByScanLoadWegmans
             }
 
             WriteToJobLog(JobLogMessageType.INFO, $"{lineNumber - 2} total records read.");
+
+            //if any new upc codes exist, send a warning email to manually update the editions field in the upc_codes table, linking to the appropriate edition
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.PayByScan, "Proc_Select_New_UPC_Codes",
+                                 new SqlParameter("@pintLoadsID", loadsId)).ToList();
+
+            if (results.Count() > 0)
+            {
+                List<string> codes = results.Select(r => r["item_description"].ToString()).ToList();
+                string newUPCCodes = String.Join(",", codes);
+                SendMail("PayByScan Wegmans - new UPC Code(s) detected", $"New Wegmans UPC code(s) ({newUPCCodes}) has been added to PayByScan.  Please update the editions field in the UPC_Codes table to link it to the appropriate edition.", false);
+            }
+            
 
             ExecuteNonQuery(DatabaseConnectionStringNames.PayByScan, "Proc_Insert_Wegmans",
                                 new SqlParameter("@pintLoadsID", loadsId),
