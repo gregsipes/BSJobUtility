@@ -44,6 +44,83 @@ namespace BSGlobals
             return value;
         }
 
+
+
+#if false // 9/27/20 PEB - This does not work in its current form as app.config is a read-only collection.  See updated function below this one.
+
+        /// <summary>
+        /// Update an existing configuration key value
+        /// </summary>
+        /// <param name="sectionName"></param>
+        /// <param name="keyName"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool SetConfigurationKeyValue(string sectionName, string keyName, string value)
+        {
+            NameValueCollection section = null;
+
+            try
+            {
+                section = ConfigurationManager.GetSection(sectionName) as NameValueCollection;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to locate section {sectionName} in configuration file.", ex);
+            }
+
+            try
+            {
+                if (section != null)
+                    section[keyName] = value;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to locate key {keyName} in section {sectionName} in configuration file.", ex);
+            }
+
+            return (true);
+        }
+#endif
+
+        public static bool SetConfigurationKeyValue(string sectionName, string keyName, string value)
+        {
+
+            NameValueCollection section = null;
+
+            // Update the local configuration.  If it doesn't already exist this will create
+            //   file <application name>.exe.config, into which the updated config parameter(s) will be saved.
+            //   The local config values override the global app.config file values.
+            try
+            {
+                section = ConfigurationManager.GetSection(sectionName) as NameValueCollection;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to locate section {sectionName} in configuration file.", ex);
+            }
+
+            try
+            {
+                if (section != null)
+                {
+                    var xmlDoc = new System.Xml.XmlDocument();
+                    xmlDoc.Load(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+                    string node = @"//configuration/" + sectionName + @"/add[@key='" + keyName + "']";
+                    //System.Xml.XmlNode xnode = xmlDoc.SelectSingleNode(node);
+                    //System.Xml.XmlAttributeCollection attrs = xnode.Attributes;
+                    //attr.Value = value;
+                    xmlDoc.SelectSingleNode(node).Attributes["value"].Value = value;
+                    xmlDoc.Save(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+                    ConfigurationManager.RefreshSection(sectionName);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to locate section {sectionName} in configuration file.", ex);
+            }
+            return (true);
+        }
+
         /// <summary>
         /// Returns connection string from the app.config file
         /// </summary>
@@ -131,11 +208,15 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.PayByScan:
                     connectionString = GetConnectionString("paybyscan");
                     break;
+                case DatabaseConnectionStringNames.Purchasing:
+                    connectionString = GetConnectionString("purchasing");
+                    break;
                 default:
                     break;
             }
 
             return connectionString;
         }
+
     }
 }

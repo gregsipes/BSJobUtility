@@ -29,10 +29,10 @@ namespace AppStatusControl
         private const int MULTILINE_LASTRUNTIME_X = 24;
         private const int MULTILINE_LASTRUNTIME_Y = 44;
 
-        private const int SINGLELINE_MINIMUMWIDTH = 500;
+        private const int SINGLELINE_MINIMUMWIDTH = 550;
         private const int SINGLELINE_MINIMUMHEIGHT = 24;
         private const int SINGLELINE_LASTRUNTIME_X = 400;
-        private const int SINGLELINE_ACTIVITY_LED_X = 600;
+        private const int SINGLELINE_ACTIVITY_LED_X = 650;
         private const int SINGLELINE_ACTIVITY_LED_Y = 4;
         private const int SINGLELINE_ALIGNMENT_Y = 4;
 
@@ -138,6 +138,21 @@ namespace AppStatusControl
             UpdateControlArea();
         }
 
+        internal void PushLEDs()
+        {
+            // Take the data associated with the LEDs and march it down one LED
+            //   in order to make room for the next LED's data
+
+            for (int i = NumLEDsToBuild - 1; i > 0; i--)
+            {
+                string msg = GetLEDMessage(i - 1);
+                SetLEDMessage(i, msg);
+
+                Color clr = GetLEDColor(i - 1);
+                SetLEDColor(LEDs.LEDStatus, i, clr);
+            }
+        }
+
         public void ClearLEDs(int firstLED)
         {
             ClearLEDs(firstLED, NumLEDsToBuild);
@@ -149,6 +164,13 @@ namespace AppStatusControl
             {
                 SetLEDColor(LEDs.LEDStatus, i, Color.Black);
             }
+        }
+
+        public Color GetLEDColor(int ledNum)
+        {
+            // Returns the selected LED's color
+            PictureBox pic = (PictureBox)this.Controls["LED" + ledNum.ToString("D2")];
+            return (pic.BackColor);
         }
 
         public void SetLEDColor(LEDs led, int ledNum, Color LEDcolor)
@@ -278,6 +300,7 @@ namespace AppStatusControl
             // Expose a mouse click to the outside
             ucMouse_Click(sender, e);
         }
+
         #endregion
     }
 }
