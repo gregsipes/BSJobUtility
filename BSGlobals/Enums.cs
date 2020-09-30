@@ -38,6 +38,7 @@ namespace BSGlobals
             PBSDumpAWork,
             PBSDumpBWork,
             PBSDumpCWork
+            Purchasing
         }
 
         public enum JobLogMessageType

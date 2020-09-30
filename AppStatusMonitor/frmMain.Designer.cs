@@ -36,7 +36,7 @@
             // timUpdateStatus
             // 
             this.timUpdateStatus.Interval = 1;
-            this.timUpdateStatus.Tick += new System.EventHandler(this.timUpdateStatus_Tick);
+            this.timUpdateStatus.Tick += new System.EventHandler(this.TimUpdateStatus_Tick);
             // 
             // pnlMonitors
             // 
@@ -50,7 +50,7 @@
             this.pnlMonitors.Name = "pnlMonitors";
             this.pnlMonitors.Size = new System.Drawing.Size(932, 495);
             this.pnlMonitors.TabIndex = 1;
-            this.pnlMonitors.Click += new System.EventHandler(this.pnlMonitors_Click);
+            this.pnlMonitors.Click += new System.EventHandler(this.PnlMonitors_Click);
             // 
             // frmMain
             // 
@@ -62,8 +62,8 @@
             this.Name = "frmMain";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "Application Status Monitor";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
-            this.ResizeEnd += new System.EventHandler(this.frmMain_ResizeEnd);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
+            this.ResizeEnd += new System.EventHandler(this.FrmMain_ResizeEnd);
             this.ResumeLayout(false);
 
         }
