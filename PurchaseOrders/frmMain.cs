@@ -7,7 +7,7 @@ using BSGlobals;
 
 namespace PurchaseOrders
 {
-    public partial class frmMain : Form
+    public partial class FrmMain : Form
     {
         #region Declarations
         const string JobName = "Purchase Orders";
@@ -17,12 +17,12 @@ namespace PurchaseOrders
         VendorListClass CurrentVendors = new VendorListClass();
         OrderClass CurrentOrder;
         ActiveDirectory UserInfo = new ActiveDirectory();
-        ClsSpreadsheet POSpreadsheet;
-        ClsSpreadsheet ERSpreadsheet;
+        Spreadsheet POSpreadsheet;
+        Spreadsheet ERSpreadsheet;
         #endregion
 
         #region Initialization
-        public frmMain()
+        public FrmMain()
         {
             InitializeComponent();
 
@@ -196,6 +196,8 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, "Unable to create new purchase order:  " + ex.ToString(), JobName);
+                MessageBox.Show("ERROR - " + "Unable to create new purchase order:  " + ex.ToString());
                 return (null);
             }
             return (order);
@@ -252,7 +254,7 @@ namespace PurchaseOrders
                     GrdOrderDetails.Rows.Add();
                     PopulateChargeToComboBox(row);
                     PopulateClassificationComboBox(row);
-                    StuffLineItems(GrdOrderDetails.Rows[row], rdrItem);
+                    DisplayLineItems(GrdOrderDetails.Rows[row], rdrItem);
                     CurrentOrder.LoadLineItemsFromSQL(rdrItem, true);
                     if (selectedOrderItem.SingleItemOnly) break; // If only a single entry was copied, exit the loop after a single iteration
                     row++;
@@ -334,7 +336,8 @@ namespace PurchaseOrders
                 }
                 catch (Exception ex)
                 {
-                    // TBD
+                    DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, "Unable to obtain the record ID for the updated order:  " + ex.ToString(), JobName);
+                    MessageBox.Show("ERROR - " + "Unable to obtain the record ID for the updated order:  " + ex.ToString());
                 }
             }
         }
@@ -354,6 +357,8 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, "Unable to create new vendor record:  " + ex.ToString(), JobName);
+                MessageBox.Show("ERROR - " + "Unable to create new vendor record:  " + ex.ToString());
                 return (null);
             }
         }
@@ -428,22 +433,85 @@ namespace PurchaseOrders
         #region Data Display Functions
         private void DisplayOrder(OrderClass currentOrder)
         {
-            OrderClass o = currentOrder;
-            StuffTextBox(TxtDate, o.OrderDate.Value.ToShortDateString());
-            StuffTextBox(TxtDeliverto, o.DeliverTo);
-            StuffTextBox(TxtDeliverToPhone, o.DeliverToPhone);
-            StuffTextBox(TxtDepartment, o.Department);
-            StuffTextBox(TxtTerms, o.Terms);
-            StuffTextBox(TxtOrderReference, o.OrderReference);
-            StuffTextBox(TxtComments, o.Comments);
+            // Displays the current order
+            try
+            {
+                OrderClass o = currentOrder;
+                StuffTextBox(TxtDate, o.OrderDate.Value.ToShortDateString());
+                StuffTextBox(TxtDeliverto, o.DeliverTo);
+                StuffTextBox(TxtDeliverToPhone, o.DeliverToPhone);
+                StuffTextBox(TxtDepartment, o.Department);
+                StuffTextBox(TxtTerms, o.Terms);
+                StuffTextBox(TxtOrderReference, o.OrderReference);
+                StuffTextBox(TxtComments, o.Comments);
 
-            // Display order details is done during the STUFF process
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ERROR - Unable to display current order:  " + ex.ToString());
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to display current order:  " + ex.ToString(), JobName);
+            }
+        }
+
+        private void DisplayLineItems(DataGridViewRow dgvr, SqlDataReader rdrItem)
+        {
+            // Displays the current order's line items on the grid
+            try
+            {
+                StuffTextBox(dgvr.Cells["Qty"], rdrItem, "Qty");
+                StuffTextBox(dgvr.Cells["Units"], rdrItem, "Units");
+                StuffTextBox(dgvr.Cells["PartNumber"], rdrItem, "Description");
+                StuffTextBox(dgvr.Cells["ItemUnitPrice"], rdrItem, "UnitPrice");
+                StuffTextBox(dgvr.Cells["Purpose"], rdrItem, "Purpose");
+                StuffTextBox((DataGridViewComboBoxCell)dgvr.Cells["ChargeTo"], rdrItem, "ChargeTo");
+                StuffTextBox((DataGridViewComboBoxCell)dgvr.Cells["Classification"], rdrItem, "Class");
+                StuffTextBox((DataGridViewCheckBoxCell)dgvr.Cells["Taxable"], rdrItem, "Taxable");
+
+                string s = "";
+                try
+                {
+                    s = dgvr.Cells["Qty"].Value.ToString();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("ERROR - Unable to populate grid Quantity value from SQL:  " + ex.ToString());
+                    DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate grid Quantity value from SQL:  " + ex.ToString(), JobName);
+                }
+
+                string t = "";
+                try
+                {
+                    t = dgvr.Cells["ItemUnitPrice"].Value.ToString();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("ERROR - Unable to populate grid Unit Price value from SQL:  " + ex.ToString());
+                    DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate grid Unit Price value from SQL:  " + ex.ToString(), JobName);
+                }
+                bool qtyokay = double.TryParse(s, out double qty);
+                bool priceokay = double.TryParse(t, out double price);
+                if (qtyokay && priceokay)
+                {
+                    dgvr.Cells["ItemTotalPrice"].Value = qty * price;
+                }
+
+                GrdOrderDetails.Columns["ItemUnitPrice"].DefaultCellStyle.Format = "c";
+                GrdOrderDetails.Columns["ItemTotalPrice"].DefaultCellStyle.Format = "c";
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ERROR trying display current line items:  " + ex.ToString());
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to correctly display current line items:  " + ex.ToString(), JobName);
+            }
         }
 
         private void DisplayVendor(VendorListClass currentVendors)
         {
             // Displays everything but the VendorID and Owner
 
+            try
+            {
             VendorClass v = currentVendors.VendorList[currentVendors.SelectedListIndex];
             CurrentVendors.DisableSelectionEvent = true;
             StuffTextBox(CmbVendorName, v.VendorName);  // We DON'T want a selected_change event to happen here, so disable the event
@@ -465,10 +533,19 @@ namespace PurchaseOrders
             CurrentVendors.VendorIsSupplied = true;
             RenderVendorSaveButton(CurrentVendors);
             RenderSaveOrderButton();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ERROR trying display current vendor:  " + ex.ToString());
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to correctly display current vendor:  " + ex.ToString(), JobName);
+            }
         }
 
         private void ClearPanelData()
         {
+            // This is invoked when a new order is generated (clears any previous orders)
+
             OrderClass o = new OrderClass();
             DisplayOrder(o);
 
@@ -539,7 +616,11 @@ namespace PurchaseOrders
         }
         #endregion
 
-        #region Stuffing
+        #region Safe Value Assignment Functions
+
+        // Functions to assign a value directly from a SQL field (or a string) into a control's text,
+        //   with error capture.
+
         private void StuffTextBox(DataGridViewCheckBoxCell t, SqlDataReader rdr, string s)
         {
             try
@@ -548,6 +629,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate grid checkbox cell from SQL :  " + ex.ToString(), JobName);
                 t.Value = 0;
             }
         }
@@ -560,6 +642,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate grid combobox cell from SQL :  " + ex.ToString(), JobName);
                 t.Value = "";
             }
         }
@@ -572,6 +655,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate grid text cell from SQL :  " + ex.ToString(), JobName);
                 t.Value = "";
             }
         }
@@ -584,6 +668,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate textbox from SQL :  " + ex.ToString(), JobName);
                 t.Text = "";
             }
         }
@@ -596,6 +681,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate combobox from SQL:  " + ex.ToString(), JobName);
                 t.Text = "";
             }
         }
@@ -609,6 +695,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate string from SQL:  " + ex.ToString(), JobName);
                 return "";
             }
         }
@@ -623,6 +710,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate integer from SQL:  " + ex.ToString(), JobName);
                 return 0;
             }
         }
@@ -637,6 +725,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate double from SQL:  " + ex.ToString(), JobName);
                 return 0;
             }
         }
@@ -649,6 +738,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate textbox from string:  " + ex.ToString(), JobName);
                 t.Text = "";
             }
         }
@@ -661,52 +751,13 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate combobox from string:  " + ex.ToString(), JobName);
                 t.Text = "";
             }
         }
+        #endregion
 
-
-        private void StuffLineItems(DataGridViewRow dgvr, SqlDataReader rdrItem)
-        {
-            StuffTextBox(dgvr.Cells["Qty"], rdrItem, "Qty");
-            StuffTextBox(dgvr.Cells["Units"], rdrItem, "Units");
-            StuffTextBox(dgvr.Cells["PartNumber"], rdrItem, "Description");
-            StuffTextBox(dgvr.Cells["ItemUnitPrice"], rdrItem, "UnitPrice");
-            StuffTextBox(dgvr.Cells["Purpose"], rdrItem, "Purpose");
-            StuffTextBox((DataGridViewComboBoxCell)dgvr.Cells["ChargeTo"], rdrItem, "ChargeTo");
-            StuffTextBox((DataGridViewComboBoxCell)dgvr.Cells["Classification"], rdrItem, "Class");
-            StuffTextBox((DataGridViewCheckBoxCell)dgvr.Cells["Taxable"], rdrItem, "Taxable");
-
-            string s = "";
-            try
-            {
-                s = dgvr.Cells["Qty"].Value.ToString();
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-            string t = "";
-            try
-            {
-                t = dgvr.Cells["ItemUnitPrice"].Value.ToString();
-            }
-            catch (Exception ex)
-            {
-
-            }
-            bool qtyokay = double.TryParse(s, out double qty);
-            bool priceokay = double.TryParse(t, out double price);
-            if (qtyokay && priceokay)
-            {
-                dgvr.Cells["ItemTotalPrice"].Value = qty * price;
-            }
-
-            GrdOrderDetails.Columns["ItemUnitPrice"].DefaultCellStyle.Format = "c";
-            GrdOrderDetails.Columns["ItemTotalPrice"].DefaultCellStyle.Format = "c";
-        }
-
+        #region Timer-related Functions
         private void RenderStatusMsg(string s, bool enable)
         {
             if (enable)

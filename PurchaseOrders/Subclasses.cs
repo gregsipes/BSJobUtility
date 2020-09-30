@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace PurchaseOrders
 {
-    public partial class frmMain
+    public partial class FrmMain
     {
         // ALL internal classes are put here so that we don't clutter the main code with too much stuff.
 

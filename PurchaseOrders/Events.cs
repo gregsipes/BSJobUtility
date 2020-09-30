@@ -6,7 +6,7 @@ using BSGlobals;
 
 namespace PurchaseOrders
 {
-    public partial class frmMain
+    public partial class FrmMain
     {
         // ALL Events are put here so that we don't clutter the main code with too much stuff.
 
@@ -445,9 +445,9 @@ namespace PurchaseOrders
                     {
                         s = GrdOrderDetails.Rows[row].Cells["Qty"].Value.ToString();
                     }
-                    catch (Exception ex)
+                    catch
                     {
-
+                        MessageBox.Show("Invalid Quantity Value - Please re-enter");
                     }
                     qtyokay = int.TryParse(s, out int qty);
                     d.Quantity = (qtyokay ? qty : 0);
@@ -464,9 +464,9 @@ namespace PurchaseOrders
                     {
                         t = GrdOrderDetails.Rows[row].Cells[3].Value.ToString();
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        //tbd
+                        MessageBox.Show("Invalid Unit Price Value - Please re-enter");
                     }
                     priceokay = double.TryParse(t, out double price);
                     d.UnitPrice = (priceokay ? price : 0);
@@ -677,7 +677,7 @@ namespace PurchaseOrders
                             }
                             catch (Exception ex)
                             {
-                                // TBD
+                                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to delete the unsaved purchase order from the Orders table on app termination: " + ex.ToString(), JobName);
                             }
                         }
 
