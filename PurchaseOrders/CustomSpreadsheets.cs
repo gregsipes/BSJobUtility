@@ -57,6 +57,7 @@ namespace PurchaseOrders
                 Point POCELL = new Point(11, 2);
                 xlPO.Alignment.MergeCells(POCELL.Y, POCELL.X, POCELL.Y, POCELL.X + 1);
                 xlPO.Style.Box(POCELL.Y, POCELL.X, POCELL.Y, POCELL.X + 1, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick, Color.Black);
+                xlPO.Style.Box(POCELL.Y, POCELL.X, POCELL.Y, POCELL.X + 1, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick, Color.Black);
                 xlPO.Font.Size(POCELL.Y, POCELL.X, 36);
                 xlPO.Font.Bold(POCELL.Y, POCELL.X);
                 xlPO.Alignment.Center(POCELL.Y, POCELL.X);
