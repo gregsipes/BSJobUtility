@@ -66,9 +66,9 @@
       <Project>{58a03971-0c97-42bc-9b51-fb93db910bd0}</Project>
       <Name>CircDumpPopulate</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CircDumpWorkLoad\CircDumpWorkLoad.csproj">
+    <ProjectReference Include="..\CircDumpWorkLoad\CircDumpWorkload.csproj">
       <Project>{0c8c80c8-b156-4211-9566-b1531e86c906}</Project>
-      <Name>CircDumpWorkLoad</Name>
+      <Name>CircDumpWorkload</Name>
     </ProjectReference>
     <ProjectReference Include="..\CommissionsCreate\CommissionsCreate.csproj">
       <Project>{9927a52d-b824-47ec-8653-cf444c79f7d8}</Project>

@@ -409,7 +409,8 @@ namespace CircDumpWorkLoad
             loopCounter = 1;
             foreach (Dictionary<string, object> columnDefinition in columnDefinitions)
             {
-                stringBuilder.AppendLine($"{PadField(loopCounter.ToString(), 8)}SQLCHAR       0       {PadField(columnDefinition["FieldLength"].ToString(), 8)}\"{PadField((loopCounter == columnDefinitions.Count() ? @"\n" : "|") + "\"", 9) }{PadField(loopCounter.ToString(), 6)}{PadField(columnDefinition["ColumnName"].ToString(), 39)}\"\"");
+                Int32 columnIndex = Convert.ToInt32(columnDefinition["ColumnIndex"].ToString());
+                stringBuilder.AppendLine($"{PadField(loopCounter.ToString(), 8)}SQLCHAR       0       {PadField(columnDefinition["FieldLength"].ToString(), 8)}\"{PadField((loopCounter == columnDefinitions.Count() ? @"\n" : "|") + "\"", 9) }{PadField(columnIndex == 0 ? "0" : columnIndex.ToString(), 6)}{PadField(columnDefinition["ColumnName"].ToString(), 39)}\"\"");
 
                 loopCounter++;
             }

@@ -57,7 +57,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBSDumpWorkload", "PBSDumpW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestJob", "TestJob\TestJob.csproj", "{428258FE-950A-4FFD-883C-7FAEA65E05B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircDumpWorkLoad", "CircDumpWorkLoad\CircDumpWorkLoad.csproj", "{0C8C80C8-B156-4211-9566-B1531E86C906}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircDumpWorkload", "CircDumpWorkLoad\CircDumpWorkload.csproj", "{0C8C80C8-B156-4211-9566-B1531E86C906}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircDumpPopulate", "CircDumpPopulate\CircDumpPopulate.csproj", "{58A03971-0C97-42BC-9B51-FB93DB910BD0}"
 EndProject
