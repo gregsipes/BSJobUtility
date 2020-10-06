@@ -27,7 +27,7 @@ namespace PBSDumpWorkload
             switch (GroupName)
             {
                 case "A":
-                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpAWork;
+                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpAWorkLoad;
                     break;
                 case "B":
                     VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpBWork;
@@ -495,11 +495,11 @@ namespace PBSDumpWorkload
             }
 
 
-            if (populateImmediatelyAfterLoad) //for PBSDumpB and PBSDumpC only
-            {
+            if (populateImmediatelyAfterLoad) //for PBSDumpB and PBSDumpC only            
                 PopulateTable(table["TableName"].ToString(), Int64.Parse(table["LoadsTableID"].ToString()), tables);
-                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
-            }
+
+
+            ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
 
             return filesToDelete;
 

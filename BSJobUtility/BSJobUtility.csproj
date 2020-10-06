@@ -106,6 +106,10 @@
       <Project>{d31351eb-64a1-48b8-a407-2c7dc0493b0b}</Project>
       <Name>PayByScanLoadWegmans</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBSDumpPopulate\PBSDumpPopulate.csproj">
+      <Project>{b31d42d9-bae1-4a78-a1c6-fc33d68ab464}</Project>
+      <Name>PBSDumpPopulate</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PBSDumpWorkload\PBSDumpWorkload.csproj">
       <Project>{7cd71798-c122-4145-a08e-506a88273108}</Project>
       <Name>PBSDumpWorkload</Name>

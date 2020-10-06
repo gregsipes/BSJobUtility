@@ -35,7 +35,8 @@ namespace BSGlobals
             PrepackInsertLoad,
             CircDumpWorkLoad,
             CircDumpWorkPopulate,
-            PBSDumpAWork,
+            PBSDumpAWorkLoad,
+            PBSDumpAWorkPopulate,
             PBSDumpBWork,
             PBSDumpCWork,
             Purchasing
