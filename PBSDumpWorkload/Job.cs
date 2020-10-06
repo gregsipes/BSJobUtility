@@ -30,10 +30,10 @@ namespace PBSDumpWorkload
                     VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpAWork;
                     break;
                 case "B":
-                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpAWork;
+                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpBWork;
                     break;
                 case "C":
-                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpAWork;
+                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpCWork;
                     break;
             }
         }
@@ -207,7 +207,7 @@ namespace PBSDumpWorkload
                                                     new SqlParameter("@pintLoadsDumpControlID", loadsId),
                                                     new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"]),
                                                     new SqlParameter("@pvchrTranDate", tables[0]["FromDate"]),
-                                                    new SqlParameter("@pflgUpdateTranDateAfterSuccessfulPopulate", Convert.ToBoolean(tables[0]["UpdateTranDateAfterSuccessfulPopulate"].ToString())));
+                                                    new SqlParameter("@pflgUpdateTranDateAfterSuccessfulPopulate", tables[0]["UpdateTranDateAfterSuccessfulPopulate"].ToString()));
                 }
                 else //this only gets hit for PBSDumpA
                 {
@@ -270,8 +270,9 @@ namespace PBSDumpWorkload
                 if (bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
                     DeleteFiles(filesToDelete);
 
-                ExecuteNonQuery(VersionSpecificConnectionString, "dbo.Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag",
-                                       new SqlParameter("@pintLoadsDumpControlID", loadsId));
+                if (!populateImmediatelyAfterLoad)
+                     ExecuteNonQuery(VersionSpecificConnectionString, "dbo.Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag", new SqlParameter("@pintLoadsDumpControlID", loadsId));
+                
             }
         }
 
@@ -310,11 +311,27 @@ namespace PBSDumpWorkload
 
             WriteToJobLog(JobLogMessageType.INFO, $"Preparing to load {table["TableName"]}");
 
+            Dictionary<string, object> result = null;
+
+            if (Int32.Parse(table["LoadsTableID"].ToString()) == 0)
+            {
+                result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Insert_BN_Loads_Tables",
+                                                                    new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
+                                                                    new SqlParameter("@pbintLoadsDumpControlID", loadsId),
+                                                                    new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
+                                                                    new SqlParameter("@pvchrFile", fileInfo.Name),
+                                                                    new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime)).FirstOrDefault();
+                table["LoadsTableID"] = result["loads_tables_id"];
+
+            } else
+            {
              ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables",
                                                              new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
                                                              new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
                                                              new SqlParameter("@pvchrFile", fileInfo.Name),
                                                              new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
+            }
+
             
 
             WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({timeStampDate})");
@@ -347,11 +364,6 @@ namespace PBSDumpWorkload
                 }
             }
 
-            if (table["TableName"].ToString() == "Messages")
-            {
-                var x = 2 + 1;
-            }
-
             List<Dictionary<string, object>> results = ExecuteSQL(VersionSpecificConnectionString, CommandType.Text,
                                                                     $"SELECT ORDINAL_POSITION, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = 'PBSDump{GroupName}_Work' AND TABLE_NAME = @TableName",
                                                                     new SqlParameter("@TableName", table["TableName"].ToString()));
@@ -370,7 +382,7 @@ namespace PBSDumpWorkload
                         switch (column["DATA_TYPE"].ToString())
                         {
                             case "varchar":
-                                columnDefinition["FieldLength"] = (Convert.ToInt32(column["CHARACTER_MAXIMUM_LENGTH"]) == -1 ? 8000 : column["CHARACTER_MAXIMUM_LENGTH"]);
+                          //      columnDefinition["FieldLength"] = (Convert.ToInt32(column["CHARACTER_MAXIMUM_LENGTH"]) == -1 ? 8000 : column["CHARACTER_MAXIMUM_LENGTH"]);
                                 break;
                             case "int":
                                 columnDefinition["FieldLength"] = 12;
@@ -423,12 +435,11 @@ namespace PBSDumpWorkload
             stringBuilder.AppendLine((columnDefinitions.Count()).ToString());
 
             loopCounter = 1;
+
             foreach (Dictionary<string, object> columnDefinition in columnDefinitions)
             {
-                Int32 fieldLength = Convert.ToInt32(columnDefinition["FieldLength"].ToString());
-                stringBuilder.AppendLine($"{PadField(loopCounter.ToString(), 8)}SQLCHAR       0       {PadField(columnDefinition["FieldLength"].ToString(), 8)}\"{PadField((loopCounter == columnDefinitions.Count() ? @"\n" : "|") + "\"", 9) }{PadField(fieldLength == 0 ? "0" : loopCounter.ToString(), 6)}{PadField(columnDefinition["ColumnName"].ToString(), 39)}\"\"");
-
-                //stringBuilder.AppendLine($"{PadField(loopCounter.ToString(), 8)}SQLCHAR       0       {PadField(columnDefinition["FieldLength"].ToString(), 8)}\"{PadField((loopCounter == columnDefinitions.Count() ? @"\n" : "|") + "\"", 9) }{PadField(loopCounter.ToString(), 6)}{PadField(columnDefinition["ColumnName"].ToString(), 39)}\"\"");
+                Int32 columnIndex = Convert.ToInt32(columnDefinition["ColumnIndex"].ToString());
+                stringBuilder.AppendLine($"{PadField(loopCounter.ToString(), 8)}SQLCHAR       0       {PadField(columnDefinition["FieldLength"].ToString(), 8)}\"{PadField((loopCounter == columnDefinitions.Count() ? @"\n" : "|") + "\"", 9) }{PadField(columnIndex == 0 ? "0" : columnIndex.ToString(), 6)}{PadField(columnDefinition["ColumnName"].ToString(), 39)}\"\"");
 
                 loopCounter++;
             }
@@ -455,7 +466,6 @@ namespace PBSDumpWorkload
             WriteToJobLog(JobLogMessageType.INFO, $"Error file = {bulkInsertErrorFile}");
             WriteToJobLog(JobLogMessageType.INFO, $"Format file = {bulkInsertFormatFile}");
 
-
             ExecuteNonQuery(VersionSpecificConnectionString, CommandType.Text, $"BULK INSERT {table["TableName"].ToString()} FROM '{bulkInsertDataFile}' WITH (FORMATFILE='{bulkInsertFormatFile}', ERRORFILE='{bulkInsertErrorFile}')");
 
             WriteToJobLog(JobLogMessageType.INFO, $"Checking status of bulk insert import");
@@ -469,7 +479,7 @@ namespace PBSDumpWorkload
 
             WriteToJobLog(JobLogMessageType.INFO, "Reading last record sequence");
 
-            Dictionary<string, object> result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_RecordSequence_Maximum",
+            result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_RecordSequence_Maximum",
                                                              new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
                                                              new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents)).FirstOrDefault();
 
@@ -488,7 +498,7 @@ namespace PBSDumpWorkload
             if (populateImmediatelyAfterLoad) //for PBSDumpB and PBSDumpC only
             {
                 PopulateTable(table["TableName"].ToString(), Int64.Parse(table["LoadsTableID"].ToString()), tables);
-                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pbintLoadsTablesID", table["LoadsTableId"].ToString()));
+                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
             }
 
             return filesToDelete;
