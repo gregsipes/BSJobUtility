@@ -38,7 +38,10 @@ namespace PBSDumpPopulate
                         List<string> tablesToPopulate = DetermineTablesToPopulate(Convert.ToInt64(dumpControl["loads_dumpcontrol_id"]));
 
                         if (tablesToPopulate.Count() == 0)
-                            WriteToJobLog(JobLogMessageType.INFO, $"No tables need to be populated for group number {Version}, loadds_dumpcontrol_id = {dumpControl["loads_dumpcontrol_id"].ToString()}");
+                            WriteToJobLog(JobLogMessageType.INFO, $"No tables need to be populated for group number {Version}, loads_dumpcontrol_id = {dumpControl["loads_dumpcontrol_id"].ToString()}");
+
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSDumpAWorkLoad, "Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag",
+                                                new SqlParameter("@pintLoadsDumpControlID", dumpControl["loads_dumpcontrol_id"]));
                         //else if (Convert.ToBoolean(dumpControl["flgUpdateTranDateAfterSuccessfulPopulate"].ToString()))
                         //    updateTranDateAfterSuccessfulPopulate = true; //this is never true
                     }
@@ -113,11 +116,35 @@ namespace PBSDumpPopulate
         private void PopulateTable(Int64 loadsTableId, string tableName)
         {
             bool hasError = false;
+            bool perge = true;
+            bool verify = false;
 
-            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} bypassing purge");
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Select_BN_Tables",
+                                                        new SqlParameter("@pvchrTableName", tableName)).FirstOrDefault();
+
+            if (result != null && result.Count() > 0)
+            {
+                perge = Convert.ToBoolean(result["purge_flag"].ToString());
+                verify = Convert.ToBoolean(result["verify_flag"].ToString());
+            }
+
+            if (perge)
+            {
+                WriteToJobLog(JobLogMessageType.INFO, $"Purging {tableName}");
+                result = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Purge_Table",
+                                                new SqlParameter("@pbintLoadsTablesID", loadsTableId)).FirstOrDefault();
+
+                if (result["error_message"].ToString() != "")
+                {
+                    WriteToJobLog(JobLogMessageType.ERROR, result["error_message"].ToString());
+                    hasError = true;
+                }
+            }
+            else
+                WriteToJobLog(JobLogMessageType.INFO, $"{tableName} bypassing purge");
 
             WriteToJobLog(JobLogMessageType.INFO, $"{tableName} populating");
-            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, $"Proc_Populate_{tableName}",
+            result = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, $"Proc_Populate_{tableName}",
                                                                     new SqlParameter("@pbintLoadsTablesID", loadsTableId)).FirstOrDefault();
 
             if (result["error_message"].ToString() != "")
@@ -127,17 +154,34 @@ namespace PBSDumpPopulate
             }
 
 
-            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} bypassing verify");
-            WriteToJobLog(JobLogMessageType.INFO, $"{tableName} delete work records");
-
-            result = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Delete_Table",
-                                                       new SqlParameter("@pbintLoadsTablesID", loadsTableId)).FirstOrDefault();
-
-            if (result["error_message"].ToString() != "")
+            if (verify)
             {
-                hasError = true;
-                WriteToJobLog(JobLogMessageType.ERROR, result["error_message"].ToString());
+                WriteToJobLog(JobLogMessageType.INFO, $"Verifying {tableName}");
+
+                result = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Verify_Table",
+                                new SqlParameter("@pbintLoadsTablesID", loadsTableId)).FirstOrDefault();
+
+                if (result["error_message"].ToString() != "")
+                {
+                    WriteToJobLog(JobLogMessageType.ERROR, result["error_message"].ToString());
+                    hasError = true;
+                }
             }
+            else
+            {
+                WriteToJobLog(JobLogMessageType.INFO, $"{tableName} bypassing verify");
+                WriteToJobLog(JobLogMessageType.INFO, $"{tableName} delete work records");
+
+                result = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Delete_Table",
+                                                           new SqlParameter("@pbintLoadsTablesID", loadsTableId)).FirstOrDefault();
+
+                if (result["error_message"].ToString() != "")
+                {
+                    hasError = true;
+                    WriteToJobLog(JobLogMessageType.ERROR, result["error_message"].ToString());
+                }
+            }
+
 
 
             if (!hasError)

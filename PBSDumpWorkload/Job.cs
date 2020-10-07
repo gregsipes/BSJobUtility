@@ -56,8 +56,9 @@ namespace PBSDumpWorkload
                         foreach (string file in files)
                         {
                             touchFileFound = true;
-                            //only delete the file if it's the last group
-                            if (GroupName == "C" && bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
+                           
+
+                            if (bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
                                 File.Delete(file);
                         }
                     }
