@@ -26,6 +26,7 @@ namespace CircDumpPopulate
         {
             try
             {
+                WriteToJobLog(JobLogMessageType.INFO, $"Group Number: {GroupNumber}");
 
                 List<Dictionary<string, object>> dumpControls = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkPopulate, "Proc_Select_BN_Distinct_DumpControl_To_Populate",
                                                                                new SqlParameter("@pintGroupNumber", GroupNumber)).ToList();

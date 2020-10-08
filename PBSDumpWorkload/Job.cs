@@ -36,6 +36,8 @@ namespace PBSDumpWorkload
                     VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpCWork;
                     break;
             }
+
+            WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}");
         }
 
         public override void ExecuteJob()

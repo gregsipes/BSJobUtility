@@ -55,6 +55,7 @@ namespace CircDumpWorkLoad
         {
             try
             {
+                WriteToJobLog(JobLogMessageType.INFO, $"Group Number: {GroupNumber}");
 
                 //check for any touch files before executing
                 bool touchFileFound = false;

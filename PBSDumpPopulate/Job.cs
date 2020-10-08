@@ -25,6 +25,7 @@ namespace PBSDumpPopulate
         {
             try
             {
+                WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}   Group Number: {Version}");
 
                 List<Dictionary<string, object>> dumpControls = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Select_BN_Distinct_DumpControl_To_Populate",
                                                                                new SqlParameter("@pintGroupNumber", Version)).ToList();
