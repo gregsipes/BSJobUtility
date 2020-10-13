@@ -146,6 +146,10 @@
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SuppliesWorkload\SuppliesWorkload.csproj">
+      <Project>{6f83d1fd-0ab8-47f5-a320-8cfcd6dca26a}</Project>
+      <Name>SuppliesWorkload</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TestJob\TestJob.csproj">
       <Project>{428258fe-950a-4ffd-883c-7faea65e05b3}</Project>
       <Name>TestJob</Name>

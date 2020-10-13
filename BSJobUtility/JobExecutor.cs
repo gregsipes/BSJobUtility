@@ -88,13 +88,15 @@ namespace BSJobUtility
             else if (_jobName == "PBSDumpWorkload")
                 _managedJob = new PBSDumpWorkload.Job() { GroupName = _group };
             else if (_jobName == "PBSDumpPopulate")
-                _managedJob = new PBSDumpPopulate.Job() {GroupName = _group, Version = _version };
+                _managedJob = new PBSDumpPopulate.Job() { GroupName = _group, Version = _version };
             else if (_jobName == "CircDumpWorkload")
                 _managedJob = new CircDumpWorkLoad.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "CircDumpPopulate")
                 _managedJob = new CircDumpPopulate.Job() { GroupNumber = Convert.ToInt32(_group) };
             //else if (_jobName == "CircDumpPost")  //with the refractoring that has been done, this job/step should no longer be needed
             //    _managedJob = new CircDumpPost.Job() { GroupNumber = Convert.ToInt32(_group) };
+            else if (_jobName == "SuppliesWorkload")
+                _managedJob = new SuppliesWorkload.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

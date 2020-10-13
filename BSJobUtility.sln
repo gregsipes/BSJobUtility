@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurchaseOrders", "PurchaseO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBSDumpPopulate", "PBSDumpPopulate\PBSDumpPopulate.csproj", "{B31D42D9-BAE1-4A78-A1C6-FC33D68AB464}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuppliesWorkload", "SuppliesWorkload\SuppliesWorkload.csproj", "{6F83D1FD-0AB8-47F5-A320-8CFCD6DCA26A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +193,10 @@ Global
 		{B31D42D9-BAE1-4A78-A1C6-FC33D68AB464}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B31D42D9-BAE1-4A78-A1C6-FC33D68AB464}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B31D42D9-BAE1-4A78-A1C6-FC33D68AB464}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F83D1FD-0AB8-47F5-A320-8CFCD6DCA26A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F83D1FD-0AB8-47F5-A320-8CFCD6DCA26A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F83D1FD-0AB8-47F5-A320-8CFCD6DCA26A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F83D1FD-0AB8-47F5-A320-8CFCD6DCA26A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -221,6 +227,7 @@ Global
 		{0C8C80C8-B156-4211-9566-B1531E86C906} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{58A03971-0C97-42BC-9B51-FB93DB910BD0} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{B31D42D9-BAE1-4A78-A1C6-FC33D68AB464} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{6F83D1FD-0AB8-47F5-A320-8CFCD6DCA26A} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}

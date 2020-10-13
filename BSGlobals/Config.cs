@@ -232,6 +232,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.Purchasing:
                     connectionString = GetConnectionString("purchasing");
                     break;
+                case DatabaseConnectionStringNames.SuppliesWorkLoad:
+                    connectionString = GetConnectionString("supplieswork");
+                    break;
                 default:
                     break;
             }
