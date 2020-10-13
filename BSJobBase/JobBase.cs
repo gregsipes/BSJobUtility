@@ -101,7 +101,11 @@ namespace BSJobBase
         public virtual void PostExecuteJob()
         {
             if (bool.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "LogEmptyRuns")) == true || JobStartedLog == true)
+            {
+                //try sleeping the thread to make sure this is the last message of the job
+                System.Threading.Thread.Sleep(5000);
                 WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed");
+            }
         }
 
         #endregion
