@@ -114,6 +114,10 @@
       <Project>{b31d42d9-bae1-4a78-a1c6-fc33d68ab464}</Project>
       <Name>PBSDumpPopulate</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PBSDumpPost\PBSDumpPost.csproj">
+      <Project>{194e1ff3-bde2-4800-8b3a-d63a194ce067}</Project>
+      <Name>PBSDumpPost</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PBSDumpWorkload\PBSDumpWorkload.csproj">
       <Project>{7cd71798-c122-4145-a08e-506a88273108}</Project>
       <Name>PBSDumpWorkload</Name>

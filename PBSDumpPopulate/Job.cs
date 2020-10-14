@@ -191,12 +191,12 @@ namespace PBSDumpPopulate
                 ExecuteNonQuery(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Update_BN_Loads_Tables_Populate_Successful_Flag",
                                                         new SqlParameter("@pbintLoadsTablesID", loadsTableId));
 
-                ////delete unsuccessful touch file if one exists
-                //if (File.Exists($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupName}\\{tableName}.unsuccessful"))
-                //    File.Delete($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupName}\\{tableName}.unsuccessful");
+                //delete unsuccessful touch file if one exists
+                if (File.Exists(String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName) + tableName + ".unsuccessful"))
+                    File.Delete(String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName) + tableName + ".unsuccessful");
 
-                ////create a successul file (this is the file that gets cleaned up in the next step of the process (CircDumpPost)
-                //File.Create($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupName}\\{tableName}.successful");
+                //create a successul file (this is the file that gets cleaned up in the next step of the process (PBSDumpPost)
+                File.Create(String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName) + tableName + ".successful");
 
             }
             else

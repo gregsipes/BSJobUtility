@@ -69,6 +69,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuppliesWorkload", "Supplie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircDumpPost", "CircDumpPost\CircDumpPost.csproj", "{B09C645A-5F72-42D8-8B04-51A3D1CA44FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBSDumpPost", "PBSDumpPost\PBSDumpPost.csproj", "{194E1FF3-BDE2-4800-8B3A-D63A194CE067}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -203,6 +205,10 @@ Global
 		{B09C645A-5F72-42D8-8B04-51A3D1CA44FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B09C645A-5F72-42D8-8B04-51A3D1CA44FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B09C645A-5F72-42D8-8B04-51A3D1CA44FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{194E1FF3-BDE2-4800-8B3A-D63A194CE067}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{194E1FF3-BDE2-4800-8B3A-D63A194CE067}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{194E1FF3-BDE2-4800-8B3A-D63A194CE067}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{194E1FF3-BDE2-4800-8B3A-D63A194CE067}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -235,6 +241,7 @@ Global
 		{B31D42D9-BAE1-4A78-A1C6-FC33D68AB464} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{6F83D1FD-0AB8-47F5-A320-8CFCD6DCA26A} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{B09C645A-5F72-42D8-8B04-51A3D1CA44FF} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{194E1FF3-BDE2-4800-8B3A-D63A194CE067} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}
