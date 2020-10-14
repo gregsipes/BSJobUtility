@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F031C661-7DFB-4043-82AF-C9EBF761CA52}</ProjectGuid>
+    <ProjectGuid>{B09C645A-5F72-42D8-8B04-51A3D1CA44FF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CircDumpPost</RootNamespace>

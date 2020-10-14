@@ -14,9 +14,6 @@ namespace SuppliesWorkload
 {
     public class Job : JobBase
     {
-     //   public string GroupName { get; set; }
-
-      //  private DatabaseConnectionStringNames VersionSpecificConnectionString { get; set; }
 
         public override void SetupJob()
         {
@@ -24,20 +21,6 @@ namespace SuppliesWorkload
             JobDescription = "Performs a bulk insert from a set of pipe delimited files into a work (staging) database";
             AppConfigSectionName = "SuppliesWorkload";
 
-            //switch (GroupName)
-            //{
-            //    case "A":
-            //        VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpAWorkLoad;
-            //        break;
-            //    case "B":
-            //        VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpBWork;
-            //        break;
-            //    case "C":
-            //        VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpCWork;
-            //        break;
-            //}
-
-           // WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}");
         }
 
         public override void ExecuteJob()

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -190,12 +191,12 @@ namespace PBSDumpPopulate
                 ExecuteNonQuery(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Update_BN_Loads_Tables_Populate_Successful_Flag",
                                                         new SqlParameter("@pbintLoadsTablesID", loadsTableId));
 
-                //delete unsuccessful touch file if one exists
-                //if (File.Exists($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.unsuccessful"))
-                //    File.Delete($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.unsuccessful");
+                ////delete unsuccessful touch file if one exists
+                //if (File.Exists($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupName}\\{tableName}.unsuccessful"))
+                //    File.Delete($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupName}\\{tableName}.unsuccessful");
 
                 ////create a successul file (this is the file that gets cleaned up in the next step of the process (CircDumpPost)
-                //File.Create($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.successful");
+                //File.Create($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupName}\\{tableName}.successful");
 
             }
             else

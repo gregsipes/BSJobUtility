@@ -217,6 +217,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.CircDumpWorkPopulate:
                     connectionString = GetConnectionString("circdumpwork_populate");
                     break;
+                case DatabaseConnectionStringNames.CircDumpPost:
+                    connectionString = GetConnectionString("circdumpwork_post");
+                    break;
                 case DatabaseConnectionStringNames.PBSDumpAWorkLoad:
                     connectionString = GetConnectionString("pbsdumpawork_load");
                     break;
@@ -234,6 +237,12 @@ namespace BSGlobals
                     break;
                 case DatabaseConnectionStringNames.SuppliesWorkLoad:
                     connectionString = GetConnectionString("supplieswork");
+                    break;
+                case DatabaseConnectionStringNames.PBSDump:
+                    connectionString = GetConnectionString("pbsdump");
+                    break;
+                case DatabaseConnectionStringNames.BNTransactions:
+                    connectionString = GetConnectionString("bntransactions");
                     break;
                 default:
                     break;

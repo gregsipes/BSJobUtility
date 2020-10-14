@@ -35,12 +35,15 @@ namespace BSGlobals
             PrepackInsertLoad,
             CircDumpWorkLoad,
             CircDumpWorkPopulate,
+            CircDumpPost,
             PBSDumpAWorkLoad,
             PBSDumpAWorkPopulate,
             PBSDumpBWork,
             PBSDumpCWork,
             Purchasing,
-            SuppliesWorkLoad
+            SuppliesWorkLoad,
+            PBSDump,
+            BNTransactions
         }
 
         public enum JobLogMessageType
