@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircDumpPost", "CircDumpPos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PBSDumpPost", "PBSDumpPost\PBSDumpPost.csproj", "{194E1FF3-BDE2-4800-8B3A-D63A194CE067}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeWorkload", "TradeWorkload\TradeWorkload.csproj", "{7846F18E-0D22-4B7B-919C-E7C579091C8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -209,6 +211,10 @@ Global
 		{194E1FF3-BDE2-4800-8B3A-D63A194CE067}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{194E1FF3-BDE2-4800-8B3A-D63A194CE067}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{194E1FF3-BDE2-4800-8B3A-D63A194CE067}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7846F18E-0D22-4B7B-919C-E7C579091C8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7846F18E-0D22-4B7B-919C-E7C579091C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7846F18E-0D22-4B7B-919C-E7C579091C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7846F18E-0D22-4B7B-919C-E7C579091C8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -242,6 +248,7 @@ Global
 		{6F83D1FD-0AB8-47F5-A320-8CFCD6DCA26A} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{B09C645A-5F72-42D8-8B04-51A3D1CA44FF} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{194E1FF3-BDE2-4800-8B3A-D63A194CE067} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{7846F18E-0D22-4B7B-919C-E7C579091C8A} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}

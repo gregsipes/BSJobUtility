@@ -10,17 +10,15 @@ using System.Text;
 using System.Threading.Tasks;
 using static BSGlobals.Enums;
 
-namespace SuppliesWorkload
+namespace TradeWorkload
 {
     public class Job : JobBase
     {
-        //Parses files and populates 3 tables (FromCirc_CarrierDistribPoint, FromCirc_Carrier, and FromCirc_ChargeCode) in Supplies database
-
         public override void SetupJob()
         {
-            JobName = "Supplies Workload";
+            JobName = "Trade Workload";
             JobDescription = "Performs a bulk insert from a set of pipe delimited files into a work (staging) database";
-            AppConfigSectionName = "SuppliesWorkload";
+            AppConfigSectionName = "TradeWorkload";
 
         }
 
@@ -63,7 +61,7 @@ namespace SuppliesWorkload
                         {
                             FileInfo fileInfo = new FileInfo(file);
 
-                            Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.SuppliesWorkLoad, "dbo.Proc_Select_BN_Loads_DumpControl_If_Processed",
+                            Dictionary<string, object> previouslyLoadedFile = ExecuteSQL(DatabaseConnectionStringNames.TradeWorkLoad, "dbo.Proc_Select_BN_Loads_DumpControl_If_Processed",
                                                                     new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
                                                                     new SqlParameter("@pdatLastModified", new DateTime(fileInfo.LastWriteTime.Year, fileInfo.LastWriteTime.Month, fileInfo.LastWriteTime.Day, fileInfo.LastWriteTime.Hour, fileInfo.LastWriteTime.Minute, fileInfo.LastWriteTime.Second, fileInfo.LastWriteTime.Kind))).FirstOrDefault();
 
@@ -109,7 +107,7 @@ namespace SuppliesWorkload
 
             //create load record
             Int32 loadsId = 0;
-            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.SuppliesWorkLoad, "dbo.Proc_Insert_BN_Loads_DumpControl",
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.TradeWorkLoad, "dbo.Proc_Insert_BN_Loads_DumpControl",
                             new SqlParameter("@pdatTimeStamp", fileInfo.LastWriteTime),
                             new SqlParameter("@pvchrOriginalDir", fileInfo.DirectoryName),
                             new SqlParameter("@pvchrOriginalFile", fileInfo.Name),
@@ -121,7 +119,7 @@ namespace SuppliesWorkload
             loadsId = Int32.Parse(result["loads_id"].ToString());
             WriteToJobLog(JobLogMessageType.INFO, $"Loads Dump Control ID: {loadsId}");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, "Proc_Update_BN_Loads_DumpControl_BNTimeStamp",
+            ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, "Proc_Update_BN_Loads_DumpControl_BNTimeStamp",
                                  new SqlParameter("@pintLoadsDumpControlID", loadsId),
                                  new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents));
 
@@ -156,7 +154,7 @@ namespace SuppliesWorkload
                     table.Add("TableName", segments[3]);
                     table.Add("FileNameWithoutExtension", segments[4]);
                     table.Add("UpdateTranNumberFileAfterSuccessfulPopulate", false);
-                    table.Add("UpdateTranDateAfterSuccessfulPopulate",false);
+                    table.Add("UpdateTranDateAfterSuccessfulPopulate", false);
                     table.Add("TableDumpStartDateTime", segments[5]);
 
                     tables.Add(table);
@@ -168,7 +166,7 @@ namespace SuppliesWorkload
             {
 
                 //This sproc gets "populate immediately" flag for each group.
-                Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.SuppliesWorkLoad, "Proc_Select_BN_Groups",
+                Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.TradeWorkLoad, "Proc_Select_BN_Groups",
                                                                 new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"])).FirstOrDefault();
 
                 if (result == null)
@@ -183,7 +181,7 @@ namespace SuppliesWorkload
                 else
                     WriteToJobLog(JobLogMessageType.INFO, $"For group number {tables[0]["GroupNumber"]} , all records selected");
 
-                bool populateImmediatelyAfterLoad = bool.Parse(result["populate_immediately_after_load_flag"].ToString()); 
+                bool populateImmediatelyAfterLoad = bool.Parse(result["populate_immediately_after_load_flag"].ToString());
 
                 bool atleastOneWorkToLoad = false;
 
@@ -191,11 +189,11 @@ namespace SuppliesWorkload
                 {
                     atleastOneWorkToLoad = true;
 
-                    ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, "Proc_Update_BN_Loads_DumpControl_Group_Number",
+                    ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, "Proc_Update_BN_Loads_DumpControl_Group_Number",
                                                     new SqlParameter("@pintLoadsDumpControlID", loadsId),
                                                     new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"]));
                 }
-                
+
 
                 //Here is where the actual data import takes place, via a bulk insert.
                 List<string> filesToDelete = new List<string>();
@@ -229,7 +227,7 @@ namespace SuppliesWorkload
                     DeleteFiles(filesToDelete);
 
                 if (!populateImmediatelyAfterLoad) //this is never true
-                    ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, "dbo.Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag", new SqlParameter("@pintLoadsDumpControlID", loadsId));
+                    ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, "dbo.Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag", new SqlParameter("@pintLoadsDumpControlID", loadsId));
 
             }
         }
@@ -273,7 +271,7 @@ namespace SuppliesWorkload
 
             if (Int32.Parse(table["LoadsTableID"].ToString()) == 0)
             {
-                result = ExecuteSQL(DatabaseConnectionStringNames.SuppliesWorkLoad, "Proc_Insert_BN_Loads_Tables",
+                result = ExecuteSQL(DatabaseConnectionStringNames.TradeWorkLoad, "Proc_Insert_BN_Loads_Tables",
                                                                     new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
                                                                     new SqlParameter("@pbintLoadsDumpControlID", loadsId),
                                                                     new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
@@ -284,7 +282,7 @@ namespace SuppliesWorkload
             }
             else
             {
-                ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, "Proc_Update_BN_Loads_Tables",
+                ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, "Proc_Update_BN_Loads_Tables",
                                                                 new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
                                                                 new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
                                                                 new SqlParameter("@pvchrFile", fileInfo.Name),
@@ -295,7 +293,7 @@ namespace SuppliesWorkload
 
             WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({timeStampDate})");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampDate}'");
+            ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampDate}'");
 
             string headerFile = fileInfo.DirectoryName + "\\" + table["FileNameWithoutExtension"] + ".heading";
 
@@ -323,8 +321,8 @@ namespace SuppliesWorkload
                 }
             }
 
-            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.SuppliesWorkLoad, CommandType.Text,
-                                                                    $"SELECT ORDINAL_POSITION, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = 'Supplies_Work' AND TABLE_NAME = @TableName",
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.TradeWorkLoad, CommandType.Text,
+                                                                    $"SELECT ORDINAL_POSITION, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = 'Trade_Work' AND TABLE_NAME = @TableName",
                                                                     new SqlParameter("@TableName", table["TableName"].ToString()));
 
             int loopCounter = 0;
@@ -376,7 +374,7 @@ namespace SuppliesWorkload
 
             Int64 recordCount = Int64.Parse(File.ReadAllText(countFile).ToString());
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
+            ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
                                         new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"]),
                                         new SqlParameter("@pintDataRowsCopied", recordCount));
 
@@ -425,7 +423,7 @@ namespace SuppliesWorkload
             WriteToJobLog(JobLogMessageType.INFO, $"Error file = {bulkInsertErrorFile}");
             WriteToJobLog(JobLogMessageType.INFO, $"Format file = {bulkInsertFormatFile}");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, CommandType.Text, $"BULK INSERT {table["TableName"].ToString()} FROM '{bulkInsertDataFile}' WITH (FORMATFILE='{bulkInsertFormatFile}', ERRORFILE='{bulkInsertErrorFile}')");
+            ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, CommandType.Text, $"BULK INSERT {table["TableName"].ToString()} FROM '{bulkInsertDataFile}' WITH (FORMATFILE='{bulkInsertFormatFile}', ERRORFILE='{bulkInsertErrorFile}')");
 
             WriteToJobLog(JobLogMessageType.INFO, $"Checking status of bulk insert import");
 
@@ -434,11 +432,11 @@ namespace SuppliesWorkload
 
             WriteToJobLog(JobLogMessageType.INFO, $"Deleting ignored record (last record), if read by bulk insert");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampFileContents}' AND IgnoredRecordFlag = 1");
+            ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampFileContents}' AND IgnoredRecordFlag = 1");
 
             WriteToJobLog(JobLogMessageType.INFO, "Reading last record sequence");
 
-            result = ExecuteSQL(DatabaseConnectionStringNames.SuppliesWorkLoad, "Proc_Select_RecordSequence_Maximum",
+            result = ExecuteSQL(DatabaseConnectionStringNames.TradeWorkLoad, "Proc_Select_RecordSequence_Maximum",
                                                              new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
                                                              new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents)).FirstOrDefault();
 
@@ -458,7 +456,7 @@ namespace SuppliesWorkload
                 PopulateTable(table["TableName"].ToString(), Int64.Parse(table["LoadsTableID"].ToString()), tables);
 
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
+            ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
 
             return filesToDelete;
 
@@ -480,7 +478,7 @@ namespace SuppliesWorkload
         {
             WriteToJobLog(JobLogMessageType.INFO, $"{tableName} populating");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.SuppliesWorkLoad, $"Proc_Populate_{tableName}",
+            ExecuteNonQuery(DatabaseConnectionStringNames.TradeWorkLoad, $"Proc_Populate_{tableName}",
                                         new SqlParameter("@pbintLoadsTablesID", loadsTableId));
 
             WriteToJobLog(JobLogMessageType.INFO, $"{tableName} successful");

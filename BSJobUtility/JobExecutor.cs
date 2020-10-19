@@ -99,6 +99,8 @@ namespace BSJobUtility
                 _managedJob = new CircDumpPost.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "SuppliesWorkload")
                 _managedJob = new SuppliesWorkload.Job();
+            else if (_jobName == "TradeWorkload")
+                _managedJob = new TradeWorkload.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

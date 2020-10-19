@@ -247,6 +247,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.BNTransactions:
                     connectionString = GetConnectionString("bntransactions");
                     break;
+                case DatabaseConnectionStringNames.TradeWorkLoad:
+                    connectionString = GetConnectionString("tradework");
+                    break;
                 default:
                     break;
             }

@@ -162,6 +162,10 @@
       <Project>{428258fe-950a-4ffd-883c-7faea65e05b3}</Project>
       <Name>TestJob</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TradeWorkload\TradeWorkload.csproj">
+      <Project>{7846f18e-0d22-4b7b-919c-e7c579091c8a}</Project>
+      <Name>TradeWorkload</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UnzipNewscycleExportFiles\UnzipNewscycleExportFiles.csproj">
       <Project>{5908ef09-95b9-4ec0-91c2-a404c8545853}</Project>
       <Name>UnzipNewscycleExportFiles</Name>

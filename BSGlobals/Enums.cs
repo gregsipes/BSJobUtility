@@ -44,7 +44,8 @@ namespace BSGlobals
             Purchasing,
             SuppliesWorkLoad,
             PBSDump,
-            BNTransactions
+            BNTransactions,
+            TradeWorkLoad
         }
 
         public enum JobLogMessageType
