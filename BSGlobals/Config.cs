@@ -225,6 +225,9 @@ namespace BSGlobals
                     break;
                 case DatabaseConnectionStringNames.PBSDumpAWorkPopulate:
                     connectionString = GetConnectionString("pbsdumpawork_populate");
+                    break; 
+                case DatabaseConnectionStringNames.PBSDumpPost:
+                    connectionString = GetConnectionString("pbsdumpawork_post");
                     break;
                 case DatabaseConnectionStringNames.PBSDumpBWork:
                     connectionString = GetConnectionString("pbsdumpbwork");

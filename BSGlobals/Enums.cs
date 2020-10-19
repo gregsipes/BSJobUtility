@@ -38,6 +38,7 @@ namespace BSGlobals
             CircDumpPost,
             PBSDumpAWorkLoad,
             PBSDumpAWorkPopulate,
+            PBSDumpPost,
             PBSDumpBWork,
             PBSDumpCWork,
             Purchasing,

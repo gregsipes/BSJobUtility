@@ -15,6 +15,8 @@ namespace PBSDumpPost
     {
         public string GroupName { get; set; }
 
+        public string GroupNumber { get; set; }
+
         private DatabaseConnectionStringNames VersionSpecificConnectionString { get; set; }
 
         public override void SetupJob()
@@ -23,10 +25,11 @@ namespace PBSDumpPost
             JobDescription = "Runs final cleanup and update tasks for PBS dump.";
             AppConfigSectionName = "PBSDumpPost";
 
+            //this really only ever runs for group A
             switch (GroupName)
             {
                 case "A":
-                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpAWorkLoad;
+                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpPost;
                     break;
                 case "B":
                     VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpBWork;
@@ -42,8 +45,8 @@ namespace PBSDumpPost
         {
             try
             {
-                if (GroupName != "")
-                    GroupPost();
+               if (GroupNumber != "")
+                    GroupPost();        //only group 2 actually executes anything
                 else
                     TablePost();
             }
@@ -57,7 +60,7 @@ namespace PBSDumpPost
         private void GroupPost()
         {
             List<Dictionary<string, object>> results = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_BN_Groups_Post_Load",
-                                                                            new SqlParameter("@pintGroupNumber", GroupName));
+                                                                            new SqlParameter("@pintGroupNumber", GroupNumber));
 
             if (GroupName == "")
                 WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for all tables");
@@ -148,8 +151,9 @@ namespace PBSDumpPost
 
         private void TablePost()
         {
+            //all of the stored_procedure values are null for this version of the job, so this code doesn't currently do anything
 
-            List<string> files = Directory.GetFiles($"{GetConfigurationKeyValue("TableTouchDirectory")}", "*.successful").ToList();
+            List<string> files = Directory.GetFiles(String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName), "*.successful").ToList();
 
             foreach (string file in files)
             {

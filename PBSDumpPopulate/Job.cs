@@ -12,7 +12,7 @@ namespace PBSDumpPopulate
 {
     public class Job : JobBase
     {
-        public string Version { get; set; }
+        public string GroupNumber { get; set; }
         public string GroupName { get; set; }
 
         public override void SetupJob()
@@ -26,10 +26,10 @@ namespace PBSDumpPopulate
         {
             try
             {
-                WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}   Group Number: {Version}");
+                WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}   Group Number: {GroupNumber}");
 
                 List<Dictionary<string, object>> dumpControls = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Select_BN_Distinct_DumpControl_To_Populate",
-                                                                               new SqlParameter("@pintGroupNumber", Version)).ToList();
+                                                                               new SqlParameter("@pintGroupNumber", GroupNumber)).ToList();
 
                 //  bool updateTranDateAfterSuccessfulPopulate = false;
 
@@ -40,7 +40,7 @@ namespace PBSDumpPopulate
                         List<string> tablesToPopulate = DetermineTablesToPopulate(Convert.ToInt64(dumpControl["loads_dumpcontrol_id"]));
 
                         if (tablesToPopulate.Count() == 0)
-                            WriteToJobLog(JobLogMessageType.INFO, $"No tables need to be populated for group number {Version}, loads_dumpcontrol_id = {dumpControl["loads_dumpcontrol_id"].ToString()}");
+                            WriteToJobLog(JobLogMessageType.INFO, $"No tables need to be populated for group number {GroupNumber}, loads_dumpcontrol_id = {dumpControl["loads_dumpcontrol_id"].ToString()}");
 
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSDumpAWorkLoad, "Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag",
                                                 new SqlParameter("@pintLoadsDumpControlID", dumpControl["loads_dumpcontrol_id"]));
@@ -75,7 +75,7 @@ namespace PBSDumpPopulate
             {
                 //todo: send executing email?
 
-                WriteToJobLog(JobLogMessageType.INFO, $"Populating tables for group number {Version}, loads dump control id = {dumpControlId}");
+                WriteToJobLog(JobLogMessageType.INFO, $"Populating tables for group number {GroupNumber}, loads dump control id = {dumpControlId}");
 
                 foreach (Dictionary<string, object> result in results)
                 {
@@ -85,7 +85,7 @@ namespace PBSDumpPopulate
                     {
                         Dictionary<string, object> populateAttempts = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Update_BN_Loads_Tables_Number_Of_Populate_Attempts",
                                                                                         new SqlParameter("@pbintLoadsTablesID", result["loads_tables_id"].ToString()),
-                                                                                        new SqlParameter("@pintGroupNumber", Version)).FirstOrDefault();
+                                                                                        new SqlParameter("@pintGroupNumber", GroupNumber)).FirstOrDefault();
 
                         if (Convert.ToInt32(populateAttempts["bn_loads_tables_number_of_populate_attempts"].ToString()) <= Convert.ToInt32(populateAttempts["bn_groups_number_of_populate_attempts"].ToString()))
                         {
