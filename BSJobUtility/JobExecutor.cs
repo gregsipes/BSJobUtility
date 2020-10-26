@@ -32,7 +32,7 @@ namespace BSJobUtility
             }
             catch(Exception ex)
             {
-                throw;
+                throw new Exception ("JobExecutor exception:  " + ex.ToString()); // 10/01/20 PEB Added Ex to eliminate compiler warning.
             }
             finally
             {

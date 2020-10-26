@@ -36,11 +36,36 @@ namespace BSGlobals
     //    AutoFit rows and AutoFit columns do not appear to work when used according to Microsoft documentation.
     //    To keep this class as generic as possible, no log-writing is performed here.  Instead, most functions will return true normally,
     //       and false if any kind of exception occurred.  A public LastException string will be populated with the exception should one occur.
+    //
+    //    THIS IS NOT YET OPTIMIZED and as such it will run very slowly for any complex spreadsheet.  
+    //       One optimization step that is sorely needed is a way to collect data flowing to individual cells and to encapsulate
+    //       that data into a 2D array instead; and ONLY after the data has been fully assigned should the array be written to the spreadsheet via OLE.
+    //       (Note that this will reduce OLE calls but not eliminate those related to formatting.  However, it will do wonders for large datasets that
+    //       simply need to be written to Excel.
 
     public class Spreadsheet
     {
 
         #region Declarations
+
+        // Enums types that allow us to remove any user dependencies on Microsoft.Office.Interop.Excel
+
+        public enum LineStyle {
+            Continuous = 1,
+            Dash = -4115,
+            DashDot = 4,
+            DashDotDot = 5,
+            Dot = -4118,
+            Double = -4119,
+            None = -4142,
+            SlantDashDot = 13 };
+
+        public enum BorderWeight {
+            Hairline = 1,
+            Medium = -4138,
+            Thick = 4,
+            Thin = 2 };
+
         public FontClass Font;
         public PageSetupClass PageSetup;
         public AlignmentClass Alignment;
@@ -1189,8 +1214,6 @@ namespace BSGlobals
             {
                 return (Backcolor(row, col, row, col, color));
             }
-
-
             /// <summary>
             /// Places a box around the perimeter of the specified range of cells.
             /// </summary>
@@ -1202,12 +1225,12 @@ namespace BSGlobals
             /// <param name="weight"></param>
             /// <param name="color"></param>
             /// <returns></returns>
-            public bool Box(int startRow, int startCol, int endRow, int EndCol, Excel.XlLineStyle style, Excel.XlBorderWeight weight, Color color)
+            public bool Box(int startRow, int startCol, int endRow, int EndCol, LineStyle style, BorderWeight weight, Color color)
             {
                 try
                 {
                     Excel.Range range = SP.SetRange(startRow, startCol, endRow, EndCol);
-                    range.BorderAround2(style, weight, Excel.XlColorIndex.xlColorIndexNone, ColorTranslator.ToOle(color));
+                    range.BorderAround2((Excel.XlLineStyle)style, (Excel.XlBorderWeight)weight, Excel.XlColorIndex.xlColorIndexNone, ColorTranslator.ToOle(color));
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(range);
                     return (true);
                 }
@@ -1227,11 +1250,10 @@ namespace BSGlobals
             /// <param name="weight"></param>
             /// <param name="color"></param>
             /// <returns></returns>
-            public bool Box(int row, int col, Excel.XlLineStyle style, Excel.XlBorderWeight weight, Color color)
+            public bool Box(int row, int col, LineStyle style, BorderWeight weight, Color color)
             {
                 return (Box(row, col, row, col, style, weight, color));
             }
-
         }
         #endregion
 
@@ -1391,9 +1413,9 @@ namespace BSGlobals
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Fileclass
+#region Fileclass
         public class FileClass
         {
             Spreadsheet SP;
@@ -1444,7 +1466,7 @@ namespace BSGlobals
                 }
             }
         }
-        #endregion
+#endregion
 
     }
 }

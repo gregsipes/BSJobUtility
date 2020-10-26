@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PurchaseOrders")]
+[assembly: AssemblyTitle("Synergy Report Maintenance")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PurchaseOrders")]
+[assembly: AssemblyProduct("Synergy Report Maintenance")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("deddecc7-69d9-4924-8596-018bfa1b4bde")]
+[assembly: Guid("39c48e7b-422d-4f5e-b442-699fd0f69985")]
 
 // Version information for an assembly consists of the following four values:
 //

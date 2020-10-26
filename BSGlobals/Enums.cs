@@ -38,7 +38,9 @@ namespace BSGlobals
             PBSDumpAWork,
             PBSDumpBWork,
             PBSDumpCWork,
-            Purchasing
+            Purchasing,
+            ISInventory,
+            SynergyReportMaintenance
         }
 
         public enum JobLogMessageType

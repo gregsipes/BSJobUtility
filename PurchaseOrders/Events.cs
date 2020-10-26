@@ -137,9 +137,11 @@ namespace PurchaseOrders
             if (CurrentOrder != null)
             {
                 LblCreatingSpreadsheet.Visible = true;
+                StatusBar.AddText(0, "Creating Spreadsheet");
                 LblStatus.Visible = false;
                 POSpreadsheet = CreatePurchaseOrderSpreadsheet(CurrentOrder);
                 LblCreatingSpreadsheet.Visible = false;
+                StatusBar.AddText(0, "");
                 POSpreadsheet.Show();
             }
             else
@@ -164,9 +166,11 @@ namespace PurchaseOrders
             if (CurrentOrder != null)
             {
                 LblCreatingSpreadsheet.Visible = true;
+                StatusBar.AddText(0, "Creating Spreadsheet");
                 LblStatus.Visible = false;
                 POSpreadsheet = CreatePurchaseOrderSpreadsheet(CurrentOrder);
                 LblCreatingSpreadsheet.Visible = false;
+                StatusBar.AddText(0, "");
                 POSpreadsheet.Print();
             }
             else
@@ -184,9 +188,11 @@ namespace PurchaseOrders
         {
             // Generate an expense report from the standard expense report template
             LblCreatingSpreadsheet.Visible = true;
+            StatusBar.AddText(0, "Creating Spreadsheet");
             LblStatus.Visible = false;
             ERSpreadsheet = CreateExpenseReportSpreadsheet(CurrentOrder);
             LblCreatingSpreadsheet.Visible = false;
+            StatusBar.AddText(0, "");
             ERSpreadsheet.Show();
         }
 

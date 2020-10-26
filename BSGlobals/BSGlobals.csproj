@@ -64,6 +64,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Spreadsheet.cs" />
     <Compile Include="Types.cs" />
+    <Compile Include="VersionStatusBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.txt" />

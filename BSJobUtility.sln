@@ -63,6 +63,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircDumpPopulate", "CircDum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurchaseOrders", "PurchaseOrders\PurchaseOrders.csproj", "{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IS Inventory", "IS Inventory\IS Inventory.csproj", "{A95F38F0-8927-49F6-9A2B-9E4C95E36131}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synergy Report Maintenance", "Synergy Report Maintenance\Synergy Report Maintenance.csproj", "{39C48E7B-422D-4F5E-B442-699FD0F69985}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -185,6 +189,14 @@ Global
 		{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEDDECC7-69D9-4924-8596-018BFA1B4BDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A95F38F0-8927-49F6-9A2B-9E4C95E36131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A95F38F0-8927-49F6-9A2B-9E4C95E36131}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A95F38F0-8927-49F6-9A2B-9E4C95E36131}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A95F38F0-8927-49F6-9A2B-9E4C95E36131}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39C48E7B-422D-4F5E-B442-699FD0F69985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39C48E7B-422D-4F5E-B442-699FD0F69985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39C48E7B-422D-4F5E-B442-699FD0F69985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39C48E7B-422D-4F5E-B442-699FD0F69985}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
