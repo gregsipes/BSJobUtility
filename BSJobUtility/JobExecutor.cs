@@ -101,6 +101,8 @@ namespace BSJobUtility
                 _managedJob = new SuppliesWorkload.Job();
             else if (_jobName == "TradeWorkload")
                 _managedJob = new TradeWorkload.Job();
+            else if (_jobName == "SubBalanceLoad")
+                _managedJob = new SubBalanceLoad.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

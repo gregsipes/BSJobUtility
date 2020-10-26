@@ -45,7 +45,8 @@ namespace BSGlobals
             SuppliesWorkLoad,
             PBSDump,
             BNTransactions,
-            TradeWorkLoad
+            TradeWorkLoad,
+            SubBalanceLoad
         }
 
         public enum JobLogMessageType

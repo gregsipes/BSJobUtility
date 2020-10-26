@@ -33,7 +33,7 @@ namespace BSGlobals
 
             try
             {
-                if (section != null)
+                if (section != null && section.AllKeys.Contains(keyName))
                     value = section[keyName].ToString();
             }
             catch (Exception ex)
@@ -249,6 +249,9 @@ namespace BSGlobals
                     break;
                 case DatabaseConnectionStringNames.TradeWorkLoad:
                     connectionString = GetConnectionString("tradework");
+                    break;
+                case DatabaseConnectionStringNames.SubBalanceLoad:
+                    connectionString = GetConnectionString("subbalancework");
                     break;
                 default:
                     break;
