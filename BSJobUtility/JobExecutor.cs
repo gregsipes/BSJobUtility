@@ -103,6 +103,8 @@ namespace BSJobUtility
                 _managedJob = new TradeWorkload.Job();
             else if (_jobName == "SubBalanceLoad")
                 _managedJob = new SubBalanceLoad.Job();
+            else if (_jobName == "DeleteFile")
+                _managedJob = new DeleteFile.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

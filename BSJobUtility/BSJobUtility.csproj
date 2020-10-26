@@ -78,6 +78,10 @@
       <Project>{9927a52d-b824-47ec-8653-cf444c79f7d8}</Project>
       <Name>CommissionsCreate</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeleteFile\DeleteFile.csproj">
+      <Project>{69a6a58d-770a-406b-ae1c-14d87e9866c2}</Project>
+      <Name>DeleteFile</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DMMail\DMMail.csproj">
       <Project>{960455ab-e26b-4a6f-b065-7a1e500757f9}</Project>
       <Name>DMMail</Name>
