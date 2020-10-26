@@ -16,7 +16,7 @@ namespace SubBalanceLoad
         public override void SetupJob()
         {
             JobName = "Sub Balance Load";
-            JobDescription = "Parses a pipe delimited file into a work/staging database";
+            JobDescription = "Parses a pipe delimited file into a work/staging database then pushes the changes to PBSDump database. The only table updated in PBSDump from this pocess is SubsBalance.";
             AppConfigSectionName = "SubBalanceLoad";
 
         }
