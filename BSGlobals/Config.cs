@@ -142,8 +142,8 @@ namespace BSGlobals
 
             switch (name)
             {
-                case DatabaseConnectionStringNames.EventLogs:
-                    connectionString = GetConnectionString("eventlogs");
+                case DatabaseConnectionStringNames.BSJobUtility:
+                    connectionString = GetConnectionString("bsjobutility");
                     break;
                 case DatabaseConnectionStringNames.Parking:
                     connectionString = GetConnectionString("parking");

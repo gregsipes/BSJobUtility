@@ -24,7 +24,7 @@ namespace DeleteFile
             try
             {
                 //get the files to search for
-                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.EventLogs, "Proc_Select_Delete_Files").ToList();
+                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.BSJobUtility, "Proc_Select_Delete_Files").ToList();
 
                 foreach (Dictionary<string, object> result in results)
                 {

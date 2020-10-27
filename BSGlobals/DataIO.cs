@@ -26,7 +26,7 @@ namespace BSGlobals
             {
                 try
                 {
-                    command.Connection = new SqlConnection(Config.GetConnectionStringTo(DatabaseConnectionStringNames.EventLogs));
+                    command.Connection = new SqlConnection(Config.GetConnectionStringTo(DatabaseConnectionStringNames.BSJobUtility));
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.InsertJobLog";
                     command.Parameters.Add(new SqlParameter("@JobName", jobName));

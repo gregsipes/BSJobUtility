@@ -10,7 +10,7 @@ namespace BSGlobals
     {
         public enum DatabaseConnectionStringNames
         {
-            EventLogs,
+            BSJobUtility,
             Parking,
             SBSReports,
             PBS2Macro,
