@@ -26,6 +26,9 @@ namespace DeleteFile
                 //get the files to search for
                 List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.BSJobUtility, "Proc_Select_Delete_Files").ToList();
 
+                Int32 deletedFileCount = 0;
+                Int32 deletedFolderCount = 0;
+
                 foreach (Dictionary<string, object> result in results)
                 {
 
@@ -47,13 +50,22 @@ namespace DeleteFile
                             {
                                 WriteToJobLog(JobLogMessageType.INFO, $"Deleting {fileInfo.FullName}");
                                 File.Delete(fileInfo.FullName);
+                                deletedFileCount++;
                             }
                         }
                     }
 
                     //check subdirectories
                     if (Convert.ToBoolean(result["DeleteEmptySubDirectories"].ToString()) || Convert.ToBoolean(result["DeleteAllSubDirectories"].ToString()))
-                        DeleteSubDirectories(directoryInfo.FullName, result);
+                        deletedFolderCount += DeleteSubDirectories(directoryInfo.FullName, result);
+                }
+
+                if (deletedFileCount == 0 && deletedFolderCount == 0)
+                    WriteToJobLog(JobLogMessageType.INFO, "No files and folders to delete");
+                else
+                {
+                    WriteToJobLog(JobLogMessageType.INFO, $"{deletedFileCount} files deleted");
+                    WriteToJobLog(JobLogMessageType.INFO, $"{deletedFolderCount} folders deleted");
                 }
 
             }
@@ -64,8 +76,10 @@ namespace DeleteFile
             }
         }
 
-        private void DeleteSubDirectories(string directoryPath, Dictionary<string, object> result)
+        private Int32 DeleteSubDirectories(string directoryPath, Dictionary<string, object> result)
         {
+            Int32 deletedFolderCount = 0;
+
             List<string> folders = Directory.GetDirectories(directoryPath).ToList();
 
             foreach (string folder in folders)
@@ -75,6 +89,7 @@ namespace DeleteFile
                 {
                     WriteToJobLog(JobLogMessageType.INFO, $"Deleting empty folder {folder}");
                     Directory.Delete(folder);
+                    deletedFolderCount++;
                 }
                 else if (Convert.ToBoolean(result["DeleteAllSubDirectories"].ToString()))
                 {
@@ -86,12 +101,12 @@ namespace DeleteFile
                     {
                         WriteToJobLog(JobLogMessageType.INFO, $"Deleting {folder} with all of its contents recursively");
                         Directory.Delete(folder, true);   //recursively deletes everything in folder
+                        deletedFolderCount++;
                     }
                 }
-
-
-
             }
+
+            return deletedFolderCount;
         }
 
 
