@@ -28,17 +28,32 @@ namespace DeleteFile
 
                 foreach (Dictionary<string, object> result in results)
                 {
-                    List<string> files = Directory.GetFiles(result["Path"].ToString(), result["FileSearchPattern"].ToString()).ToList();
+
+                    DirectoryInfo directoryInfo = new DirectoryInfo(result["Path"].ToString());
+
+
+                    List<FileInfo> files = directoryInfo.GetFiles(result["FileSearchPattern"].ToString()).ToList();
+                    FileInfo mostRecentFile = files.OrderByDescending(f => f.LastWriteTime).FirstOrDefault();
 
                     //delete each file
-                    foreach(string file in files)
+                    foreach (FileInfo fileInfo in files)
                     {
-                        //todo: check if is last file
-
-                        File.Delete(file);
+                        //check to see if the file is older than the number of days to keep the file
+                        if (DateTime.Now.AddDays(Convert.ToInt32(result["DaysToKeep"].ToString()) * -1) > fileInfo.LastWriteTime)
+                        {
+                            //delete the file only if we can either delete all files or this is not the latest version
+                            if (Convert.ToBoolean(result["DeleteLatestVersion"].ToString()) == true ||
+                                (Convert.ToBoolean(result["DeleteLatestVersion"].ToString()) == false && mostRecentFile.FullName != fileInfo.FullName))
+                            {
+                                WriteToJobLog(JobLogMessageType.INFO, $"Deleting {fileInfo.FullName}");
+                                File.Delete(fileInfo.FullName);
+                            }
+                        }
                     }
 
-                    //todo: check subdirectories
+                    //check subdirectories
+                    if (Convert.ToBoolean(result["DeleteEmptySubDirectories"].ToString()) || Convert.ToBoolean(result["DeleteAllSubDirectories"].ToString()))
+                        DeleteSubDirectories(directoryInfo.FullName, result);
                 }
 
             }
@@ -46,6 +61,36 @@ namespace DeleteFile
             {
                 LogException(ex);
                 throw;
+            }
+        }
+
+        private void DeleteSubDirectories(string directoryPath, Dictionary<string, object> result)
+        {
+            List<string> folders = Directory.GetDirectories(directoryPath).ToList();
+
+            foreach (string folder in folders)
+            {
+                //if the directory is empty, always delete it. If it is not empty, check to see if the flag is set to delete anyways
+                if (!Directory.EnumerateFileSystemEntries(folder).Any())
+                {
+                    WriteToJobLog(JobLogMessageType.INFO, $"Deleting empty folder {folder}");
+                    Directory.Delete(folder);
+                }
+                else if (Convert.ToBoolean(result["DeleteAllSubDirectories"].ToString()))
+                {
+                    //only delete the subdirectory if the newest file is older than the days to keep
+                    DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+                    FileInfo mostRecentFile = directoryInfo.GetFiles("*", SearchOption.AllDirectories).OrderByDescending(f => f.LastWriteTime).FirstOrDefault();
+
+                    if (DateTime.Now.AddDays(Convert.ToInt32(result["DaysToKeep"].ToString()) * -1) > mostRecentFile.LastWriteTime)
+                    {
+                        WriteToJobLog(JobLogMessageType.INFO, $"Deleting {folder} with all of its contents recursively");
+                        Directory.Delete(folder, true);   //recursively deletes everything in folder
+                    }
+                }
+
+
+
             }
         }
 
