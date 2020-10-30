@@ -78,6 +78,10 @@
       <Project>{9927a52d-b824-47ec-8653-cf444c79f7d8}</Project>
       <Name>CommissionsCreate</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeleteEmptyTMPFiles\DeleteEmptyTMPFiles.csproj">
+      <Project>{1532ee23-f637-40fa-bba8-10b2f7c1a36d}</Project>
+      <Name>DeleteEmptyTMPFiles</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeleteFile\DeleteFile.csproj">
       <Project>{69a6a58d-770a-406b-ae1c-14d87e9866c2}</Project>
       <Name>DeleteFile</Name>

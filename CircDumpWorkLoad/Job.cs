@@ -56,7 +56,6 @@ namespace CircDumpWorkLoad
         {
             try
             {
-                WriteToJobLog(JobLogMessageType.INFO, $"Group Number: {GroupNumber}");
 
                 //check for any touch files before executing
                 bool touchFileFound = false;
@@ -86,6 +85,8 @@ namespace CircDumpWorkLoad
 
                     if (files != null && files.Count() > 0)
                     {
+                        WriteToJobLog(JobLogMessageType.INFO, $"Group Number: {GroupNumber}");
+
                         foreach (string file in files)
                         {
                             FileInfo fileInfo = new FileInfo(file);

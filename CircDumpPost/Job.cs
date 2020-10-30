@@ -41,24 +41,30 @@ namespace CircDumpPost
 
         private void GroupPost()
         {
-            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpPost, "Proc_Select_BN_Groups_Post_Load",
+            //only run this code if a successful file exists. This files gets deleted after the table post  (last) step of the job is complete
+            List<string> files = Directory.GetFiles($"{GetConfigurationKeyValue("TableTouchDirectory")}", "*.successful").ToList();
+
+            if (files.Count() > 0)
+            {
+                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpPost, "Proc_Select_BN_Groups_Post_Load",
                                                                             new SqlParameter("@pintGroupNumber", GroupNumber));
 
-            if (GroupNumber == -1)
-                WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for all tables");
-            else
-            WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for group number {GroupNumber}");
+                if (GroupNumber == -1)
+                    WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for all tables");
+                else
+                    WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for group number {GroupNumber}");
 
-            Exception sprocResult = null;
-            foreach (Dictionary<string, object> result in results)
-            {
-                sprocResult = ExecuteStoredProcedure(true, Convert.ToInt64(result["bn_groups_post_load_id"].ToString()), result["stored_procedure"].ToString(), "", Convert.ToInt32(result["database_number"].ToString())); 
-
-                //if something went wrong, determine if the job should continue processing or exit
-                if (sprocResult != null)
+                Exception sprocResult = null;
+                foreach (Dictionary<string, object> result in results)
                 {
-                    if (!Convert.ToBoolean(result["continue_on_failure_flag"].ToString()))
-                        throw new Exception(sprocResult.ToString());
+                    sprocResult = ExecuteStoredProcedure(true, Convert.ToInt64(result["bn_groups_post_load_id"].ToString()), result["stored_procedure"].ToString(), "", Convert.ToInt32(result["database_number"].ToString()));
+
+                    //if something went wrong, determine if the job should continue processing or exit
+                    if (sprocResult != null)
+                    {
+                        if (!Convert.ToBoolean(result["continue_on_failure_flag"].ToString()))
+                            throw new Exception(sprocResult.ToString());
+                    }
                 }
             }
 
@@ -99,6 +105,7 @@ namespace CircDumpPost
 
         private string RetrieveParameters(bool isGroup, Int64 postLoadId, string tableName, bool quote)
         {
+
             List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
             if (isGroup)

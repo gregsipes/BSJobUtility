@@ -26,7 +26,6 @@ namespace PBSDumpPopulate
         {
             try
             {
-                WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}   Group Number: {GroupNumber}");
 
                 List<Dictionary<string, object>> dumpControls = ExecuteSQL(DatabaseConnectionStringNames.PBSDumpAWorkPopulate, "Proc_Select_BN_Distinct_DumpControl_To_Populate",
                                                                                new SqlParameter("@pintGroupNumber", GroupNumber)).ToList();
@@ -35,6 +34,8 @@ namespace PBSDumpPopulate
 
                 if (dumpControls != null && dumpControls.Count() > 0)
                 {
+                    WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}   Group Number: {GroupNumber}");
+
                     foreach (Dictionary<string, object> dumpControl in dumpControls)
                     {
                         List<string> tablesToPopulate = DetermineTablesToPopulate(Convert.ToInt64(dumpControl["loads_dumpcontrol_id"]));

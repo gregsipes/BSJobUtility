@@ -36,8 +36,6 @@ namespace PBSDumpWorkload
                     VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpCWork;
                     break;
             }
-
-            WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}");
         }
 
         public override void ExecuteJob()
@@ -68,12 +66,15 @@ namespace PBSDumpWorkload
 
                 if (touchFileFound)
                 {
+
                     //get the input files that are ready for processing
                     string inputDirectory = String.Format(GetConfigurationKeyValue("InputDirectory"), GroupName);
                     files = Directory.GetFiles($"{inputDirectory}\\", "dumpcontrol*.timestamp").ToList();
 
                     if (files != null && files.Count() > 0)
                     {
+                        WriteToJobLog(JobLogMessageType.INFO, $"Group Name: {GroupName}");
+
                         foreach (string file in files)
                         {
                             FileInfo fileInfo = new FileInfo(file);

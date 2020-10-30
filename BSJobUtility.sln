@@ -77,6 +77,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubBalanceLoad", "SubBalanc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeleteFile", "DeleteFile\DeleteFile.csproj", "{69A6A58D-770A-406B-AE1C-14D87E9866C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeleteEmptyTMPFiles", "DeleteEmptyTMPFiles\DeleteEmptyTMPFiles.csproj", "{1532EE23-F637-40FA-BBA8-10B2F7C1A36D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -227,6 +229,10 @@ Global
 		{69A6A58D-770A-406B-AE1C-14D87E9866C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69A6A58D-770A-406B-AE1C-14D87E9866C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69A6A58D-770A-406B-AE1C-14D87E9866C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1532EE23-F637-40FA-BBA8-10B2F7C1A36D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1532EE23-F637-40FA-BBA8-10B2F7C1A36D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1532EE23-F637-40FA-BBA8-10B2F7C1A36D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1532EE23-F637-40FA-BBA8-10B2F7C1A36D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -263,6 +269,7 @@ Global
 		{7846F18E-0D22-4B7B-919C-E7C579091C8A} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{8E87415B-A7EA-4165-9AEE-8FB6D88496AE} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{69A6A58D-770A-406B-AE1C-14D87E9866C2} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{1532EE23-F637-40FA-BBA8-10B2F7C1A36D} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}
