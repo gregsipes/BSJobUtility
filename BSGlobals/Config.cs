@@ -253,6 +253,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.SubBalanceLoad:
                     connectionString = GetConnectionString("subbalancework");
                     break;
+                case DatabaseConnectionStringNames.Feeds:
+                    connectionString = GetConnectionString("feeds");
+                    break;
                 default:
                     break;
             }

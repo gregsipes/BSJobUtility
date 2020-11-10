@@ -56,7 +56,7 @@ namespace PBSDumpWorkload
                         foreach (string file in files)
                         {
                             touchFileFound = true;
-                           
+
 
                             if (bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
                                 File.Delete(file);
@@ -153,8 +153,6 @@ namespace PBSDumpWorkload
             WriteToJobLog(JobLogMessageType.INFO, $"Reading {fileInfo.Name}");
 
             List<Dictionary<string, object>> tables = new List<Dictionary<string, object>>();
-            //    bool pbsDumpFileVersion = false;
-            //   bool suppliedDumpFileVersion = false;
 
             if (fileInfo.Length > 0)
             {
@@ -215,7 +213,7 @@ namespace PBSDumpWorkload
                 }
                 else //this only gets hit for PBSDumpA
                 {
-                    
+
                     ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_DumpControl_Group_Number",
                                                         new SqlParameter("@pintLoadsDumpControlID", loadsId),
                                                         new SqlParameter("@pintGroupNumber", tables[0]["GroupNumber"]),
@@ -228,7 +226,7 @@ namespace PBSDumpWorkload
                         if (table["FileNameWithoutExtension"].ToString() != "")
                         {
                             atleastOneWorkToLoad = true;
-                            
+
                             result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Insert_BN_Loads_Tables",
                                                   new SqlParameter("@pvchrTableName", table["TableName"]),
                                                   new SqlParameter("@pbintLoadsDumpControlID", loadsId),
@@ -268,15 +266,15 @@ namespace PBSDumpWorkload
                 }
 
                 //create workload touch file
-               // CreateWorkloadTouchFile(fileInfo.Name);
+                // CreateWorkloadTouchFile(fileInfo.Name);
 
                 //delete files
                 if (bool.Parse(GetConfigurationKeyValue("DeleteFlag")) == true)
                     DeleteFiles(filesToDelete);
 
                 if (!populateImmediatelyAfterLoad)
-                     ExecuteNonQuery(VersionSpecificConnectionString, "dbo.Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag", new SqlParameter("@pintLoadsDumpControlID", loadsId));
-                
+                    ExecuteNonQuery(VersionSpecificConnectionString, "dbo.Proc_Update_BN_Loads_DumpControl_Load_Successful_Flag", new SqlParameter("@pintLoadsDumpControlID", loadsId));
+
             }
         }
 
@@ -301,17 +299,23 @@ namespace PBSDumpWorkload
             string timeStampFile = fileInfo.DirectoryName + "\\" + table["FileNameWithoutExtension"] + ".timestamp";
 
             //add file to list of files to delete
-            filesToDelete.Add(timeStampFile);
+            //in some cases this file doesn't exist because of a NewsCycle hiccup, so only delete it if it does and stop using it for anything else
+            if (File.Exists(timeStampFile))
+            {
+                filesToDelete.Add(timeStampFile);
 
-            WriteToJobLog(JobLogMessageType.INFO, $"Verifying {timeStampFile} ");
+                //WriteToJobLog(JobLogMessageType.INFO, $"Verifying {timeStampFile} ");
 
-            string timeStampFileContents = File.ReadAllText(timeStampFile).Replace("\n", "");
+                //string timeStampFileContents = File.ReadAllText(timeStampFile).Replace("\n", "");
 
-            DateTime timeStampDate;
-            if (!DateTime.TryParse(timeStampFileContents, out timeStampDate))
-                throw new Exception($"Unable to determine table's timestamp ({timeStampFileContents}) for table");
-            else if (dumpControlTimeStamp != timeStampDate)
-                throw new Exception($"Table's timestamp ({timeStampDate.ToString()}) does not match dump control's timestamp ({dumpControlTimeStamp}) for table {table["TableName"]}");
+                //DateTime timeStampDate;
+                //if (!DateTime.TryParse(timeStampFileContents, out timeStampDate))
+                //    throw new Exception($"Unable to determine table's timestamp ({timeStampFileContents}) for table");
+                //else if (dumpControlTimeStamp != timeStampDate)
+                //    throw new Exception($"Table's timestamp ({timeStampDate.ToString()}) does not match dump control's timestamp ({dumpControlTimeStamp}) for table {table["TableName"]}");
+            }
+            else
+                WriteToJobLog(JobLogMessageType.WARNING, $"Timestamp file not found {timeStampFile}");
 
             WriteToJobLog(JobLogMessageType.INFO, $"Preparing to load {table["TableName"]}");
 
@@ -327,20 +331,21 @@ namespace PBSDumpWorkload
                                                                     new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime)).FirstOrDefault();
                 table["LoadsTableID"] = result["loads_tables_id"];
 
-            } else
+            }
+            else
             {
-             ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables",
-                                                             new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
-                                                             new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
-                                                             new SqlParameter("@pvchrFile", fileInfo.Name),
-                                                             new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
+                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables",
+                                                                new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
+                                                                new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
+                                                                new SqlParameter("@pvchrFile", fileInfo.Name),
+                                                                new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
             }
 
-            
 
-            WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({timeStampDate})");
 
-            ExecuteNonQuery(VersionSpecificConnectionString, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampDate}'");
+            WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({dumpControlTimeStamp})");
+
+            ExecuteNonQuery(VersionSpecificConnectionString, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{dumpControlTimeStamp}'");
 
             string headerFile = fileInfo.DirectoryName + "\\" + table["FileNameWithoutExtension"] + ".heading";
 
@@ -386,7 +391,7 @@ namespace PBSDumpWorkload
                         switch (column["DATA_TYPE"].ToString())
                         {
                             case "varchar":
-                          //      columnDefinition["FieldLength"] = (Convert.ToInt32(column["CHARACTER_MAXIMUM_LENGTH"]) == -1 ? 8000 : column["CHARACTER_MAXIMUM_LENGTH"]);
+                                //      columnDefinition["FieldLength"] = (Convert.ToInt32(column["CHARACTER_MAXIMUM_LENGTH"]) == -1 ? 8000 : column["CHARACTER_MAXIMUM_LENGTH"]);
                                 break;
                             case "int":
                                 columnDefinition["FieldLength"] = 12;
@@ -416,17 +421,21 @@ namespace PBSDumpWorkload
             }
 
             string countFile = fileInfo.DirectoryName + "\\" + table["FileNameWithoutExtension"] + ".count";
+            Int64 recordCount = 0;
 
-            WriteToJobLog(JobLogMessageType.INFO, $"Reading {countFile}");
+            if (File.Exists(countFile))
+            {
+                WriteToJobLog(JobLogMessageType.INFO, $"Reading {countFile}");
 
-            Int64 recordCount = Int64.Parse(File.ReadAllText(countFile).ToString());
+                recordCount = Int64.Parse(File.ReadAllText(countFile).ToString());
 
-            ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
-                                        new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"]),
-                                        new SqlParameter("@pintDataRowsCopied", recordCount));
+                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
+                                            new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"]),
+                                            new SqlParameter("@pintDataRowsCopied", recordCount));
 
-            //add file to list of files to delete
-            filesToDelete.Add(countFile);
+                //add file to list of files to delete
+                filesToDelete.Add(countFile);
+            }
 
             string bulkInsertErrorFile = bulkInsertDirectory + "Config\\" + table["TableName"].ToString() + ".error";
             string bulkInsertFormatFile = bulkInsertDirectory + "Config\\" + table["TableName"].ToString() + ".format";
@@ -479,23 +488,33 @@ namespace PBSDumpWorkload
 
             WriteToJobLog(JobLogMessageType.INFO, $"Deleting ignored record (last record), if read by bulk insert");
 
-            ExecuteNonQuery(VersionSpecificConnectionString, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampFileContents}' AND IgnoredRecordFlag = 1");
+            ExecuteNonQuery(VersionSpecificConnectionString, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{dumpControlTimeStamp}' AND IgnoredRecordFlag = 1");
 
             WriteToJobLog(JobLogMessageType.INFO, "Reading last record sequence");
 
             result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_RecordSequence_Maximum",
                                                              new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
-                                                             new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents)).FirstOrDefault();
+                                                             new SqlParameter("@pvchrBNTimeStamp", dumpControlTimeStamp)).FirstOrDefault();
 
             Int64 recordSequenceMax = result["RecordSequence_maximum"].ToString() == "" ? 0 : Int64.Parse(result["RecordSequence_maximum"].ToString());
 
-            if (recordSequenceMax == recordCount)
-                WriteToJobLog(JobLogMessageType.INFO, $".count file & database both contain the same number of data records ({recordSequenceMax})");
+            //if we don't have a count file because of a NewsCycle hiccup, skip the integrity count and use the returned result from the bulk insert
+            if (File.Exists(countFile))
+            {
+                if (recordSequenceMax == recordCount)
+                    WriteToJobLog(JobLogMessageType.INFO, $".count file & database both contain the same number of data records ({recordSequenceMax})");
+                else
+                {
+                    string message = $".count file ({recordCount}) differs from database count ({recordSequenceMax})";
+                    WriteToJobLog(JobLogMessageType.WARNING, message);
+                    throw new Exception(message);
+                }
+            }
             else
             {
-                string message = $".count file ({recordCount}) differs from database count ({recordSequenceMax})";
-                WriteToJobLog(JobLogMessageType.WARNING, message);
-                throw new Exception(message);
+                ExecuteNonQuery(VersionSpecificConnectionString, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
+                            new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"]),
+                            new SqlParameter("@pintDataRowsCopied", recordSequenceMax));
             }
 
 
@@ -521,7 +540,7 @@ namespace PBSDumpWorkload
             }
         }
 
-       private void PopulateTable(string tableName, Int64 loadsTableId, List<Dictionary<string, object>> tables)
+        private void PopulateTable(string tableName, Int64 loadsTableId, List<Dictionary<string, object>> tables)
         {
             WriteToJobLog(JobLogMessageType.INFO, $"{tableName} populating");
 

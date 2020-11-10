@@ -107,6 +107,8 @@ namespace BSJobUtility
                 _managedJob = new DeleteFile.Job();
             else if (_jobName == "DeleteEmptyTMPFiles")
                 _managedJob = new DeleteEmptyTMPFiles.Job();
+            else if (_jobName == "Feeds")
+                _managedJob = new Feeds.Job() { Version = _version };
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

@@ -90,6 +90,10 @@
       <Project>{960455ab-e26b-4a6f-b065-7a1e500757f9}</Project>
       <Name>DMMail</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Feeds\Feeds.csproj">
+      <Project>{ebde7e14-5db4-49ea-ace0-b4b5d61fdcb8}</Project>
+      <Name>Feeds</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ManifestFreeLoad\ManifestFreeLoad.csproj">
       <Project>{8c9f48e7-4657-4917-a999-838260bf1784}</Project>
       <Name>ManifestFreeLoad</Name>

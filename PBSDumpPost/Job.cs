@@ -45,10 +45,10 @@ namespace PBSDumpPost
         {
             try
             {
-               if (GroupNumber != "")
+                if (GroupNumber != "")
                     GroupPost();        //only group 2 actually executes anything
                 else
-                    TablePost();
+                    TablePost();        //this doesn't currently get called, ever
             }
             catch (Exception ex)
             {
@@ -59,25 +59,38 @@ namespace PBSDumpPost
 
         private void GroupPost()
         {
-            List<Dictionary<string, object>> results = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_BN_Groups_Post_Load",
+
+            //only run this code if a successful file exists. This files gets deleted after the table post  (last) step of the job is complete
+            List<string> files = Directory.GetFiles(String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName), "*.successful").ToList();
+
+            if (files.Count() > 0)
+            {
+                List<Dictionary<string, object>> results = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_BN_Groups_Post_Load",
                                                                             new SqlParameter("@pintGroupNumber", GroupNumber));
 
-            if (GroupName == "")
-                WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for all tables");
-            else
-                WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for group number {GroupName}");
+                if (GroupName == "")
+                    WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for all tables");
+                else
+                    WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for group number {GroupName}");
 
-            Exception sprocResult = null;
-            foreach (Dictionary<string, object> result in results)
-            {
-                sprocResult = ExecuteStoredProcedure(true, Convert.ToInt64(result["bn_groups_post_load_id"].ToString()), result["stored_procedure"].ToString(), "", Convert.ToInt32(result["database_number"].ToString()));
-
-                //if something went wrong, determine if the job should continue processing or exit
-                if (sprocResult != null)
+                Exception sprocResult = null;
+                foreach (Dictionary<string, object> result in results)
                 {
-                    if (!Convert.ToBoolean(result["continue_on_failure_flag"].ToString()))
-                        throw new Exception(sprocResult.ToString());
+                    sprocResult = ExecuteStoredProcedure(true, Convert.ToInt64(result["bn_groups_post_load_id"].ToString()), result["stored_procedure"].ToString(), "", Convert.ToInt32(result["database_number"].ToString()));
+
+                    //if something went wrong, determine if the job should continue processing or exit
+                    if (sprocResult != null)
+                    {
+                        if (!Convert.ToBoolean(result["continue_on_failure_flag"].ToString()))
+                            throw new Exception(sprocResult.ToString());
+                    }
                 }
+
+                foreach (string file in files)
+                {
+                    File.Delete(file);
+                }
+
             }
 
         }
