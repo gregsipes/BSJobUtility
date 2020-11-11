@@ -494,7 +494,7 @@ namespace PBSDumpWorkload
 
             result = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_RecordSequence_Maximum",
                                                              new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
-                                                             new SqlParameter("@pvchrBNTimeStamp", dumpControlTimeStamp)).FirstOrDefault();
+                                                             new SqlParameter("@pvchrBNTimeStamp", dumpControlTimeStamp.ToString())).FirstOrDefault();
 
             Int64 recordSequenceMax = result["RecordSequence_maximum"].ToString() == "" ? 0 : Int64.Parse(result["RecordSequence_maximum"].ToString());
 
