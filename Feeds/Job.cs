@@ -177,8 +177,8 @@ namespace Feeds
                                             new SqlParameter("@pvchrUserSpecifiedEndingDate", endDate.HasValue ? endDate.Value.ToString() : ""),
                                             new SqlParameter("@pvchrStandardLogFileName", ""), //todo: should this be something?
                                             new SqlParameter("@pvchrUserDefinedLogFileName", ""), //todo: should this be something?
-                                            new SqlParameter("@pvchrNetworkUserName", ""),
-                                            new SqlParameter("@pvchrComputerName", "")).FirstOrDefault();
+                                            new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                                            new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower())).FirstOrDefault();
 
 
         }
