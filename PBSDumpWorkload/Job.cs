@@ -141,11 +141,11 @@ namespace PBSDumpWorkload
                                  new SqlParameter("@pintLoadsDumpControlID", loadsId),
                                  new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents));
 
-            ProcessFile(fileInfo.FullName, loadsId, DateTime.Parse(timeStampFileContents));
+            ProcessFile(fileInfo.FullName, loadsId, timeStampFileContents);
 
         }
 
-        private void ProcessFile(string fileName, Int32 loadsId, DateTime dumpControlTimeStamp)
+        private void ProcessFile(string fileName, Int32 loadsId, string dumpControlTimeStamp)
         {
             //get a handle to the dumpcontrol*.data file. This file acts as the master list of each file to import
             FileInfo fileInfo = new FileInfo(fileName.Replace(".timestamp", ".data"));
@@ -278,7 +278,7 @@ namespace PBSDumpWorkload
             }
         }
 
-        private List<string> ImportTable(Dictionary<string, object> table, FileInfo fileInfo, Int32 loadsId, string bulkInsertDirectory, bool populateImmediatelyAfterLoad, DateTime dumpControlTimeStamp, List<Dictionary<string, object>> tables)
+        private List<string> ImportTable(Dictionary<string, object> table, FileInfo fileInfo, Int32 loadsId, string bulkInsertDirectory, bool populateImmediatelyAfterLoad, string dumpControlTimeStamp, List<Dictionary<string, object>> tables)
         {
             List<string> filesToDelete = new List<string>();
 
@@ -488,7 +488,7 @@ namespace PBSDumpWorkload
 
             WriteToJobLog(JobLogMessageType.INFO, $"Deleting ignored record (last record), if read by bulk insert");
 
-            ExecuteNonQuery(VersionSpecificConnectionString, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{dumpControlTimeStamp}' AND IgnoredRecordFlag = 1");
+            ExecuteNonQuery(VersionSpecificConnectionString, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{dumpControlTimeStamp.ToString()}' AND IgnoredRecordFlag = 1");
 
             WriteToJobLog(JobLogMessageType.INFO, "Reading last record sequence");
 
