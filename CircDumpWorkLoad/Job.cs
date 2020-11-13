@@ -28,12 +28,11 @@ namespace CircDumpWorkLoad
         //11. Create bulk insert config directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Config
         //12. Create bulk insert config directory at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Data
         //13. Check for an error file if one exists \\circfs\backup\circdump\data\<groupNumber>\<tableName>.error. Exit and throw exception if one is found
-        //14. Parse the file's matching timestamp file \\circfs\backup\circdump\data\<groupNumber>\<tableName>.timestamp. Make sure this matches the the timestamp in the dumpcontrol*.timestamp file. Recently, there have been cases where this file is missing, 
-        //    so the timestamp is now checked against the dumpcontrol instead of each individual table's timestamp file.
+        //14. Parse the file's matching timestamp file \\circfs\backup\circdump\data\<groupNumber>\<tableName>.timestamp. Make sure this matches the the timestamp in the dumpcontrol*.timestamp file
         //15. Delete any records from the destination table with a matching timestamp
         //16. Read in matching file specific header file to get a list of the column names 
         //17. Query the database for a list of column names to build the field lengths for neach column. This will then be used to build the bulk insert format file
-        //18. Parse the count file at \\circfs\backup\circdump\data\<groupNumber>\<tableName>.count. Recently, there have been cases where this file is missing, so the count is now only checked if the file exists.
+        //18. Parse the count file at \\circfs\backup\circdump\data\<groupNumber>\<tableName>.count
         //19. Build bulk insert files, both the format and error files at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.error and \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.format
         //20. Copy data file from \\circfs\backup\circdump\data\1\<tableName>.data to \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\Data\<tableName>.data
         //21. Run bulk insert
@@ -289,25 +288,17 @@ namespace CircDumpWorkLoad
             string timeStampFile = fileInfo.DirectoryName + "\\" + table["FileNameWithoutExtension"] + ".timestamp";
 
             //add file to list of files to delete
-            //in some cases this file doesn't exist because of a NewsCycle hiccup, so only delete it if it does and stop using it for anything else
-            if (File.Exists(timeStampFile))
-            {
-                filesToDelete.Add(timeStampFile);
+            filesToDelete.Add(timeStampFile);
 
-                //WriteToJobLog(JobLogMessageType.INFO, $"Verifying {timeStampFile} ");
+            WriteToJobLog(JobLogMessageType.INFO, $"Verifying {timeStampFile} ");
 
-                //string timeStampFileContents = File.ReadAllText(timeStampFile).Replace("\n", "");
+            string timeStampFileContents = File.ReadAllText(timeStampFile).Replace("\n", "");
 
-                //DateTime timeStampDate;
-                //if (!DateTime.TryParse(timeStampFileContents, out timeStampDate))
-                //    throw new Exception($"Unable to determine table's timestamp ({timeStampFileContents}) for table");
-                //else if (dumpControlTimeStamp != timeStampDate)
-                //    throw new Exception($"Table's timestamp ({timeStampDate.ToString()}) does not match dump control's timestamp ({dumpControlTimeStamp}) for table {table["TableName"]}");
-
-            }
-            else
-                WriteToJobLog(JobLogMessageType.WARNING, $"Timestamp file not found {timeStampFile}");
-
+            DateTime timeStampDate;
+            if (!DateTime.TryParse(timeStampFileContents, out timeStampDate))
+                throw new Exception($"Unable to determine table's timestamp ({timeStampFileContents}) for table");
+            else if (dumpControlTimeStamp != timeStampDate)
+                throw new Exception($"Table's timestamp ({timeStampDate.ToString()}) does not match dump control's timestamp ({dumpControlTimeStamp}) for table {table["TableName"]}");
 
             WriteToJobLog(JobLogMessageType.INFO, $"Preparing to load {table["TableName"]}");
 
@@ -318,9 +309,9 @@ namespace CircDumpWorkLoad
                                                             new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
 
 
-            WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table with timestamp {dumpControlTimeStamp}");
+            WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({timeStampDate})");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{dumpControlTimeStamp}'");
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampDate}'");
 
             string headerFile = fileInfo.DirectoryName + "\\" + table["FileNameWithoutExtension"] + ".heading";
 
@@ -396,23 +387,17 @@ namespace CircDumpWorkLoad
             }
 
             string countFile = fileInfo.DirectoryName + "\\" + table["FileNameWithoutExtension"] + ".count";
-            Int64 recordCount = 0;
 
-            if (File.Exists(countFile))
-            {
-                WriteToJobLog(JobLogMessageType.INFO, $"Reading {countFile}");
+            WriteToJobLog(JobLogMessageType.INFO, $"Reading {countFile}");
 
-                recordCount = Int64.Parse(File.ReadAllText(countFile).ToString());
+            Int64 recordCount = Int64.Parse(File.ReadAllText(countFile).ToString());
 
-                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
-                                            new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"]),
-                                            new SqlParameter("@pintDataRowsCopied", recordCount));
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
+                                        new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"]),
+                                        new SqlParameter("@pintDataRowsCopied", recordCount));
 
-                //add file to list of files to delete
-                filesToDelete.Add(countFile);
-            }
-            else
-                WriteToJobLog(JobLogMessageType.WARNING, $"Count file doesn't exist {countFile}");
+            //add file to list of files to delete
+            filesToDelete.Add(countFile);
 
             string bulkInsertErrorFile = bulkInsertDirectory + "Config\\" + table["TableName"].ToString() + ".error";
             string bulkInsertFormatFile = bulkInsertDirectory + "Config\\" + table["TableName"].ToString() + ".format";
@@ -464,33 +449,23 @@ namespace CircDumpWorkLoad
 
             WriteToJobLog(JobLogMessageType.INFO, $"Deleting ignored record (last record), if read by bulk insert");
 
-            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{dumpControlTimeStamp}' AND IgnoredRecordFlag = 1");
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, CommandType.Text, $"DELETE FROM {table["TableName"].ToString()} WHERE BNTimeStamp = '{timeStampFileContents}' AND IgnoredRecordFlag = 1");
 
             WriteToJobLog(JobLogMessageType.INFO, "Reading last record sequence");
 
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Select_RecordSequence_Maximum",
                                                              new SqlParameter("@pvchrTableName", table["TableName"].ToString()),
-                                                             new SqlParameter("@pvchrBNTimeStamp", dumpControlTimeStamp.ToString())).FirstOrDefault();
+                                                             new SqlParameter("@pvchrBNTimeStamp", timeStampFileContents)).FirstOrDefault();
 
             Int64 recordSequenceMax = result["RecordSequence_maximum"].ToString() == "" ? 0 : Int64.Parse(result["RecordSequence_maximum"].ToString());
 
-            //if we don't have a count file because of a NewsCycle hiccup, skip the integrity count and use the returned result from the bulk insert
-            if (File.Exists(countFile))
+            if (recordSequenceMax == recordCount)
+                WriteToJobLog(JobLogMessageType.INFO, $".count file & database both contain the same number of data records ({recordSequenceMax})");
+            else
             {
-                if (recordSequenceMax == recordCount)
-                    WriteToJobLog(JobLogMessageType.INFO, $".count file & database both contain the same number of data records ({recordSequenceMax})");
-                else
-                {
-                    string message = $".count file ({recordCount}) differs from database count ({recordSequenceMax})";
-                    WriteToJobLog(JobLogMessageType.WARNING, message);
-                    throw new Exception(message);
-                }
-            } else
-            {
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Data_Rows_Copied",
-                            new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"]),
-                            new SqlParameter("@pintDataRowsCopied", recordSequenceMax));
+                string message = $".count file ({recordCount}) differs from database count ({recordSequenceMax})";
+                WriteToJobLog(JobLogMessageType.WARNING, message);
+                throw new Exception(message);
             }
 
             ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables_Load_Successful_Flag", new SqlParameter("@pintLoadsTablesID", table["LoadsTableID"].ToString()));
