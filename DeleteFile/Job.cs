@@ -48,9 +48,16 @@ namespace DeleteFile
                             if (Convert.ToBoolean(result["DeleteLatestVersion"].ToString()) == true ||
                                 (Convert.ToBoolean(result["DeleteLatestVersion"].ToString()) == false && mostRecentFile.FullName != fileInfo.FullName))
                             {
+                                try
+                                {
                                 WriteToJobLog(JobLogMessageType.INFO, $"Deleting {fileInfo.FullName}");
                                 File.Delete(fileInfo.FullName);
                                 deletedFileCount++;
+                                }
+                                catch (Exception fileEx)
+                                {
+                                    WriteToJobLog(JobLogMessageType.WARNING, $"File could not be deleted {fileInfo.FullName}. {fileEx.ToString()}");
+                                }
                             }
                         }
                     }
@@ -87,9 +94,16 @@ namespace DeleteFile
                 //if the directory is empty, always delete it. If it is not empty, check to see if the flag is set to delete anyways
                 if (!Directory.EnumerateFileSystemEntries(folder).Any())
                 {
-                    WriteToJobLog(JobLogMessageType.INFO, $"Deleting empty folder {folder}");
-                    Directory.Delete(folder);
-                    deletedFolderCount++;
+                    try
+                    {
+                        WriteToJobLog(JobLogMessageType.INFO, $"Deleting empty folder {folder}");
+                        Directory.Delete(folder);
+                        deletedFolderCount++;
+                    }
+                    catch (Exception directoryEx)
+                    {
+                        WriteToJobLog(JobLogMessageType.WARNING, $"Directory could not be deleted {folder}. {directoryEx.ToString()}");
+                    }
                 }
                 else if (Convert.ToBoolean(result["DeleteAllSubDirectories"].ToString()))
                 {
@@ -99,9 +113,16 @@ namespace DeleteFile
 
                     if (DateTime.Now.AddDays(Convert.ToInt32(result["DaysToKeep"].ToString()) * -1) > mostRecentFile.LastWriteTime)
                     {
-                        WriteToJobLog(JobLogMessageType.INFO, $"Deleting {folder} with all of its contents recursively");
-                        Directory.Delete(folder, true);   //recursively deletes everything in folder
-                        deletedFolderCount++;
+                        try
+                        {
+                            WriteToJobLog(JobLogMessageType.INFO, $"Deleting {folder} with all of its contents recursively");
+                            Directory.Delete(folder, true);   //recursively deletes everything in folder
+                            deletedFolderCount++;
+                        }
+                        catch (Exception directoryEx)
+                        {
+                            WriteToJobLog(JobLogMessageType.WARNING, $"Directory could not be deleted {folder}. {directoryEx.ToString()}");
+                        }
                     }
                 }
             }
