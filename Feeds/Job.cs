@@ -111,7 +111,7 @@ namespace Feeds
                                                                 new SqlParameter("@FeedName", Version)).FirstOrDefault();
 
             bool uploadFile = Convert.ToBoolean(result["UploadFile"].ToString());
-            bool postPorcess = Convert.ToBoolean(result["PostProcess"].ToString());
+            bool postProcess = Convert.ToBoolean(result["PostProcess"].ToString());
 
 
             //retrieve the rest of the feed specific fields
@@ -124,10 +124,10 @@ namespace Feeds
             DateTime? startDate = null;
             DateTime? endDate = null;
 
-            if (Convert.ToBoolean(result["starting_date_field"].ToString()))
+            if (Convert.ToBoolean(result["starting_date_flag"].ToString()))
                 startDate = DateTime.Now.AddDays(Convert.ToInt32(result["days_to_add"].ToString()));
             if (Convert.ToBoolean(result["ending_date_flag"].ToString()))
-                endDate = DateTime.Now.AddDays(Convert.ToInt32(result["noninteractive_ending_date_days_after_starting_date"].ToString()));
+                endDate = startDate.Value.AddDays(Convert.ToInt32(result["noninteractive_ending_date_days_after_starting_date"].ToString()));
 
 
             WriteToJobLog(JobLogMessageType.INFO, " Feeds ID: " + result["feeds_id"].ToString() +
@@ -228,18 +228,88 @@ namespace Feeds
                                     new SqlParameter("@UserSerialno", userSerialNumber));
 
                 //Invoke the appropriate stored procedure (from the build record field "stored_proc" in table Feeds)
-                DetermineParameters(feedId, buildId, Convert.ToInt64(feed["pubid"].ToString()), userSerialNumber);
+                string parameterString = DetermineParameters(Convert.ToInt64(result["feeds_id"].ToString()), buildId, feed["pubid"].ToString(), userSerialNumber, startDate.Value, endDate.Value, feed["user_name"].ToString());
+
+                WriteToJobLog(JobLogMessageType.INFO, "Selecting data with parameters");
+
+                //(The "mudfFeels.strStoredProc" value can be found in table Feeds, field stored_proc - IF you know the feeds_id value.
+                //For Tearsheets, this would be a feeds_id = 7,
+                //which translates to "Proc_Select_Tearsheets"
+
+                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "EXEC " + feed["stored_proc"].ToString() + " " + parameterString).ToList();
+
+                //todo: are we supposed to be reusing this variable?
+                buildId = Convert.ToInt64(result["builds_id"].ToString());
+
+                if (feed["date_column_for_put_subdirectory_replacement"].ToString() != "")
+                {
+                    string replacementDateString = results[0][feed["date_column_for_put_subdirectory_replacement"].ToString()].ToString();
+                    DateTime replacementDate;
+                    if (DateTime.TryParse(replacementDateString, out replacementDate))
+                    {
+                        string subDirectory = feed["put_subdirectory"].ToString();
+                        subDirectory = subDirectory.Replace("{dd}", replacementDate.ToString("dd"));
+                        subDirectory = subDirectory.Replace("{mm}", replacementDate.ToString("MM"));
+                        subDirectory = subDirectory.Replace("{yy}", replacementDate.ToString("yy"));
+                        subDirectory = subDirectory.Replace("{yyyy}", replacementDate.ToString("yyyy"));
+
+                        feed["put_subdirectory"] = subDirectory;
+                    }
+                }
+
+
+                //Create output filename:  For Tearsheets it's in the form TSExport_YYMMDD_YYMMddhhmmss.txt
+                string outputFileName = DetermineOutputFileName(outputDirectory, feed["output_file_name_prefix"].ToString(), feed["format_of_user_specified_date_in_output_file_name"].ToString(), 
+                                                               feed["format_of_current_datetime_in_output_file_name"].ToString(), endDate, feed["output_file_name_extension"].ToString());
+
+                //In table Builds, set the file_creation_start_date_time field to current date/time
+                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Creation_Start",
+                                            new SqlParameter("@pintBuildsID", buildId),
+                                            new SqlParameter("@pdatCurrent", DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt")),
+                                            new SqlParameter("@pvchrDataFileName", outputFileName));
+
+                if (outputFileName != "")
+                    WriteToJobLog(JobLogMessageType.INFO, $"Creating feed file {outputFileName}");
+
+
+                //When no target output filename has been specified, ONLY
+                //create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
+                //and will be FTP'd during post - processing
+                List<string> filesToPostProcess = new List<string>();
+                if (outputFileName == "")
+                {
+                    foreach (Dictionary<string, object> filesToCreate in results)
+                    {
+                        if (postProcess && Convert.ToInt32(feed["post_processing_group"].ToString()) == 2)
+                            filesToPostProcess.Add(filesToCreate["file_name"].ToString());
+                    }
+                }
+                else
+                {
+                    //When a target output filename has been specified, write specific build fields from each build record to this file
+                    //and then FTP the corresponding PDF file.
+                    StringBuilder stringBuilder = new StringBuilder();
+                   if (Convert.ToBoolean(format["delimited_flag"].ToString()))
+                    {
+                        if (Convert.ToBoolean(format["headings_flag"].ToString()))
+                        {
+                            foreach(Dictionary<string, object> field in fields)
+                            {
+
+                            }
+                        }
+                    }
+                }
 
             }
         }
 
-        private List<SqlParameter> DetermineParameters(Int32 feedId, Int64 buildId, Int64 pubId, Int64 userSerialNumber)
+        private string DetermineParameters(Int64 feedId, Int64 buildId, string pubId, Int64 userSerialNumber, DateTime startDate, DateTime endDate, string userName)
         {
             //Different ad types have different fields/parameters associated with them.
             //Here is where we select the appropriate parameters based on the FeedsID
             //(which, of course, is passed in as a global parameter and not a calling parameter,
-            //  just to make things difficult to maintain).
-            List<SqlParameter> parameters = new List<SqlParameter>();
+            string parameterString = "";
 
             List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_Parameters", new SqlParameter("@pintFeedsID", feedId)).ToList();
 
@@ -248,49 +318,77 @@ namespace Feeds
                 switch (result["parameter_name"].ToString())
                 {
                     case "builds_id":
-                        parameters.Add(new SqlParameter("", buildId));
+                        parameterString += buildId + ",";
                         break;
                     case "bw_database":
-                        parameters.Add(new SqlParameter("", GetConfigurationKeyValue("RemoteDatabaseName")));
+                        parameterString += "'" + GetConfigurationKeyValue("RemoteDatabaseName") + "'," ;
                         break;
                     case "bw_server_instance":
-                        parameters.Add(new SqlParameter("", GetConfigurationKeyValue("RemoteServerName")));
+                        parameterString += "'" + GetConfigurationKeyValue("RemoteServerName") + "',";
                         break;
                     case "ending_date":
-                        parameters.Add(new SqlParameter("", DateTime.Now.AddDays(Convert.ToDouble(result["days_to_add"].ToString())).AddDays(Convert.ToDouble(result["noninteractive_ending_date_days_after_starting_date"].ToString()))));
+                        parameterString += "'" + endDate + "',";
                         break;
                     case "false":
-                        parameters.Add(new SqlParameter("", false));
+                        parameterString += "0" + ",";
                         break;
                     case "password":
-                        parameters.Add(new SqlParameter("", GetConfigurationKeyValue("RemotePassword")));
+                        parameterString += "'" + GetConfigurationKeyValue("RemotePassword") + "',";
                         break;
                     case "pbsdumpb_database":
-                        parameters.Add(new SqlParameter("", GetConfigurationKeyValue("PBSDumpBDatabaseName")));
+                        parameterString += "'" + GetConfigurationKeyValue("PBSDumpBDatabaseName") + "',";
                         break;
                     case "pbsdumpb_server_instance":
-                        parameters.Add(new SqlParameter("", GetConfigurationKeyValue("PBSDumpBServerName")));
+                        parameterString += "'" + GetConfigurationKeyValue("PBSDumpBServerName") + "',";
                         break;
                     case "pubid":
-                        parameters.Add(new SqlParameter("", pubId));
+                        parameterString += pubId + ",";
                         break;
                     case "starting_date":
-                        parameters.Add(new SqlParameter("", DateTime.Now.AddDays(Convert.ToDouble(result["days_to_add"].ToString()))));
+                        parameterString += "'" + startDate + "',";
                         break;
                     case "true":
-                        parameters.Add(new SqlParameter("", true));
+                        parameterString += "1" + ",";
                         break;
                     case "user_name":
-                        parameters.Add(new SqlParameter("", result["user_name"].ToString()));
+                        parameterString += "'" + userName + "',";
                         break;
                     case "userserialno":
-                        parameters.Add(new SqlParameter("", userSerialNumber));
+                        parameterString += "'" + userSerialNumber + "',";
                         break;
                 }
             }
 
-            return parameters;
+            return parameterString.TrimEnd(',');
 
+        }
+
+        private string DetermineOutputFileName(string directory, string prefix, string dateFormat, string outputFileDateFormat, DateTime? endDate, string extension)
+        {
+
+            if (extension == "")
+                extension = ""; //does this ever get hit?
+            else
+                extension = "." + extension;
+
+            if (!directory.EndsWith("\\"))
+                directory += "\\";
+
+            string outputFileName = directory + prefix;
+
+            string dateFormatString = dateFormat.Replace("m", "M");
+            string timeFormatString = outputFileDateFormat.Replace("m", "M").Replace("n", "m");
+
+            if (dateFormatString != "" & endDate.HasValue)
+                outputFileName += endDate.Value.ToString(dateFormatString);
+
+            if (timeFormatString != "")
+                outputFileName += DateTime.Now.ToString(timeFormatString);
+
+            outputFileName += extension;
+
+
+            return outputFileName;
         }
     }
 }
