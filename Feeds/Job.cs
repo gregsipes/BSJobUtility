@@ -117,7 +117,7 @@ namespace Feeds
             //retrieve the rest of the feed specific fields
             Dictionary<string, object> feed = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_Feeds",
                                                         new SqlParameter("@pvchrTitle", Version),
-                                                        new SqlParameter("@pflgActiveOnly", 0),
+                                                        new SqlParameter("@pflgActiveOnly", false),
                                                         new SqlParameter("@pvchrPassPhrase", ""),
                                                         new SqlParameter("@pvchrUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name)).FirstOrDefault();
 
@@ -201,7 +201,7 @@ namespace Feeds
 
             }
 
-
+            Int64 userSerialNumber = 0;
             //Aging summary (special case, only when this build's aging_summary_flag is set to 1)
             if (Convert.ToBoolean(feed["aging_summary_flag"].ToString()))
             {
@@ -209,7 +209,7 @@ namespace Feeds
 
                 result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_UserSerialNos").FirstOrDefault();
 
-                Int64 userSerialNumber = Convert.ToInt64(result["userserialno"].ToString());
+                userSerialNumber = Convert.ToInt64(result["userserialno"].ToString());
 
                 WriteToJobLog(JobLogMessageType.INFO, "Retrieving dates for Aging Summary.");
 
@@ -226,82 +226,218 @@ namespace Feeds
                                     new SqlParameter("@days60", Convert.ToDateTime(result["days60"].ToString()).ToShortDateString()),
                                     new SqlParameter("@days90", Convert.ToDateTime(result["days90"].ToString()).ToShortDateString()),
                                     new SqlParameter("@UserSerialno", userSerialNumber));
+            }
 
                 //Invoke the appropriate stored procedure (from the build record field "stored_proc" in table Feeds)
                 string parameterString = DetermineParameters(Convert.ToInt64(result["feeds_id"].ToString()), buildId, feed["pubid"].ToString(), userSerialNumber, startDate.Value, endDate.Value, feed["user_name"].ToString());
+            
 
-                WriteToJobLog(JobLogMessageType.INFO, "Selecting data with parameters");
+            WriteToJobLog(JobLogMessageType.INFO, "Selecting data with parameters");
 
-                //(The "mudfFeels.strStoredProc" value can be found in table Feeds, field stored_proc - IF you know the feeds_id value.
-                //For Tearsheets, this would be a feeds_id = 7,
-                //which translates to "Proc_Select_Tearsheets"
+            //(The "mudfFeels.strStoredProc" value can be found in table Feeds, field stored_proc - IF you know the feeds_id value.
+            //For Tearsheets, this would be a feeds_id = 7,
+            //which translates to "Proc_Select_Tearsheets"
 
-                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "EXEC " + feed["stored_proc"].ToString() + " " + parameterString).ToList();
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "EXEC " + feed["stored_proc"].ToString() + " " + parameterString).ToList();
 
-                //todo: are we supposed to be reusing this variable?
-                buildId = Convert.ToInt64(result["builds_id"].ToString());
+            //todo: are we supposed to be reusing this variable?
+            buildId = Convert.ToInt64(result["builds_id"].ToString());
 
-                if (feed["date_column_for_put_subdirectory_replacement"].ToString() != "")
+            if (feed["date_column_for_put_subdirectory_replacement"].ToString() != "")
+            {
+                string replacementDateString = results[0][feed["date_column_for_put_subdirectory_replacement"].ToString()].ToString();
+                DateTime replacementDate;
+                if (DateTime.TryParse(replacementDateString, out replacementDate))
                 {
-                    string replacementDateString = results[0][feed["date_column_for_put_subdirectory_replacement"].ToString()].ToString();
-                    DateTime replacementDate;
-                    if (DateTime.TryParse(replacementDateString, out replacementDate))
-                    {
-                        string subDirectory = feed["put_subdirectory"].ToString();
-                        subDirectory = subDirectory.Replace("{dd}", replacementDate.ToString("dd"));
-                        subDirectory = subDirectory.Replace("{mm}", replacementDate.ToString("MM"));
-                        subDirectory = subDirectory.Replace("{yy}", replacementDate.ToString("yy"));
-                        subDirectory = subDirectory.Replace("{yyyy}", replacementDate.ToString("yyyy"));
+                    string subDirectory = feed["put_subdirectory"].ToString();
+                    subDirectory = subDirectory.Replace("{dd}", replacementDate.ToString("dd"));
+                    subDirectory = subDirectory.Replace("{mm}", replacementDate.ToString("MM"));
+                    subDirectory = subDirectory.Replace("{yy}", replacementDate.ToString("yy"));
+                    subDirectory = subDirectory.Replace("{yyyy}", replacementDate.ToString("yyyy"));
 
-                        feed["put_subdirectory"] = subDirectory;
-                    }
+                    feed["put_subdirectory"] = subDirectory;
                 }
+            }
 
 
-                //Create output filename:  For Tearsheets it's in the form TSExport_YYMMDD_YYMMddhhmmss.txt
-                string outputFileName = DetermineOutputFileName(outputDirectory, feed["output_file_name_prefix"].ToString(), feed["format_of_user_specified_date_in_output_file_name"].ToString(), 
-                                                               feed["format_of_current_datetime_in_output_file_name"].ToString(), endDate, feed["output_file_name_extension"].ToString());
+            //Create output filename:  For Tearsheets it's in the form TSExport_YYMMDD_YYMMddhhmmss.txt
+            string outputFileName = DetermineOutputFileName(outputDirectory, feed["output_file_name_prefix"].ToString(), feed["format_of_user_specified_date_in_output_file_name"].ToString(),
+                                                           feed["format_of_current_datetime_in_output_file_name"].ToString(), endDate, feed["output_file_name_extension"].ToString());
 
-                //In table Builds, set the file_creation_start_date_time field to current date/time
-                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Creation_Start",
-                                            new SqlParameter("@pintBuildsID", buildId),
-                                            new SqlParameter("@pdatCurrent", DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt")),
-                                            new SqlParameter("@pvchrDataFileName", outputFileName));
+            //In table Builds, set the file_creation_start_date_time field to current date/time
+            ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Creation_Start",
+                                        new SqlParameter("@pintBuildsID", buildId),
+                                        new SqlParameter("@pdatCurrent", DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt")),
+                                        new SqlParameter("@pvchrDataFileName", outputFileName));
 
-                if (outputFileName != "")
-                    WriteToJobLog(JobLogMessageType.INFO, $"Creating feed file {outputFileName}");
+            if (outputFileName != "")
+                WriteToJobLog(JobLogMessageType.INFO, $"Creating feed file {outputFileName}");
 
 
-                //When no target output filename has been specified, ONLY
-                //create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
-                //and will be FTP'd during post - processing
-                List<string> filesToPostProcess = new List<string>();
-                if (outputFileName == "")
+            //When no target output filename has been specified, ONLY
+            //create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
+            //and will be FTP'd during post - processing
+            List<string> filesToPostProcess = new List<string>();
+            if (outputFileName == "")
+            {
+                foreach (Dictionary<string, object> filesToCreate in results)
                 {
-                    foreach (Dictionary<string, object> filesToCreate in results)
-                    {
-                        if (postProcess && Convert.ToInt32(feed["post_processing_group"].ToString()) == 2)
-                            filesToPostProcess.Add(filesToCreate["file_name"].ToString());
-                    }
+                    if (postProcess && Convert.ToInt32(feed["post_processing_group"].ToString()) == 2)
+                        filesToPostProcess.Add(filesToCreate["file_name"].ToString());
                 }
-                else
+            }
+            else
+            {
+                //When a target output filename has been specified, write specific build fields from each build record to this file
+                //and then FTP the corresponding PDF file.
+                StringBuilder stringBuilder = new StringBuilder();
+                if (Convert.ToBoolean(format["delimited_flag"].ToString()))
                 {
-                    //When a target output filename has been specified, write specific build fields from each build record to this file
-                    //and then FTP the corresponding PDF file.
-                    StringBuilder stringBuilder = new StringBuilder();
-                   if (Convert.ToBoolean(format["delimited_flag"].ToString()))
+                    //Execute this logic for any field-delimited outputs (delimited with a comma, pipe, etc.)
+                    if (Convert.ToBoolean(format["headings_flag"].ToString()))
                     {
-                        if (Convert.ToBoolean(format["headings_flag"].ToString()))
+                        foreach (Dictionary<string, object> field in fields)
                         {
-                            foreach(Dictionary<string, object> field in fields)
-                            {
-
-                            }
+                            stringBuilder.Append(format["quote_character"].ToString() + field["output_field"].ToString() + format["quote_character"].ToString());
                         }
                     }
-                }
 
+                    //For EVERY record in the dataset,
+                    //Convert each value to a string, contatenate it with the appropriate delimiter, and output it
+                    //   to the output file.
+                    // Exit this loop on any conversion error.
+                    // Int64 dataRowCounter = 0;
+                    foreach (Dictionary<string, object> dataRow in results)
+                    {
+                        //  dataRowCounter++;
+
+                        //With each pass in the loop below, populate this string with a delimiter and a formatted field value
+                        foreach (Dictionary<string, object> field in fields)
+                        {
+                            //stringBuilder.Append(FormatField(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()) + format["delimiter_character"].ToString());
+                            stringBuilder.Append(dataRow[field["source_field"].ToString()].ToString() + format["delimiter_character"].ToString());
+
+                        }
+
+                        //todo: is this needed?
+                        // if (Convert.ToBoolean(feed["source_of_additional_information_in_log_files"].ToString()))
+
+
+                        //Create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
+                        // and will be FTP'd during post - processing
+                        if (postProcess && Convert.ToInt32(feed["post_processing_group"].ToString()) == 2)
+                            filesToPostProcess.Add(dataRow["file_name"].ToString());
+                    }
+                }
+                else if (Convert.ToBoolean(format["fixed_width_flag"].ToString()))
+                {
+                    //Execute this logic for fixed-width field outputs.
+                    if (Convert.ToBoolean(format["headings_flag"].ToString()))
+                    {
+                        foreach (Dictionary<string, object> field in fields)
+                        {
+                            if (Convert.ToBoolean(field["left_justified_flag"].ToString()))   //this is always true
+                                stringBuilder.Append(field["output_field"].ToString().PadRight(Convert.ToInt32(field["field_length"].ToString())));
+                            else
+                                stringBuilder.Append(field["output_field"].ToString().PadLeft(Convert.ToInt32(field["field_length"].ToString())));
+                        }
+                    }
+
+
+                    foreach (Dictionary<string, object> dataRow in results)
+                    {
+                        //  dataRowCounter++;
+
+                        //With each pass in the loop below, populate this string with a delimiter and a formatted field value
+                        foreach (Dictionary<string, object> field in fields)
+                        {
+                            stringBuilder.Append(dataRow[field["source_field"].ToString()].ToString().PadRight(Convert.ToInt32(field["field_length"].ToString())));
+
+                        }
+
+                        //todo: is this needed?
+                        // if (Convert.ToBoolean(feed["source_of_additional_information_in_log_files"].ToString()))
+
+
+                        //Create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
+                        // and will be FTP'd during post - processing
+                        if (postProcess && Convert.ToInt32(feed["post_processing_group"].ToString()) == 2)
+                            filesToPostProcess.Add(dataRow["file_name"].ToString());
+                    }
+
+                }
+                //In table Builds, set the file_creation_end_date_time field to current date/time
+                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Creation_End",
+                                            new SqlParameter("@pintBuildsID", buildId),
+                                            new SqlParameter("@pflgFileUploadSuccessful", 1));
+
+
+                //"POST PROCESSING" is where files are transferred from the local source to the remote (FTP or SFTP) destination
+                if (postProcess)
+                {
+                    result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_Post_Processing_Start",
+                                            new SqlParameter("@pintBuildsID", buildId)).FirstOrDefault();
+
+                    bool continueProcessingOnError = Convert.ToBoolean(result["continue_processing_if_fails_flag"]);
+
+                    // if (Convert.ToInt32(result["post_processing_group"].ToString()) == 0)
+
+                    bool successful = PostProcess(Convert.ToInt32(result["post_processing_group"].ToString()), outputFileName);
+
+                    if (!successful && !continueProcessingOnError)
+                        throw new Exception("Post Process unsuccessful and continuing processing set to false");
+
+                    result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_Post_Processing_End",
+                    new SqlParameter("@pintBuildsID", buildId)).FirstOrDefault();
+                }
             }
+
+        }
+
+        //private string FormatField(string value, string format)
+        //{
+        //    //Specialized formatting routine to convert bit (or string) 1/0 into string containing
+        //    //Yes/No
+        //    //True/False
+        //    //On/Off
+        //    if (format != null)
+        //    {
+        //        switch (format)
+        //        {
+        //            case "0/1":
+        //                if (value == "0")
+        //                    return "0";
+        //                else
+        //                    return "1";
+        //            case ""
+        //        }
+        //    }
+
+
+        //    return field;
+
+        //}
+
+        private bool PostProcess(Int32 groupNumber, string outputFileName)
+        {
+            //there are only 2 groups, 1 and 2
+            //group 1 is only for video employment ads. These ads were stopped in early 2020 but the code was carried over just in case it was needed again
+
+            switch (groupNumber)
+            {
+                case 1:
+
+                    break;
+                case 2:
+
+                    break;
+            }
+
+
+            return true;
+
+
+
         }
 
         private string DetermineParameters(Int64 feedId, Int64 buildId, string pubId, Int64 userSerialNumber, DateTime startDate, DateTime endDate, string userName)
@@ -321,7 +457,7 @@ namespace Feeds
                         parameterString += buildId + ",";
                         break;
                     case "bw_database":
-                        parameterString += "'" + GetConfigurationKeyValue("RemoteDatabaseName") + "'," ;
+                        parameterString += "'" + GetConfigurationKeyValue("RemoteDatabaseName") + "',";
                         break;
                     case "bw_server_instance":
                         parameterString += "'" + GetConfigurationKeyValue("RemoteServerName") + "',";
