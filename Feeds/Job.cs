@@ -1,6 +1,7 @@
 ﻿using BSJobBase;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -124,27 +125,31 @@ namespace Feeds
             DateTime? startDate = null;
             DateTime? endDate = null;
 
-            if (Convert.ToBoolean(result["starting_date_flag"].ToString()))
-                startDate = DateTime.Now.AddDays(Convert.ToInt32(result["days_to_add"].ToString()));
-            if (Convert.ToBoolean(result["ending_date_flag"].ToString()))
-                endDate = startDate.Value.AddDays(Convert.ToInt32(result["noninteractive_ending_date_days_after_starting_date"].ToString()));
+
+            if (Convert.ToBoolean(feed["starting_date_flag"].ToString()))
+                startDate = DateTime.Now.AddDays(Convert.ToInt32(feed["days_to_add"].ToString()));
+            if (Convert.ToBoolean(feed["ending_date_flag"].ToString()))
+                endDate = startDate.Value.AddDays(Convert.ToInt32(feed["noninteractive_ending_date_days_after_starting_date"].ToString()));
+
+            //todo: remove, test code only
+            startDate = new DateTime(2020, 11, 27);
 
 
-            WriteToJobLog(JobLogMessageType.INFO, " Feeds ID: " + result["feeds_id"].ToString() +
-                                                " Formats ID: " + result["formats_id"].ToString() +
-                                                " Description: " + result["Description"].ToString() +
-                                                " FTP Server: " + result["ftp_server"].ToString() +
-                                                " Pub ID: " + result["pubid"].ToString() +
-                                                " Sproc: " + result["stored_proc"].ToString() +
-                                                " Username: " + result["user_name"].ToString());
+            WriteToJobLog(JobLogMessageType.INFO, " Feeds ID: " + feed["feeds_id"].ToString() +
+                                                " Formats ID: " + feed["formats_id"].ToString() +
+                                                " Description: " + feed["description"].ToString() +
+                                                " FTP Server: " + feed["ftp_server"].ToString() +
+                                                " Pub ID: " + feed["pubid"].ToString() +
+                                                " Sproc: " + feed["stored_proc"].ToString() +
+                                                " Username: " + feed["user_name"].ToString());
 
             //Error checks and defaults.  Some fields might be blank (or just wrong); compute defaults and if there is no default, generate an error and exit.
             WriteToJobLog(JobLogMessageType.INFO, "Checking for errors...");
 
-            string outputDirectory = result["output_directory"].ToString();
+            string outputDirectory = feed["output_directory"].ToString();
             //format_of_current_datetime_in_output_subdirectory
-            if (result["format_of_current_datetime_in_output_subdirectory"].ToString() != "")
-                outputDirectory += "\\" + DateTime.Now.ToString(result["format_of_current_datetime_in_output_subdirectory"].ToString()) + "\\";
+            if (feed["format_of_current_datetime_in_output_subdirectory"].ToString() != "")
+                outputDirectory += "\\" + DateTime.Now.ToString(feed["format_of_current_datetime_in_output_subdirectory"].ToString()) + "\\";
 
 
             //todo: what should we do with the user definied log? Perhaps it can all be consolidated into 1 log stored in SQL
@@ -166,13 +171,13 @@ namespace Feeds
 
 
             //At this point we've successfully populated all required fields, so log a message indicating that we're now building the output file.
-            if (startDate.HasValue && endDate.HasValue)
-                WriteToJobLog(JobLogMessageType.INFO, $"Creating build from {startDate.ToString()} thru {endDate.ToString()} ");
+            // if (startDate.HasValue && endDate.HasValue)
+            WriteToJobLog(JobLogMessageType.INFO, $"Creating build from {startDate.ToString()} thru {endDate.ToString() ?? ""} ");
 
 
             //Invoke stored procedure Proc_Insert_Builds and create a record identifying (logging) this build.
             result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Insert_Builds",
-                                            new SqlParameter("@pintFeedsID", result["feeds_id"].ToString()),
+                                            new SqlParameter("@pintFeedsID", feed["feeds_id"].ToString()),
                                             new SqlParameter("@pvchrUserSpecifiedStartingDate", startDate.HasValue ? startDate.Value.ToString() : ""),
                                             new SqlParameter("@pvchrUserSpecifiedEndingDate", endDate.HasValue ? endDate.Value.ToString() : ""),
                                             new SqlParameter("@pvchrStandardLogFileName", ""), //todo: should this be something?
@@ -228,9 +233,9 @@ namespace Feeds
                                     new SqlParameter("@UserSerialno", userSerialNumber));
             }
 
-                //Invoke the appropriate stored procedure (from the build record field "stored_proc" in table Feeds)
-                string parameterString = DetermineParameters(Convert.ToInt64(result["feeds_id"].ToString()), buildId, feed["pubid"].ToString(), userSerialNumber, startDate.Value, endDate.Value, feed["user_name"].ToString());
-            
+            //Invoke the appropriate stored procedure (from the build record field "stored_proc" in table Feeds)
+            string parameterString = DetermineParameters(Convert.ToInt64(feed["feeds_id"].ToString()), buildId, feed["pubid"].ToString(), userSerialNumber, startDate.HasValue ? startDate.Value.ToShortDateString() : "", endDate.HasValue ? endDate.Value.ToShortDateString() : "", feed["user_name"].ToString());
+
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting data with parameters");
 
@@ -238,7 +243,22 @@ namespace Feeds
             //For Tearsheets, this would be a feeds_id = 7,
             //which translates to "Proc_Select_Tearsheets"
 
-            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "EXEC " + feed["stored_proc"].ToString() + " " + parameterString).ToList();
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Feeds, CommandType.Text,  "EXEC " + feed["stored_proc"].ToString() + " " + parameterString).ToList();
+
+            if (results.Count() <= 0)
+            {
+                WriteToJobLog(JobLogMessageType.INFO, "No data selected for this feed.");
+
+                //throw an exception if the feed's flag is set to true
+                if (Convert.ToBoolean(feed["error_if_no_data_selected_flag"].ToString()))
+                    throw new Exception($"No data selected for feed");
+
+                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_End",
+                                    new SqlParameter("@pintBuildsID", buildId));
+
+                return;
+            }
+
 
             //todo: are we supposed to be reusing this variable?
             buildId = Convert.ToInt64(result["builds_id"].ToString());
@@ -366,30 +386,31 @@ namespace Feeds
                     }
 
                 }
-                //In table Builds, set the file_creation_end_date_time field to current date/time
-                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Creation_End",
-                                            new SqlParameter("@pintBuildsID", buildId),
-                                            new SqlParameter("@pflgFileUploadSuccessful", 1));
 
+            }
 
-                //"POST PROCESSING" is where files are transferred from the local source to the remote (FTP or SFTP) destination
-                if (postProcess)
-                {
-                    result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_Post_Processing_Start",
-                                            new SqlParameter("@pintBuildsID", buildId)).FirstOrDefault();
+            //In table Builds, set the file_creation_end_date_time field to current date/time
+            ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Creation_End",
+                    new SqlParameter("@pintBuildsID", buildId),
+                    new SqlParameter("@pintDataRecordCount", results.Count()));
 
-                    bool continueProcessingOnError = Convert.ToBoolean(result["continue_processing_if_fails_flag"]);
+            //"POST PROCESSING" is where files are transferred from the local source to the remote (FTP or SFTP) destination
+            if (postProcess)
+            {
+                result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_Post_Processing_Start",
+                                        new SqlParameter("@pintBuildsID", buildId)).FirstOrDefault();
 
-                    // if (Convert.ToInt32(result["post_processing_group"].ToString()) == 0)
+                bool continueProcessingOnError = Convert.ToBoolean(result["continue_processing_if_fails_flag"]);
 
-                    bool successful = PostProcess(Convert.ToInt32(result["post_processing_group"].ToString()), outputFileName);
+                // if (Convert.ToInt32(result["post_processing_group"].ToString()) == 0)
 
-                    if (!successful && !continueProcessingOnError)
-                        throw new Exception("Post Process unsuccessful and continuing processing set to false");
+                bool successful = PostProcess(Convert.ToInt32(result["post_processing_group"].ToString()), feed, filesToPostProcess, outputFileName);
 
-                    result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_Post_Processing_End",
-                    new SqlParameter("@pintBuildsID", buildId)).FirstOrDefault();
-                }
+                if (!successful && !continueProcessingOnError)
+                    throw new Exception("Post Process unsuccessful and continuing processing set to false");
+
+                result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_Post_Processing_End",
+                new SqlParameter("@pintBuildsID", buildId)).FirstOrDefault();
             }
 
         }
@@ -418,7 +439,7 @@ namespace Feeds
 
         //}
 
-        private bool PostProcess(Int32 groupNumber, string outputFileName)
+        private bool PostProcess(Int32 groupNumber, Dictionary<string, object> feed, List<string> filesToPostProcess, string outputFileName)
         {
             //there are only 2 groups, 1 and 2
             //group 1 is only for video employment ads. These ads were stopped in early 2020 but the code was carried over just in case it was needed again
@@ -426,9 +447,27 @@ namespace Feeds
             switch (groupNumber)
             {
                 case 1:
-
+                    //todo:
                     break;
                 case 2:
+
+                    if (filesToPostProcess.Count() == 0)
+                    {
+                        WriteToJobLog(JobLogMessageType.INFO, "No files to be ftp'd in post processing");
+                        return false;
+                    }
+
+                    Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_Post_Processing_Groups",
+                                                                            new SqlParameter("@pintPostPorcessingGroup", groupNumber)).FirstOrDefault();
+
+                    //Open an FTP channel
+                    WriteToJobLog(JobLogMessageType.INFO, $"FTP Server = {feed["isSFTP"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"FTP User = {feed["user_name"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"Binary FTP? = {feed["binary_flag"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"SFTP? = {feed["isSFTP"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"Remote destination directory? = {feed["put_subdirectory"].ToString()}");
+
+
 
                     break;
             }
@@ -440,7 +479,7 @@ namespace Feeds
 
         }
 
-        private string DetermineParameters(Int64 feedId, Int64 buildId, string pubId, Int64 userSerialNumber, DateTime startDate, DateTime endDate, string userName)
+        private string DetermineParameters(Int64 feedId, Int64 buildId, string pubId, Int64 userSerialNumber, string startDate, string endDate, string userName)
         {
             //Different ad types have different fields/parameters associated with them.
             //Here is where we select the appropriate parameters based on the FeedsID
@@ -487,7 +526,7 @@ namespace Feeds
                         parameterString += "1" + ",";
                         break;
                     case "user_name":
-                        parameterString += "'" + userName + "',";
+                        parameterString += "'" + GetConfigurationKeyValue("RemoteUserName") + "',";
                         break;
                     case "userserialno":
                         parameterString += "'" + userSerialNumber + "',";
@@ -507,7 +546,7 @@ namespace Feeds
             else
                 extension = "." + extension;
 
-            if (!directory.EndsWith("\\"))
+            if (!directory.EndsWith("\\") && directory != "")
                 directory += "\\";
 
             string outputFileName = directory + prefix;
