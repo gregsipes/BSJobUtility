@@ -11,16 +11,29 @@ namespace Feeds
 {
    public class SFTP
     {
-        public Session Session { get; set; }
+        private Session Session { get; set; }
 
-        public void OpenSession(string host, string user, string password, string fingerprint, string keyFilePath, string keyPassPhrase)
+        private string Host { get; set; }
+
+        private string UserName { get; set; }
+
+        private string Password { get; set; }
+
+        public SFTP(string host, string userName, string password)
+        {
+            Host = host;
+            UserName = userName;
+            Password = password;
+        }
+
+        public void OpenSession( string fingerprint, string keyFilePath, string keyPassPhrase)
         {
             SessionOptions sessionOptions = new SessionOptions()
                     {
                         Protocol = Protocol.Sftp,
-                        HostName = host,
-                        UserName = user,
-                        Password = password,
+                        HostName = Host,
+                        UserName = UserName,
+                        Password = Password,
                         SshHostKeyFingerprint = fingerprint
                     };
 
