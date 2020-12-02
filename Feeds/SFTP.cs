@@ -67,6 +67,17 @@ namespace Feeds
                 return true;
         }
 
+        public void CreateDirectory(string path)
+        {
+            Session.CreateDirectory(path);
+        }
+
+        public bool CheckIfDirectoryExists(string path)
+        {
+           return  Session.FileExists(path);
+        }
+
+
 
         public void CloseSession()
         {

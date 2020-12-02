@@ -468,6 +468,67 @@ namespace Feeds
                     WriteToJobLog(JobLogMessageType.INFO, $"Remote destination directory? = {feed["put_subdirectory"].ToString()}");
 
 
+                    //either ftp or stp the files
+                    if (Convert.ToBoolean(feed["isSFTP"].ToString()))
+                    {
+                        SFTP sFTP = new SFTP(feed["ftp_server"].ToString(), feed["user_name"].ToString(), feed["Password"].ToString());
+
+                        sFTP.OpenSession();
+
+                        //create the destination directory if one doesn't already exist
+                        if (!sFTP.CheckIfDirectoryExists(feed["put_subdirectory"].ToString()))
+                        {
+                            WriteToJobLog(JobLogMessageType.INFO, "Remote directory does not exist");
+
+                            sFTP.CreateDirectory(feed["put_subdirectory"].ToString());   //todo: do we want to add looping here?
+                        }
+
+                        //Output every name on the FTP file list (that came from the list built in CreateBuild())
+                        foreach (string file in filesToPostProcess)
+                        {
+                            sFTP.UploadFile(file, feed["put_subdirectory"].ToString(), true, true);
+
+                            WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {file}");
+
+                            //todo: should we add a retry counter?
+                        }
+
+                        WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {filesToPostProcess.Count()} files");
+
+
+
+                        sFTP.CloseSession();
+
+                    } else
+                    {
+                        FTP ftp = new FTP(feed["ftp_server"].ToString(), feed["user_name"].ToString(), feed["Password"].ToString());
+
+                        //create the destination directory if one doesn't already exist
+                        if (!ftp.CheckIfDirectoryExists(feed["put_subdirectory"].ToString()))
+                        {
+                            WriteToJobLog(JobLogMessageType.INFO, "Remote directory does not exist");
+
+                            ftp.CreateDirectory(feed["put_subdirectory"].ToString());   //todo: do we want to add looping here?
+                        }
+
+                        //Output every name on the FTP file list (that came from the list built in CreateBuild())
+                        foreach (string file in filesToPostProcess)
+                        {
+                            ftp.UploadFile(new System.IO.FileInfo(file), feed["put_subdirectory"].ToString());
+
+                            WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {file}");
+
+                            //todo: should we add a retry counter?
+                        }
+
+                        WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {filesToPostProcess.Count()} files");
+
+                    }
+
+
+
+
+
 
                     break;
             }
