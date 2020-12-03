@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using static BSGlobals.Enums;
@@ -114,12 +117,13 @@ namespace Feeds
             bool uploadFile = Convert.ToBoolean(result["UploadFile"].ToString());
             bool postProcess = Convert.ToBoolean(result["PostProcess"].ToString());
 
+            string securityPassPhrase = DeterminePassPhrase();
 
             //retrieve the rest of the feed specific fields
             Dictionary<string, object> feed = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_Feeds",
                                                         new SqlParameter("@pvchrTitle", Version),
                                                         new SqlParameter("@pflgActiveOnly", false),
-                                                        new SqlParameter("@pvchrPassPhrase", ""),
+                                                        new SqlParameter("@pvchrPassPhrase", securityPassPhrase),
                                                         new SqlParameter("@pvchrUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name)).FirstOrDefault();
 
             DateTime? startDate = null;
@@ -133,7 +137,6 @@ namespace Feeds
 
             //todo: remove, test code only
             startDate = new DateTime(2020, 11, 27);
-
 
             WriteToJobLog(JobLogMessageType.INFO, " Feeds ID: " + feed["feeds_id"].ToString() +
                                                 " Formats ID: " + feed["formats_id"].ToString() +
@@ -239,7 +242,7 @@ namespace Feeds
 
             WriteToJobLog(JobLogMessageType.INFO, "Selecting data with parameters");
 
-            //(The "mudfFeels.strStoredProc" value can be found in table Feeds, field stored_proc - IF you know the feeds_id value.
+            //(The "strStoredProc" value can be found in table Feeds, field stored_proc - IF you know the feeds_id value.
             //For Tearsheets, this would be a feeds_id = 7,
             //which translates to "Proc_Select_Tearsheets"
 
@@ -415,6 +418,40 @@ namespace Feeds
 
         }
 
+        private string DeterminePassPhrase()
+        {
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_BS_Verify").FirstOrDefault();
+
+            //to build the passphrase, get the user sid, replace hyphen and leading S, then reverse
+
+            string userSID = WindowsIdentity.GetCurrent().User.AccountDomainSid.ToString();
+
+            //this is for debugging purposes only, pretend we are the bs_sql user
+            if (Debugger.IsAttached)
+                userSID = "S-1-5-21-120139959-531444630-1543857936-9490";
+
+            char[] passPhraseArray = userSID.Replace("-", "").Replace("S", "").ToCharArray();
+            Array.Reverse(passPhraseArray);
+            string passPhrase = new string(passPhraseArray);
+
+            result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_BS_Verify_Verify_Value",
+                                            new SqlParameter("@pvchrPassPhrase", passPhrase)).FirstOrDefault();
+
+            //only if the two returned values match (one is reversed), return the correct passphrase
+            string verifyString = result["verify_value"].ToString();
+            char[] verifyArray = verifyString.ToCharArray();
+            Array.Reverse(verifyArray);
+
+            if (new string(verifyArray) != result["misc_user"].ToString())
+            {
+                WriteToJobLog(JobLogMessageType.WARNING, "Invalid passphrase");
+                return "";
+            }
+
+
+            return passPhrase;
+        }
+
         //private string FormatField(string value, string format)
         //{
         //    //Specialized formatting routine to convert bit (or string) 1/0 into string containing
@@ -465,18 +502,18 @@ namespace Feeds
                     WriteToJobLog(JobLogMessageType.INFO, $"FTP User = {feed["user_name"].ToString()}");
                     WriteToJobLog(JobLogMessageType.INFO, $"Binary FTP? = {feed["binary_flag"].ToString()}");
                     WriteToJobLog(JobLogMessageType.INFO, $"SFTP? = {feed["isSFTP"].ToString()}");
-                    WriteToJobLog(JobLogMessageType.INFO, $"Remote destination directory? = {feed["put_subdirectory"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"Remote destination directory = {feed["put_subdirectory"].ToString()}");
 
 
                     //either ftp or stp the files
-                    if (Convert.ToBoolean(feed["isSFTP"].ToString()))
+                    if (Convert.ToBoolean(Convert.ToInt32(feed["isSFTP"].ToString())))
                     {
-                        SFTP sFTP = new SFTP(feed["ftp_server"].ToString(), feed["user_name"].ToString(), feed["Password"].ToString());
+                        SFTP sFTP = new SFTP(feed["ftp_server"].ToString(), feed["user_name"].ToString(), feed["password"].ToString());
 
-                        sFTP.OpenSession();
+                        sFTP.OpenSession(feed["host_key"].ToString(), "", "");
 
                         //create the destination directory if one doesn't already exist
-                        if (!sFTP.CheckIfDirectoryExists(feed["put_subdirectory"].ToString()))
+                        if (!sFTP.CheckIfFileOrDirectoryExists(feed["put_subdirectory"].ToString()))
                         {
                             WriteToJobLog(JobLogMessageType.INFO, "Remote directory does not exist");
 
@@ -486,11 +523,23 @@ namespace Feeds
                         //Output every name on the FTP file list (that came from the list built in CreateBuild())
                         foreach (string file in filesToPostProcess)
                         {
-                            sFTP.UploadFile(file, feed["put_subdirectory"].ToString(), true, true);
+                            string sourceFileName = result["pdf_directory"].ToString() + "\\" + file;
+                            string destinationFileName = feed["put_subdirectory"].ToString() + "/" + file;
+                            //only upload the file if it doesn't already exist
+                            if (!sFTP.CheckIfFileOrDirectoryExists(destinationFileName))
+                            {
+                                sFTP.UploadFile(sourceFileName, feed["put_subdirectory"].ToString(), true, true);
+                                WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {sourceFileName} to {destinationFileName}");
 
-                            WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {file}");
+                                //todo: should we add a retry counter?
 
-                            //todo: should we add a retry counter?
+                                //todo:
+                                //If mudfFeeds.flgUpdateSourceLastModifiedDateTimeAfterPut Then
+                                //        Call SetLastModifiedDateTime(strFile)
+                                //    End If
+
+                            }
+                            
                         }
 
                         WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {filesToPostProcess.Count()} files");
@@ -519,6 +568,11 @@ namespace Feeds
                             WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {file}");
 
                             //todo: should we add a retry counter?
+
+                            //todo:
+                            //If mudfFeeds.flgUpdateSourceLastModifiedDateTimeAfterPut Then
+                            //        Call SetLastModifiedDateTime(strFile)
+                            //    End If
                         }
 
                         WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {filesToPostProcess.Count()} files");

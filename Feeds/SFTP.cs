@@ -44,7 +44,7 @@ namespace Feeds
                 sessionOptions.SshPrivateKeyPath = keyFilePath;
                 sessionOptions.PrivateKeyPassphrase = keyPassPhrase;
             }
-
+            
             Session.Open(sessionOptions);
         }
 
@@ -57,7 +57,7 @@ namespace Feeds
 
             transferOptions.PreserveTimestamp = allowResumeSupport;
 
-            TransferOperationResult result = Session.PutFiles(sourceFilePath, destinationFilePath + "//" + Path.GetFileName(sourceFilePath), false, transferOptions);
+            TransferOperationResult result = Session.PutFiles(sourceFilePath, destinationFilePath + "/" + Path.GetFileName(sourceFilePath), false, transferOptions);
 
             result.Check();
 
@@ -72,7 +72,7 @@ namespace Feeds
             Session.CreateDirectory(path);
         }
 
-        public bool CheckIfDirectoryExists(string path)
+        public bool CheckIfFileOrDirectoryExists(string path)
         {
            return  Session.FileExists(path);
         }
