@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.DirectoryServices.AccountManagement;
+using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
@@ -136,7 +137,7 @@ namespace Feeds
                 endDate = startDate.Value.AddDays(Convert.ToInt32(feed["noninteractive_ending_date_days_after_starting_date"].ToString()));
 
             //todo: remove, test code only
-            startDate = new DateTime(2020, 11, 27);
+           // startDate = new DateTime(2020, 11, 27);
 
             WriteToJobLog(JobLogMessageType.INFO, " Feeds ID: " + feed["feeds_id"].ToString() +
                                                 " Formats ID: " + feed["formats_id"].ToString() +
@@ -285,7 +286,7 @@ namespace Feeds
 
             //Create output filename:  For Tearsheets it's in the form TSExport_YYMMDD_YYMMddhhmmss.txt
             string outputFileName = DetermineOutputFileName(outputDirectory, feed["output_file_name_prefix"].ToString(), feed["format_of_user_specified_date_in_output_file_name"].ToString(),
-                                                           feed["format_of_current_datetime_in_output_file_name"].ToString(), endDate, feed["output_file_name_extension"].ToString());
+                                                           feed["format_of_current_datetime_in_output_file_name"].ToString(), endDate ?? startDate, feed["output_file_name_extension"].ToString());
 
             //In table Builds, set the file_creation_start_date_time field to current date/time
             ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Creation_Start",
@@ -319,10 +320,12 @@ namespace Feeds
                     //Execute this logic for any field-delimited outputs (delimited with a comma, pipe, etc.)
                     if (Convert.ToBoolean(format["headings_flag"].ToString()))
                     {
+                        StringBuilder headerStringBuilder = new StringBuilder();
                         foreach (Dictionary<string, object> field in fields)
                         {
-                            stringBuilder.Append(format["quote_character"].ToString() + field["output_field"].ToString() + format["quote_character"].ToString());
+                            headerStringBuilder.Append(format["quote_character"].ToString() + field["output_field"].ToString() + format["quote_character"].ToString());
                         }
+                        stringBuilder.AppendLine(headerStringBuilder.ToString());
                     }
 
                     //For EVERY record in the dataset,
@@ -335,12 +338,15 @@ namespace Feeds
                         //  dataRowCounter++;
 
                         //With each pass in the loop below, populate this string with a delimiter and a formatted field value
+                        StringBuilder dataRowStringBuilder = new StringBuilder();
                         foreach (Dictionary<string, object> field in fields)
                         {
-                            //stringBuilder.Append(FormatField(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()) + format["delimiter_character"].ToString());
-                            stringBuilder.Append(dataRow[field["source_field"].ToString()].ToString() + format["delimiter_character"].ToString());
 
+                            //stringBuilder.Append(FormatField(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()) + format["delimiter_character"].ToString());
+                            dataRowStringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()) + format["delimiter_character"].ToString());
                         }
+
+                        stringBuilder.AppendLine(dataRowStringBuilder.ToString());
 
                         //todo: is this needed?
                         // if (Convert.ToBoolean(feed["source_of_additional_information_in_log_files"].ToString()))
@@ -354,16 +360,21 @@ namespace Feeds
                 }
                 else if (Convert.ToBoolean(format["fixed_width_flag"].ToString()))
                 {
+
                     //Execute this logic for fixed-width field outputs.
                     if (Convert.ToBoolean(format["headings_flag"].ToString()))
                     {
+                        StringBuilder headerStringBuilder = new StringBuilder();
+
                         foreach (Dictionary<string, object> field in fields)
                         {
                             if (Convert.ToBoolean(field["left_justified_flag"].ToString()))   //this is always true
-                                stringBuilder.Append(field["output_field"].ToString().PadRight(Convert.ToInt32(field["field_length"].ToString())));
+                                headerStringBuilder.Append(field["output_field"].ToString().PadRight(Convert.ToInt32(field["field_length"].ToString())));
                             else
-                                stringBuilder.Append(field["output_field"].ToString().PadLeft(Convert.ToInt32(field["field_length"].ToString())));
+                                headerStringBuilder.Append(field["output_field"].ToString().PadLeft(Convert.ToInt32(field["field_length"].ToString())));
                         }
+
+                        stringBuilder.AppendLine(headerStringBuilder.ToString());
                     }
 
 
@@ -372,11 +383,14 @@ namespace Feeds
                         //  dataRowCounter++;
 
                         //With each pass in the loop below, populate this string with a delimiter and a formatted field value
+                        StringBuilder dataRowStringBuilder = new StringBuilder();
                         foreach (Dictionary<string, object> field in fields)
                         {
-                            stringBuilder.Append(dataRow[field["source_field"].ToString()].ToString().PadRight(Convert.ToInt32(field["field_length"].ToString())));
+                            stringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), format["delimiter_character"].ToString()).PadRight(Convert.ToInt32(field["field_length"].ToString())));
 
                         }
+
+                        stringBuilder.AppendLine(dataRowStringBuilder.ToString());
 
                         //todo: is this needed?
                         // if (Convert.ToBoolean(feed["source_of_additional_information_in_log_files"].ToString()))
@@ -389,6 +403,8 @@ namespace Feeds
                     }
 
                 }
+
+                File.WriteAllText(outputFileName, stringBuilder.ToString());
 
             }
 
@@ -418,6 +434,22 @@ namespace Feeds
 
         }
 
+        private string FormatValue(string value, string format)
+        {
+            if (String.IsNullOrEmpty(format))
+                return value;
+            else
+            {
+                if (format.Contains("mm") | format.Contains("yy")) //this must be a date
+                    return Convert.ToDateTime(value).ToString(format.Replace("m", "M"));   //M and m are different from VB6 to .net
+                else if (format.Contains("0") && !format.Contains("/")) //this must be a numeric
+                    return Convert.ToDecimal(value).ToString(format);
+                else
+                    return value;
+            }
+           
+        }
+
         private string DeterminePassPhrase()
         {
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_BS_Verify").FirstOrDefault();
@@ -426,7 +458,7 @@ namespace Feeds
 
             string userSID = WindowsIdentity.GetCurrent().User.AccountDomainSid.ToString();
 
-            //this is for debugging purposes only, pretend we are the bs_sql user
+            //this is for debugging purposes only, pretend we are the bs_sql user 
             if (Debugger.IsAttached)
                 userSID = "S-1-5-21-120139959-531444630-1543857936-9490";
 
@@ -533,10 +565,8 @@ namespace Feeds
 
                                 //todo: should we add a retry counter?
 
-                                //todo:
-                                //If mudfFeeds.flgUpdateSourceLastModifiedDateTimeAfterPut Then
-                                //        Call SetLastModifiedDateTime(strFile)
-                                //    End If
+                                if (Convert.ToBoolean(feed["update_source_last_modified_date_time_after_put_flag"].ToString()))
+                                     File.SetLastWriteTime(sourceFileName, DateTime.Now);
 
                             }
                             
@@ -569,10 +599,8 @@ namespace Feeds
 
                             //todo: should we add a retry counter?
 
-                            //todo:
-                            //If mudfFeeds.flgUpdateSourceLastModifiedDateTimeAfterPut Then
-                            //        Call SetLastModifiedDateTime(strFile)
-                            //    End If
+                            if (Convert.ToBoolean(feed["update_source_last_modified_date_time_after_put_flag"].ToString()))
+                                File.SetLastWriteTime(file, DateTime.Now);
                         }
 
                         WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {filesToPostProcess.Count()} files");
@@ -653,7 +681,7 @@ namespace Feeds
 
         }
 
-        private string DetermineOutputFileName(string directory, string prefix, string dateFormat, string outputFileDateFormat, DateTime? endDate, string extension)
+        private string DetermineOutputFileName(string directory, string prefix, string userSpecifiedDateFormat, string outputFileDateFormat, DateTime? endDate, string extension)
         {
 
             if (extension == "")
@@ -666,14 +694,13 @@ namespace Feeds
 
             string outputFileName = directory + prefix;
 
-            string dateFormatString = dateFormat.Replace("m", "M");
-            string timeFormatString = outputFileDateFormat.Replace("m", "M").Replace("n", "m");
+            if (userSpecifiedDateFormat != "")
+                outputFileName += DateTime.Now.ToString(userSpecifiedDateFormat.Replace("m", "M").Replace("n", "m"));
+
+            string dateFormatString = outputFileDateFormat.Replace("m", "M").Replace("n", "m");
 
             if (dateFormatString != "" & endDate.HasValue)
                 outputFileName += endDate.Value.ToString(dateFormatString);
-
-            if (timeFormatString != "")
-                outputFileName += DateTime.Now.ToString(timeFormatString);
 
             outputFileName += extension;
 
