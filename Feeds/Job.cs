@@ -339,11 +339,18 @@ namespace Feeds
 
                         //With each pass in the loop below, populate this string with a delimiter and a formatted field value
                         StringBuilder dataRowStringBuilder = new StringBuilder();
+                        Int32 fieldCounter = 0;
                         foreach (Dictionary<string, object> field in fields)
                         {
+                            fieldCounter++;
 
                             //stringBuilder.Append(FormatField(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()) + format["delimiter_character"].ToString());
-                            dataRowStringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()) + format["delimiter_character"].ToString());
+                            dataRowStringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()));
+
+                            //if this is the last field, don't include the delimiter
+                            if (fieldCounter != fields.Count())
+                                dataRowStringBuilder.Append(format["delimiter_character"].ToString());
+
                         }
 
                         stringBuilder.AppendLine(dataRowStringBuilder.ToString());
@@ -387,7 +394,7 @@ namespace Feeds
                         foreach (Dictionary<string, object> field in fields)
                         {
                             stringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), format["delimiter_character"].ToString()).PadRight(Convert.ToInt32(field["field_length"].ToString())));
-
+                            
                         }
 
                         stringBuilder.AppendLine(dataRowStringBuilder.ToString());
@@ -483,30 +490,6 @@ namespace Feeds
 
             return passPhrase;
         }
-
-        //private string FormatField(string value, string format)
-        //{
-        //    //Specialized formatting routine to convert bit (or string) 1/0 into string containing
-        //    //Yes/No
-        //    //True/False
-        //    //On/Off
-        //    if (format != null)
-        //    {
-        //        switch (format)
-        //        {
-        //            case "0/1":
-        //                if (value == "0")
-        //                    return "0";
-        //                else
-        //                    return "1";
-        //            case ""
-        //        }
-        //    }
-
-
-        //    return field;
-
-        //}
 
         private bool PostProcess(Int32 groupNumber, Dictionary<string, object> feed, List<string> filesToPostProcess, string outputFileName)
         {
