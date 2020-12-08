@@ -230,10 +230,16 @@ namespace Feeds
                     //Execute this logic for any field-delimited outputs (delimited with a comma, pipe, etc.)
                     if (Convert.ToBoolean(format["headings_flag"].ToString()))
                     {
+                        Int32 fieldCounter = 0;
                         StringBuilder headerStringBuilder = new StringBuilder();
                         foreach (Dictionary<string, object> field in fields)
                         {
+                            fieldCounter++;
+
                             headerStringBuilder.Append(format["quote_character"].ToString() + field["output_field"].ToString() + format["quote_character"].ToString());
+
+                            if (fieldCounter != fields.Count())
+                                headerStringBuilder.Append(format["delimiter_character"].ToString());
                         }
                         stringBuilder.AppendLine(headerStringBuilder.ToString());
                     }
@@ -255,7 +261,7 @@ namespace Feeds
                             fieldCounter++;
 
                             //stringBuilder.Append(FormatField(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()) + format["delimiter_character"].ToString());
-                            dataRowStringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString()));
+                            dataRowStringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), field["format_string"].ToString(), Convert.ToBoolean(field["quoted_flag"].ToString()), format["quote_character"].ToString()));
 
                             //if this is the last field, don't include the delimiter
                             if (fieldCounter != fields.Count())
@@ -273,42 +279,43 @@ namespace Feeds
                 }
                 else if (Convert.ToBoolean(format["fixed_width_flag"].ToString()))
                 {
+                    //the only feeds that are fixed width are related to USA Today. These feeds only run manually, so for now, this format is not needed and not tested
+                    throw new Exception("Fixed width files have been disabled");
+                    ////Execute this logic for fixed-width field outputs.
+                    //if (Convert.ToBoolean(format["headings_flag"].ToString()))
+                    //{
+                    //    StringBuilder headerStringBuilder = new StringBuilder();
 
-                    //Execute this logic for fixed-width field outputs.
-                    if (Convert.ToBoolean(format["headings_flag"].ToString()))
-                    {
-                        StringBuilder headerStringBuilder = new StringBuilder();
+                    //    foreach (Dictionary<string, object> field in fields)
+                    //    {
+                    //        if (Convert.ToBoolean(field["left_justified_flag"].ToString()))   //this is always true
+                    //            headerStringBuilder.Append(field["output_field"].ToString().PadRight(Convert.ToInt32(field["field_length"].ToString())));
+                    //        else
+                    //            headerStringBuilder.Append(field["output_field"].ToString().PadLeft(Convert.ToInt32(field["field_length"].ToString())));
+                    //    }
 
-                        foreach (Dictionary<string, object> field in fields)
-                        {
-                            if (Convert.ToBoolean(field["left_justified_flag"].ToString()))   //this is always true
-                                headerStringBuilder.Append(field["output_field"].ToString().PadRight(Convert.ToInt32(field["field_length"].ToString())));
-                            else
-                                headerStringBuilder.Append(field["output_field"].ToString().PadLeft(Convert.ToInt32(field["field_length"].ToString())));
-                        }
-
-                        stringBuilder.AppendLine(headerStringBuilder.ToString());
-                    }
+                    //    stringBuilder.AppendLine(headerStringBuilder.ToString());
+                    //}
 
 
-                    foreach (Dictionary<string, object> dataRow in results)
-                    {
+                    //foreach (Dictionary<string, object> dataRow in results)
+                    //{
 
-                        //With each pass in the loop below, populate this string with a delimiter and a formatted field value
-                        StringBuilder dataRowStringBuilder = new StringBuilder();
-                        foreach (Dictionary<string, object> field in fields)
-                        {
-                            stringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), format["delimiter_character"].ToString()).PadRight(Convert.ToInt32(field["field_length"].ToString())));
+                    //    //With each pass in the loop below, populate this string with a delimiter and a formatted field value
+                    //    StringBuilder dataRowStringBuilder = new StringBuilder();
+                    //    foreach (Dictionary<string, object> field in fields)
+                    //    {
+                    //        stringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), format["delimiter_character"].ToString(), Convert.ToBoolean(field["quoted_flag"].ToString()), format["quote_character"].ToString()).PadRight(Convert.ToInt32(field["field_length"].ToString())));
 
-                        }
+                    //    }
 
-                        stringBuilder.AppendLine(dataRowStringBuilder.ToString());
+                    //    stringBuilder.AppendLine(dataRowStringBuilder.ToString());
 
-                        //Create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
-                        // and will be FTP'd during post - processing
-                        if (Convert.ToBoolean(feed["post_process"].ToString()) && Convert.ToInt32(feed["post_processing_group"].ToString()) == 2)
-                            filesToPostProcess.Add(dataRow["file_name"].ToString());
-                    }
+                    //    //Create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
+                    //    // and will be FTP'd during post - processing
+                    //    if (Convert.ToBoolean(feed["post_process"].ToString()) && Convert.ToInt32(feed["post_processing_group"].ToString()) == 2)
+                    //        filesToPostProcess.Add(dataRow["file_name"].ToString());
+                    //}
 
                 }
 
@@ -349,10 +356,17 @@ namespace Feeds
 
         }
 
-        private string FormatValue(string value, string format)
+        private string FormatValue(string value, string format, bool isQuoted, string quoteCharacter)
         {
-            if (String.IsNullOrEmpty(format))
+            if (String.IsNullOrEmpty(value))
                 return value;
+            else if (String.IsNullOrEmpty(format))
+            {
+                if (isQuoted && value.Trim() != "")
+                    return quoteCharacter + value + quoteCharacter;
+                else
+                    return value;
+            }
             else
             {
                 if (format.Contains("mm") | format.Contains("yy")) //this must be a date
@@ -360,7 +374,13 @@ namespace Feeds
                 else if (format.Contains("0") && !format.Contains("/")) //this must be a numeric
                     return Convert.ToDecimal(value).ToString(format);
                 else
-                    return value;
+                {
+
+                    if (isQuoted && value.Trim() != "")
+                        return quoteCharacter + value + quoteCharacter;
+                    else
+                        return value;
+                }
             }
 
         }
@@ -609,12 +629,22 @@ namespace Feeds
             string outputFileName = directory + prefix;
 
             if (userSpecifiedDateFormat != "")
-                outputFileName += DateTime.Now.ToString(userSpecifiedDateFormat.Replace("m", "M").Replace("n", "m"));
+            {
+                if (endDate.HasValue)
+                    outputFileName += endDate.Value.ToString(userSpecifiedDateFormat.Replace("m", "M").Replace("n", "m"));
+                else
+                    outputFileName += DateTime.Now.ToString(userSpecifiedDateFormat.Replace("m", "M").Replace("n", "m"));
+            }                
 
             string dateFormatString = outputFileDateFormat.Replace("m", "M").Replace("n", "m");
 
-            if (dateFormatString != "" & endDate.HasValue)
+            if (dateFormatString != "")
+            {
+                if (!endDate.HasValue)
+                    endDate = DateTime.Now;
+
                 outputFileName += endDate.Value.ToString(dateFormatString);
+            }
 
             outputFileName += extension;
 
