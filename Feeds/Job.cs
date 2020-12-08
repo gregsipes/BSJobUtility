@@ -13,10 +13,11 @@ using System.Threading.Tasks;
 using static BSGlobals.Enums;
 
 namespace Feeds
+
 {       //There appears to be 3 types of "Feed" jobs 
         //1. Generates data files to a network share  (22 jobs)
         //2. SFTP existing PDF files to Wehaa (client vendor) (16 jobs)
-        //3. Runs aging summary related sprocs (only the Emails and Accounts (Relationals) jobs)
+        //3. Runs aging summary related sprocs (only the Emails and Accounts (Relationals) jobs). The Email feed does also generate an output file
     public class Job : JobBase
     {
         public string Version { get; set; }
@@ -33,74 +34,7 @@ namespace Feeds
         {
             try
             {
-                //todo:
-                //            For intIndex = 0 To UBound(astrProgramOptionsMultiple)
-                //    If astrProgramOptionsMultiple(intIndex) <> "" And Left$(astrProgramOptionsMultiple(intIndex), 1) <> "'" Then
-                //        astrProgramOptionsEach = Split(astrProgramOptionsMultiple(intIndex), "=", , vbTextCompare)
-
-
-                //        If UBound(astrProgramOptionsEach) = 1 Then
-                //            If StrComp(astrProgramOptionsEach(0), "FeedTitle", vbTextCompare) = 0 Then
-                //                strFeedTitle = astrProgramOptionsEach(1)
-                //            End If
-
-
-                //            If StrComp(astrProgramOptionsEach(0), "FileUpload", vbTextCompare) = 0 And StrComp(astrProgramOptionsEach(1), "True", vbTextCompare) = 0 Then
-                //                flgFileUpload = True
-                //            End If
-
-
-                //            If StrComp(astrProgramOptionsEach(0), "KeepFTPLogForDebugging", vbTextCompare) = 0 And StrComp(astrProgramOptionsEach(1), "True", vbTextCompare) = 0 Then
-                //                mflgKeepFTPLogForDebugging = True
-                //            End If
-
-
-                //            If StrComp(astrProgramOptionsEach(0), "PostProcessing", vbTextCompare) = 0 And StrComp(astrProgramOptionsEach(1), "True", vbTextCompare) = 0 Then
-                //                flgPostProcessing = True
-                //            End If
-                //        End If
-                //    End If
-                //Next
-
-
-                //todo: should the passphrase portion be brought over?
-
-
                 CreateBuild();
-
-
-
-                //test SFTP connection
-                //  SFTP sFTP = new SFTP();
-
-                // sFTP.OpenSession()
-
-                //Int32 deletedFileCount = 0;
-
-                //List<string> inputDirectories = GetConfigurationKeyValue("InputDirectories").Split(',').ToList();
-
-
-                //foreach (string directory in inputDirectories)
-                //{
-                //    List<string> files = Directory.GetFiles(directory, "*.tmp").ToList();
-
-                //    //delete each file
-                //    foreach (string file in files)
-                //    {
-                //        FileInfo fileInfo = new FileInfo(file);
-
-                //        if (fileInfo.Length == 0)
-                //        {
-                //            WriteToJobLog(JobLogMessageType.INFO, $"Deleting {file}");
-                //            File.Delete(file);
-                //        }
-                //        deletedFileCount++;
-                //    }
-                //}
-
-                //if (deletedFileCount > 0)
-                //    WriteToJobLog(JobLogMessageType.INFO, $"{deletedFileCount} files deleted");
-
             }
             catch (Exception ex)
             {
@@ -112,14 +46,6 @@ namespace Feeds
 
         private void CreateBuild()
         {
-
-            //retrieve the feed record from the database (this call is what replaces the differences for each feed in the INI files)
-            //these fields could have been appeneded to the Feeds.dbo.Feeds table, but I didn't want to risk breaking anything
-            //Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.BSJobUtility, "Proc_Select_Feed",
-            //                                                    new SqlParameter("@FeedName", Version)).FirstOrDefault();
-
-            //bool uploadFile = Convert.ToBoolean(result["UploadFile"].ToString());
-            //bool postProcess = Convert.ToBoolean(result["PostProcess"].ToString());
 
             string securityPassPhrase = DeterminePassPhrase();
 
@@ -140,7 +66,7 @@ namespace Feeds
                 endDate = startDate.Value.AddDays(Convert.ToInt32(feed["noninteractive_ending_date_days_after_starting_date"].ToString()));
 
             //todo: remove, test code only
-           // startDate = new DateTime(2020, 11, 27);
+            // startDate = new DateTime(2020, 11, 27);
 
             WriteToJobLog(JobLogMessageType.INFO, " Feeds ID: " + feed["feeds_id"].ToString() +
                                                 " Formats ID: " + feed["formats_id"].ToString() +
@@ -159,38 +85,20 @@ namespace Feeds
                 outputDirectory += "\\" + DateTime.Now.ToString(feed["format_of_current_datetime_in_output_subdirectory"].ToString()) + "\\";
 
 
-            //todo: what should we do with the user definied log? Perhaps it can all be consolidated into 1 log stored in SQL
-            //if (Convert.ToBoolean(result["log_in_output_directory_flag"].ToString()))
-            //{
-            //With gobjUserDefinedLog
-            //    If mudfFeeds.strFileNameOfLogInOutputDirectory = "" Then
-            //        .OpenUserDefinedLog strOutputDirectory &gobjIni.AppAbbrev & ".log", gobjUtilsLocal.NetAuthenticatedUserName(gobjIni.NetAuthenticatedResource), gobjUtilsLocal.ComputerName
-            //    Else
-            //        .OpenUserDefinedLog strOutputDirectory &mudfFeeds.strFileNameOfLogInOutputDirectory, gobjUtilsLocal.NetAuthenticatedUserName(gobjIni.NetAuthenticatedResource), _
-            //            gobjUtilsLocal.ComputerName
-            //    End If
-
-            //    gflgUserDefinedLogOpened = True
-            //    .WriteToUserDefinedLog "Application " & gobjIni.AppAbbrev & " (v" & App.Major & "." & App.Minor & "." & App.Revision & ")", eniInfo
-            //    .WriteToUserDefinedLog "Processing " & pstrFeedsTitle, eniInfo
-            //End With
-            //}
-
-
             //At this point we've successfully populated all required fields, so log a message indicating that we're now building the output file.
             // if (startDate.HasValue && endDate.HasValue)
             WriteToJobLog(JobLogMessageType.INFO, $"Creating build from {startDate.ToString()} thru {endDate.ToString() ?? ""} ");
 
 
             //Invoke stored procedure Proc_Insert_Builds and create a record identifying (logging) this build.
-           Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Insert_Builds",
-                                            new SqlParameter("@pintFeedsID", feed["feeds_id"].ToString()),
-                                            new SqlParameter("@pvchrUserSpecifiedStartingDate", startDate.HasValue ? startDate.Value.ToString() : ""),
-                                            new SqlParameter("@pvchrUserSpecifiedEndingDate", endDate.HasValue ? endDate.Value.ToString() : ""),
-                                            new SqlParameter("@pvchrStandardLogFileName", ""), //todo: should this be something?
-                                            new SqlParameter("@pvchrUserDefinedLogFileName", ""), //todo: should this be something?
-                                            new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
-                                            new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower())).FirstOrDefault();
+            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Insert_Builds",
+                                             new SqlParameter("@pintFeedsID", feed["feeds_id"].ToString()),
+                                             new SqlParameter("@pvchrUserSpecifiedStartingDate", startDate.HasValue ? startDate.Value.ToString() : ""),
+                                             new SqlParameter("@pvchrUserSpecifiedEndingDate", endDate.HasValue ? endDate.Value.ToString() : ""),
+                                             new SqlParameter("@pvchrStandardLogFileName", ""), //todo: should this be something?
+                                             new SqlParameter("@pvchrUserDefinedLogFileName", ""), //todo: should this be something?
+                                             new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
+                                             new SqlParameter("@pvchrComputerName", System.Environment.MachineName.ToLower())).FirstOrDefault();
 
             Int64 buildId = Convert.ToInt64(result["builds_id"].ToString());
 
@@ -220,7 +128,7 @@ namespace Feeds
             {
                 WriteToJobLog(JobLogMessageType.INFO, "Assigning userserialno for Aging Summary.");
 
-               Dictionary<string, object> agingResult = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_UserSerialNos").FirstOrDefault();
+                Dictionary<string, object> agingResult = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_UserSerialNos").FirstOrDefault();
 
                 userSerialNumber = Convert.ToInt64(agingResult["userserialno"].ToString());
 
@@ -253,7 +161,7 @@ namespace Feeds
             //For Tearsheets, this would be a feeds_id = 7,
             //which translates to "Proc_Select_Tearsheets"
 
-            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Feeds, CommandType.Text,  "EXEC " + feed["stored_proc"].ToString() + " " + parameterString).ToList();
+            List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.Feeds, CommandType.Text, "EXEC " + feed["stored_proc"].ToString() + " " + parameterString).ToList();
 
             if (results.Count() <= 0)
             {
@@ -357,10 +265,6 @@ namespace Feeds
 
                         stringBuilder.AppendLine(dataRowStringBuilder.ToString());
 
-                        //todo: is this needed?
-                        // if (Convert.ToBoolean(feed["source_of_additional_information_in_log_files"].ToString()))
-
-
                         //Create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
                         // and will be FTP'd during post - processing
                         if (Convert.ToBoolean(feed["post_process"].ToString()) && Convert.ToInt32(feed["post_processing_group"].ToString()) == 2)
@@ -389,21 +293,16 @@ namespace Feeds
 
                     foreach (Dictionary<string, object> dataRow in results)
                     {
-                        //  dataRowCounter++;
 
                         //With each pass in the loop below, populate this string with a delimiter and a formatted field value
                         StringBuilder dataRowStringBuilder = new StringBuilder();
                         foreach (Dictionary<string, object> field in fields)
                         {
                             stringBuilder.Append(FormatValue(dataRow[field["source_field"].ToString()].ToString(), format["delimiter_character"].ToString()).PadRight(Convert.ToInt32(field["field_length"].ToString())));
-                            
+
                         }
 
                         stringBuilder.AppendLine(dataRowStringBuilder.ToString());
-
-                        //todo: is this needed?
-                        // if (Convert.ToBoolean(feed["source_of_additional_information_in_log_files"].ToString()))
-
 
                         //Create a master list of PDF files to be FTP'd.These come from the selected build sproc(mrstSQL!file_name)
                         // and will be FTP'd during post - processing
@@ -429,8 +328,6 @@ namespace Feeds
                                         new SqlParameter("@pintBuildsID", buildId)).FirstOrDefault();
 
                 bool continueProcessingOnError = Convert.ToBoolean(result["continue_processing_if_fails_flag"]);
-
-                // if (Convert.ToInt32(result["post_processing_group"].ToString()) == 0)
 
                 bool successful = PostProcess(buildId, Convert.ToInt32(result["post_processing_group"].ToString()), feed, filesToPostProcess, outputFileName);
 
@@ -465,7 +362,7 @@ namespace Feeds
                 else
                     return value;
             }
-           
+
         }
 
         private string DeterminePassPhrase()
@@ -478,7 +375,7 @@ namespace Feeds
 
             //this is for debugging purposes only, pretend we are the bs_sql user 
             if (Debugger.IsAttached)
-                userSID = "S-1-5-21-120139959-531444630-1543857936-9490";
+                userSID = GetConfigurationKeyValue("UserSID");
 
             char[] passPhraseArray = userSID.Replace("-", "").Replace("S", "").ToCharArray();
             Array.Reverse(passPhraseArray);
@@ -505,13 +402,14 @@ namespace Feeds
         private bool PostProcess(Int64 buildId, Int32 groupNumber, Dictionary<string, object> feed, List<string> filesToPostProcess, string outputFileName)
         {
             //there are only 2 groups, 1 and 2
-            //group 1 is only for video employment ads. These ads were stopped in early 2020 but the code was carried over just in case it was needed again
+            Dictionary<string, object> result = null;
 
             switch (groupNumber)
             {
                 case 1:
-                    //todo:
-                    break;
+                    //group 1 is only for video employment ads. These ads were stopped in early 2020, throw an exception if this code gets hit
+                    throw new Exception("Group 1 post processing has not yet been implemented.");
+
                 case 2:
 
                     if (filesToPostProcess.Count() == 0)
@@ -520,14 +418,13 @@ namespace Feeds
                         return false;
                     }
 
-                    Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_Post_Processing_Groups",
+                    result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_Post_Processing_Groups",
                                                                             new SqlParameter("@pintPostPorcessingGroup", groupNumber)).FirstOrDefault();
 
-                    //Open an FTP channel
-                    WriteToJobLog(JobLogMessageType.INFO, $"FTP Server = {feed["isSFTP"].ToString()}");
-                    WriteToJobLog(JobLogMessageType.INFO, $"FTP User = {feed["user_name"].ToString()}");
-                    WriteToJobLog(JobLogMessageType.INFO, $"Binary FTP? = {feed["binary_flag"].ToString()}");
-                    WriteToJobLog(JobLogMessageType.INFO, $"SFTP? = {feed["isSFTP"].ToString()}");
+
+                    WriteToJobLog(JobLogMessageType.INFO, $"SFTP Server = {feed["ftp_server"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"SFTP User = {feed["user_name"].ToString()}");
+                    //WriteToJobLog(JobLogMessageType.INFO, $"SBinary FTP? = {feed["binary_flag"].ToString()}");
                     WriteToJobLog(JobLogMessageType.INFO, $"Remote destination directory = {feed["put_subdirectory"].ToString()}");
 
 
@@ -557,18 +454,32 @@ namespace Feeds
                             {
                                 ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Upload_Start", new SqlParameter("@pintBuildsID", buildId));
 
-                                sFTP.UploadFile(sourceFileName, feed["put_subdirectory"].ToString(), true, true);
-                                WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {sourceFileName} to {destinationFileName}");
+                                Int32 attemptCounter = 0;
+
+                                while (attemptCounter < Convert.ToInt32(feed["post_processing_number_of_retries_on_unsuccessful_put"].ToString()))
+                                {
+                                    try
+                                    {
+                                        sFTP.UploadFile(sourceFileName, feed["put_subdirectory"].ToString(), true, true);
+                                        WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {sourceFileName} to {destinationFileName}");
+                                        break;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        WriteToJobLog(JobLogMessageType.WARNING, $"File {sourceFileName} could not be uploaded to {destinationFileName}. Exception - {ex.ToString()}");
+                                        attemptCounter++;
+                                    }
+                                }
 
                                 ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Upload_End", new SqlParameter("@pintBuildsID", buildId));
 
                                 //todo: should we add a retry counter?
 
                                 if (Convert.ToBoolean(feed["update_source_last_modified_date_time_after_put_flag"].ToString()))
-                                     File.SetLastWriteTime(sourceFileName, DateTime.Now);
+                                    File.SetLastWriteTime(sourceFileName, DateTime.Now);
 
                             }
-                            
+
                         }
 
                         WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {filesToPostProcess.Count()} files");
@@ -577,7 +488,7 @@ namespace Feeds
 
                         sFTP.CloseSession();
 
-                    } 
+                    }
                     else
                     {
                         //this code shold never be hit. All feeds have been updated to use SFTP
