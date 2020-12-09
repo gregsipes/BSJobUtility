@@ -66,7 +66,7 @@ namespace Feeds
                 endDate = startDate.Value.AddDays(Convert.ToInt32(feed["noninteractive_ending_date_days_after_starting_date"].ToString()));
 
             //todo: remove, test code only
-            // startDate = new DateTime(2020, 11, 27);
+           // startDate = new DateTime(2020, 12, 3);
 
             WriteToJobLog(JobLogMessageType.INFO, " Feeds ID: " + feed["feeds_id"].ToString() +
                                                 " Formats ID: " + feed["formats_id"].ToString() +
@@ -167,12 +167,12 @@ namespace Feeds
             {
                 WriteToJobLog(JobLogMessageType.INFO, "No data selected for this feed.");
 
+                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_End",
+                    new SqlParameter("@pintBuildsID", buildId));
+
                 //throw an exception if the feed's flag is set to true
                 if (Convert.ToBoolean(feed["error_if_no_data_selected_flag"].ToString()))
                     throw new Exception($"No data selected for feed");
-
-                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_End",
-                                    new SqlParameter("@pintBuildsID", buildId));
 
                 return;
             }
@@ -460,7 +460,7 @@ namespace Feeds
                         {
                             WriteToJobLog(JobLogMessageType.INFO, "Remote directory does not exist");
 
-                            sFTP.CreateDirectory(feed["put_subdirectory"].ToString());   //todo: do we want to add looping here?
+                            sFTP.CreateDirectory(feed["put_subdirectory"].ToString());   
                         }
 
                         //Output every name on the FTP file list (that came from the list built in CreateBuild())
@@ -492,8 +492,6 @@ namespace Feeds
                                 }
 
                                 ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Upload_End", new SqlParameter("@pintBuildsID", buildId));
-
-                                //todo: should we add a retry counter?
 
                                 if (Convert.ToBoolean(feed["update_source_last_modified_date_time_after_put_flag"].ToString()))
                                     File.SetLastWriteTime(sourceFileName, DateTime.Now);
