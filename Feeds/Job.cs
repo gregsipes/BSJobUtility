@@ -66,7 +66,7 @@ namespace Feeds
                 endDate = startDate.Value.AddDays(Convert.ToInt32(feed["noninteractive_ending_date_days_after_starting_date"].ToString()));
 
             //todo: remove, test code only
-           // startDate = new DateTime(2020, 12, 3);
+            //startDate = new DateTime(2020, 12, 7);
 
             WriteToJobLog(JobLogMessageType.INFO, " Feeds ID: " + feed["feeds_id"].ToString() +
                                                 " Formats ID: " + feed["formats_id"].ToString() +
