@@ -150,6 +150,41 @@ namespace PurchaseOrders
             }
         }
 
+        private void CmdPreviewArchive_Click(object sender, EventArgs e)
+        {
+            // Create a spreadsheet and display it
+            // NOTE: The spreadsheet code is in file Spreadsheets.cs
+
+            // Don't do anything if we don't have an order
+
+            if (SelectedOrderItem != null)
+            {
+
+                int row = SelectedOrderItem.SelectedRow;
+                int PONumber = (int)GrdExistingOrders.Rows[row].Cells[0].Value;
+                OrderClass Preview = new OrderClass();
+                Preview.UpdatePONumber(PONumber);
+
+
+
+#if false
+
+                LblCreatingSpreadsheet.Visible = true;
+                StatusBar.AddText(0, "Creating Spreadsheet");
+                LblStatus.Visible = false;
+                POSpreadsheet = CreatePurchaseOrderSpreadsheet(CurrentOrder);
+                LblCreatingSpreadsheet.Visible = false;
+                StatusBar.AddText(0, "");
+                POSpreadsheet.Show();
+#endif
+
+            }
+            else
+            {
+                MessageBox.Show("Try creating a PO before trying to print/preview");
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -196,9 +231,9 @@ namespace PurchaseOrders
             ERSpreadsheet.Show();
         }
 
-        #endregion
+#endregion
 
-        #region Vendor Control Events
+#region Vendor Control Events
 
         /// <summary>
         /// 
@@ -307,9 +342,9 @@ namespace PurchaseOrders
             v.VendorList.Add(CreateNewVendorRecord());
         }
 
-        #endregion
+#endregion
 
-        #region Copy/Paste Events
+#region Copy/Paste Events
 
         /// <summary>
         /// 
@@ -382,7 +417,7 @@ namespace PurchaseOrders
         {
             // If an existing record was already selected (better have been!) then paste it into a new PO
 
-            AutoCreateNewPORecord(SelectedOrderItem);
+            AutoCreateNewPORecord(CurrentOrder, SelectedOrderItem);
             PnlOrderDetail.Visible = true;
             PnlOrderButtons.Visible = true;
             PnlVendor.Visible = true;
@@ -404,9 +439,9 @@ namespace PurchaseOrders
             TabOrders.SelectTab("TabNewOrders");
         }
 
-        #endregion
+#endregion
 
-        #region Grid Events
+#region Grid Events
         /// <summary>
         /// 
         /// </summary>
@@ -542,9 +577,9 @@ namespace PurchaseOrders
 
         }
 
-        #endregion
+#endregion
 
-        #region Configuration Events
+#region Configuration Events
 
         /// <summary>
         /// 
@@ -595,9 +630,9 @@ namespace PurchaseOrders
                 PopulateVendorComboBox(cmbFilterByVendor, "");
             }
         }
-        #endregion
+#endregion
 
-        #region Tab Control Events
+#region Tab Control Events
 
         /// <summary>
         /// 
@@ -623,9 +658,9 @@ namespace PurchaseOrders
             }
         }
 
-        #endregion
+#endregion
 
-        #region Timer Events
+#region Timer Events
 
         /// <summary>
         /// 
@@ -637,9 +672,9 @@ namespace PurchaseOrders
             RenderStatusMsg("", false);
         }
 
-        #endregion
+#endregion
 
-        #region Termination Events
+#region Termination Events
 
         /// <summary>
         /// 
@@ -707,7 +742,7 @@ namespace PurchaseOrders
 
         }
 
-        #endregion
+#endregion
 
     }
 }

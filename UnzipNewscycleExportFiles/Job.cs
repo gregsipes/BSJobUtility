@@ -75,8 +75,7 @@ namespace UnzipNewscycleExportFiles
                         }
                         else
                         {
-                            WriteToJobLog(JobLogMessageType.WARNING, "Unable to find Newscycle EXPORT root path from zip file " + zf + " (no folders found, using " + FolderName + " as the default root path)");
-                            WarningsGiven = true;
+                            WriteToJobLog(JobLogMessageType.INFO, "Unable to find Newscycle EXPORT root path from zip file " + zf + " (no folders found, using " + FolderName + " as the default root path)");
                         }
                     }
                 }

@@ -50,7 +50,8 @@ namespace BSGlobals
 
         // Enums types that allow us to remove any user dependencies on Microsoft.Office.Interop.Excel
 
-        public enum LineStyle {
+        public enum LineStyle
+        {
             Continuous = 1,
             Dash = -4115,
             DashDot = 4,
@@ -58,13 +59,34 @@ namespace BSGlobals
             Dot = -4118,
             Double = -4119,
             None = -4142,
-            SlantDashDot = 13 };
+            SlantDashDot = 13
+        };
 
-        public enum BorderWeight {
+        public enum BorderWeight
+        {
             Hairline = 1,
             Medium = -4138,
             Thick = 4,
-            Thin = 2 };
+            Thin = 2
+        };
+
+        public enum FileFormat
+        {
+            CSV = 6,
+            CSVWindows = 23,
+            CurrentPlatformText = -4158,
+            DIF = 9,
+            HTML = 44,
+            OpenDocumentSpreadsheet = 60,
+            OpenXMLTemplate = 54,
+            OpenXMLTemplateMacroEnabled = 52,
+            TabDelimited = 20,
+            Template = 17,
+            TextMSDOS = 21,
+            TextWindows = 20,
+            WorkbookDefault = 51,
+            XMLSpreadhseet = 46
+        }
 
         public FontClass Font;
         public PageSetupClass PageSetup;
@@ -188,7 +210,7 @@ namespace BSGlobals
                 ExcelWorksheet.Cells[row, col].Value = value;
                 return (true);
             }
-            catch 
+            catch
             {
                 return (false);
             }
@@ -574,7 +596,7 @@ namespace BSGlobals
         {
             Spreadsheet SP;
 
-            public FormatClass (Spreadsheet sp)
+            public FormatClass(Spreadsheet sp)
             {
                 SP = sp;
             }
@@ -730,7 +752,7 @@ namespace BSGlobals
             /// <returns></returns>
             /// 
             public bool Custom(int startRow, int startCol, int endRow, int endCol, string format)
-            {                
+            {
                 try
                 {
                     Excel.Range range = SP.SetRange(startRow, startCol, endRow, endCol);
@@ -763,7 +785,7 @@ namespace BSGlobals
         {
             Spreadsheet SP;
 
-            public AlignmentClass (Spreadsheet sp)
+            public AlignmentClass(Spreadsheet sp)
             {
                 SP = sp;
             }
@@ -1258,11 +1280,11 @@ namespace BSGlobals
         #endregion
 
         #region PageSetupClass
-        public class PageSetupClass 
+        public class PageSetupClass
         {
             Spreadsheet SP;
 
-            public PageSetupClass (Spreadsheet sp)
+            public PageSetupClass(Spreadsheet sp)
             {
                 SP = sp;
             }
@@ -1413,9 +1435,9 @@ namespace BSGlobals
                 }
             }
         }
-#endregion
+        #endregion
 
-#region Fileclass
+        #region Fileclass
         public class FileClass
         {
             Spreadsheet SP;
@@ -1465,8 +1487,89 @@ namespace BSGlobals
                     return (false);
                 }
             }
+
+            public bool SaveAs(string saveAsPath, FileFormat spreadsheetFormat, bool DeleteFirst)
+            {
+                // Save the file as a type specified in the parameters.  Useful for conversion to CSV
+                try
+                {
+                    if (DeleteFirst)
+                    {
+                        if (System.IO.File.Exists(saveAsPath))
+                        {
+                            System.IO.File.Delete(saveAsPath);
+                        }
+                    }
+                    SP.ExcelApp.DisplayAlerts = true;
+
+                    object fileFormat = Excel.XlFileFormat.xlWorkbookDefault;
+                    switch (spreadsheetFormat)
+                    {
+                        case FileFormat.CSV:
+                            fileFormat = Excel.XlFileFormat.xlCSV;
+                            break;
+                        case FileFormat.CSVWindows:
+                            fileFormat = Excel.XlFileFormat.xlCSVWindows;
+                            break;
+                        case FileFormat.CurrentPlatformText:
+                            fileFormat = Excel.XlFileFormat.xlCurrentPlatformText;
+                            break;
+                        case FileFormat.DIF:
+                            fileFormat = Excel.XlFileFormat.xlDIF;
+                            break;
+                        case FileFormat.HTML:
+                            fileFormat = Excel.XlFileFormat.xlHtml;
+                            break;
+                        case FileFormat.OpenDocumentSpreadsheet:
+                            fileFormat = Excel.XlFileFormat.xlOpenDocumentSpreadsheet;
+                            break;
+                        case FileFormat.OpenXMLTemplate:
+                            fileFormat = Excel.XlFileFormat.xlOpenXMLTemplate;
+                            break;
+                        case FileFormat.OpenXMLTemplateMacroEnabled:
+                            fileFormat = Excel.XlFileFormat.xlOpenXMLTemplateMacroEnabled;
+                            break;
+                        case FileFormat.TabDelimited: // Same as FileFormat.TextWindows
+                            fileFormat = Excel.XlFileFormat.xlTextWindows;
+                            break;
+                        case FileFormat.Template:
+                            fileFormat = Excel.XlFileFormat.xlTemplate;
+                            break;
+                        case FileFormat.TextMSDOS:
+                            fileFormat = Excel.XlFileFormat.xlTextMSDOS;
+                            break;
+                        case FileFormat.WorkbookDefault:
+                            fileFormat = Excel.XlFileFormat.xlWorkbookDefault;
+                            break;
+                        case FileFormat.XMLSpreadhseet:
+                            fileFormat = Excel.XlFileFormat.xlXMLSpreadsheet;
+                            break;
+                    }
+
+                    SP.ExcelWorkbook.SaveAs(
+                        saveAsPath,
+                        fileFormat,
+                        Type.Missing,
+                        Type.Missing,
+                        Type.Missing,
+                        Type.Missing,
+                        Excel.XlSaveAsAccessMode.xlNoChange,
+                        Type.Missing,
+                        Type.Missing,
+                        Type.Missing,
+                        Type.Missing);
+
+                    return (true);
+                }
+                catch (Exception ex)
+                {
+                    return (false);
+                }
+            }
+
+
         }
-#endregion
+        #endregion
 
     }
 }

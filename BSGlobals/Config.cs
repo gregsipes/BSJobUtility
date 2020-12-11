@@ -197,6 +197,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.SynergyReportMaintenance:
                     connectionString = GetConnectionString("synergyreportmaintenance");
                     break;
+                case DatabaseConnectionStringNames.SBSJournalEntryImport:
+                    connectionString = GetConnectionString("sbsjournalentryimport");
+                    break;
                 default:
                     break;
             }

@@ -67,6 +67,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IS Inventory", "IS Inventor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synergy Report Maintenance", "Synergy Report Maintenance\Synergy Report Maintenance.csproj", "{39C48E7B-422D-4F5E-B442-699FD0F69985}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SBSJournalEntryImport", "SBSJournalEntryImport\SBSJournalEntryImport.csproj", "{321F20CA-E720-4503-93D5-5C10526F3456}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +199,10 @@ Global
 		{39C48E7B-422D-4F5E-B442-699FD0F69985}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39C48E7B-422D-4F5E-B442-699FD0F69985}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39C48E7B-422D-4F5E-B442-699FD0F69985}.Release|Any CPU.Build.0 = Release|Any CPU
+		{321F20CA-E720-4503-93D5-5C10526F3456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{321F20CA-E720-4503-93D5-5C10526F3456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{321F20CA-E720-4503-93D5-5C10526F3456}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{321F20CA-E720-4503-93D5-5C10526F3456}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

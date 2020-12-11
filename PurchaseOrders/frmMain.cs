@@ -207,14 +207,14 @@ namespace PurchaseOrders
             return (order);
         }
 
-        private void AutoCreateNewPORecord(OrderItemClass selectedOrderItem)
+        private void AutoCreateNewPORecord(OrderClass order, OrderItemClass selectedOrderItem)
         {
             // Create a new PO from the row that was selected from the existing PO List
             // Only a single row (row 0) is created if selectedOrderItem.SingleItemOnly is set
             // Note that we are forced to create an order record here to prevent anyone else from using this PO Number.
             //   If we don't complete the PO order we can delete it at the end.
 
-            CurrentOrder = CreateNewPORecord();
+            order = CreateNewPORecord();
 
             // Get all vendor info associated with this item
 
@@ -227,8 +227,8 @@ namespace PurchaseOrders
                 {
                     // Put order into order object and display
 
-                    CurrentOrder.LoadOrderFromSQL(rdrOrder);
-                    DisplayOrder(CurrentOrder);
+                    order.LoadOrderFromSQL(rdrOrder);
+                    DisplayOrder(order);
 
                     // Put vendor into vendor object and display
 
@@ -259,13 +259,13 @@ namespace PurchaseOrders
                     PopulateChargeToComboBox(row);
                     PopulateClassificationComboBox(row);
                     DisplayLineItems(GrdOrderDetails.Rows[row], rdrItem);
-                    CurrentOrder.LoadLineItemsFromSQL(rdrItem, true);
+                    order.LoadLineItemsFromSQL(rdrItem, true);
                     if (selectedOrderItem.SingleItemOnly) break; // If only a single entry was copied, exit the loop after a single iteration
                     row++;
                 }
             }
 
-            TxtPOTotal.Text = CurrentOrder.ComputeOrderTotal().ToString("C2");
+            TxtPOTotal.Text = order.ComputeOrderTotal().ToString("C2");
         }
 
         private void SavePORecord(OrderClass currentOrder)
