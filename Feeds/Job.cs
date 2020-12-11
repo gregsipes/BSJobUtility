@@ -505,8 +505,7 @@ namespace Feeds
 
                         }
 
-                        WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {fileUploadCount} files");
-
+                        WriteToJobLog(JobLogMessageType.INFO, $"There were {filesToPostProcess.Count} files to be loaded.  Of those files, {filesToPostProcess.Count - fileUploadCount} were successfully loaded previously, and {fileUploadCount} was loaded during this run");
 
 
                         sFTP.CloseSession();
