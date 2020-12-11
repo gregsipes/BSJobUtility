@@ -464,6 +464,7 @@ namespace Feeds
                         }
 
                         //Output every name on the FTP file list (that came from the list built in CreateBuild())
+                        Int32 fileUploadCount = 0;
                         foreach (string file in filesToPostProcess)
                         {
                             string sourceFileName = result["pdf_directory"].ToString() + "\\" + file;
@@ -482,12 +483,13 @@ namespace Feeds
                                     {
                                         sFTP.UploadFile(sourceFileName, feed["put_subdirectory"].ToString(), true, true);
                                         WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {sourceFileName} to {destinationFileName}");
+                                        fileUploadCount++;
                                         break;
                                     }
                                     catch (Exception ex)
                                     {
                                         WriteToJobLog(JobLogMessageType.WARNING, $"File {sourceFileName} could not be uploaded to {destinationFileName} attempt {attemptCounter}. Exception - {ex.ToString()}");
-                                        System.Threading.Thread.Sleep(1000);
+                                        System.Threading.Thread.Sleep(Convert.ToInt32(GetConfigurationKeyValue("PutSleepTime")));
                                         attemptCounter++;
                                     }
                                 }
@@ -503,7 +505,7 @@ namespace Feeds
 
                         }
 
-                        WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {filesToPostProcess.Count()} files");
+                        WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {fileUploadCount} files");
 
 
 
