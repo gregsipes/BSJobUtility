@@ -486,7 +486,8 @@ namespace Feeds
                                     }
                                     catch (Exception ex)
                                     {
-                                        WriteToJobLog(JobLogMessageType.WARNING, $"File {sourceFileName} could not be uploaded to {destinationFileName}. Exception - {ex.ToString()}");
+                                        WriteToJobLog(JobLogMessageType.WARNING, $"File {sourceFileName} could not be uploaded to {destinationFileName} attempt {attemptCounter}. Exception - {ex.ToString()}");
+                                        System.Threading.Thread.Sleep(1000);
                                         attemptCounter++;
                                     }
                                 }
