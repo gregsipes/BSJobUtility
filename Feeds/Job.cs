@@ -492,7 +492,9 @@ namespace Feeds
                                     }
                                 }
 
-                                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Upload_End", new SqlParameter("@pintBuildsID", buildId));
+                                ExecuteNonQuery(DatabaseConnectionStringNames.Feeds, "Proc_Update_Builds_File_Upload_End", 
+                                                                                new SqlParameter("@pintBuildsID", buildId),
+                                                                                new SqlParameter("@pflgFileUploadSuccessful", 1));
 
                                 if (Convert.ToBoolean(feed["update_source_last_modified_date_time_after_put_flag"].ToString()))
                                     File.SetLastWriteTime(sourceFileName, DateTime.Now);
