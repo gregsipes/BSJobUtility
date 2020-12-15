@@ -192,7 +192,7 @@ namespace SBSJournalEntryImport
         public static SqlDataReader SQLQuery(string qryName)
         {
             SqlDataReader rdr = DataIO.ExecuteQuery(
-                Enums.DatabaseConnectionStringNames.Purchasing,
+                Enums.DatabaseConnectionStringNames.SBSJournalEntryImport,
                 CommandType.StoredProcedure,
                 qryName);
             return (rdr);
@@ -201,7 +201,7 @@ namespace SBSJournalEntryImport
         public static SqlDataReader SQLQuery(string qryName, SqlParameter[] orderParams)
         {
             SqlDataReader rdr = DataIO.ExecuteQuery(
-                Enums.DatabaseConnectionStringNames.Purchasing,
+                Enums.DatabaseConnectionStringNames.SBSJournalEntryImport,
                 CommandType.StoredProcedure,
                 qryName,
                 orderParams);
@@ -210,7 +210,7 @@ namespace SBSJournalEntryImport
 
         public static void SQLProcCall(string procName, SqlParameter[] Params)
         {
-            DataIO.ExecuteSQL(Enums.DatabaseConnectionStringNames.Purchasing,
+            DataIO.ExecuteSQL(Enums.DatabaseConnectionStringNames.SBSJournalEntryImport,
                 CommandType.StoredProcedure,
                 procName,
                 Params);

@@ -21,3 +21,13 @@ C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.cspro
 C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.dll
 C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.pdb
 C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csprojAssemblyReference.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\DMMail.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\DMMail.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\BSGlobals.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\BSJobBase.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\BSGlobals.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\BSJobBase.pdb
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\BSJobBase.dll.config
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CoreCompileInputs.cache
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.dll
+C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.pdb

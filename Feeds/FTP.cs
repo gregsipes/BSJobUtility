@@ -48,7 +48,7 @@ namespace Feeds
                 FtpWebResponse response = (FtpWebResponse)request.GetResponse();
                 return true;
             }
-            catch (WebException ex)
+            catch // (WebException ex) // Eliminate the compiler warning msg if we're not going to use the exception handler.
             {
                 return false;
             }

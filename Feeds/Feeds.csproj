@@ -41,7 +41,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WinSCPnet">
-      <HintPath>..\..\..\..\..\Program Files (x86)\WinSCP\WinSCPnet.dll</HintPath>
+      <HintPath>..\..\BSJobUtilityMaster\BSJobUtility\Feeds\WinSCPnet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
