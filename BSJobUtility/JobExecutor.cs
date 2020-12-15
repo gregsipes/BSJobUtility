@@ -90,7 +90,7 @@ namespace BSJobUtility
             else if (_jobName == "PBSDumpPopulate")
                 _managedJob = new PBSDumpPopulate.Job() { GroupName = _group, GroupNumber = _version };
             else if (_jobName == "PBSDumpPost")
-                _managedJob = new PBSDumpPost.Job() { GroupName = _group, GroupNumber =  _version};
+                _managedJob = new PBSDumpPost.Job() { GroupName = _group, GroupNumber = _version };
             else if (_jobName == "CircDumpWorkload")
                 _managedJob = new CircDumpWorkLoad.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "CircDumpPopulate")
@@ -109,6 +109,8 @@ namespace BSJobUtility
                 _managedJob = new DeleteEmptyTMPFiles.Job();
             else if (_jobName == "Feeds")
                 _managedJob = new Feeds.Job() { Version = _version };
+            else if (_jobName == "PurgeFeeds")
+                _managedJob = new PurgeFeeds.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else
