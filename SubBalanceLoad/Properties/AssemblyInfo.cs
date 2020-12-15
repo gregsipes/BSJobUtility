@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CircDumpPost")]
+[assembly: AssemblyTitle("SubBalanceLoad")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CircDumpPost")]
+[assembly: AssemblyProduct("SubBalanceLoad")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b09c645a-5f72-42d8-8b04-51a3d1ca44ff")]
+[assembly: Guid("8e87415b-a7ea-4165-9aee-8fb6d88496ae")]
 
 // Version information for an assembly consists of the following four values:
 //

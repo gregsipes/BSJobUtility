@@ -10,7 +10,7 @@ namespace BSGlobals
     {
         public enum DatabaseConnectionStringNames
         {
-            EventLogs,
+            BSJobUtility,
             Parking,
             SBSReports,
             PBS2Macro,
@@ -35,10 +35,19 @@ namespace BSGlobals
             PrepackInsertLoad,
             CircDumpWorkLoad,
             CircDumpWorkPopulate,
-            PBSDumpAWork,
+            CircDumpPost,
+            PBSDumpAWorkLoad,
+            PBSDumpAWorkPopulate,
+            PBSDumpPost,
             PBSDumpBWork,
             PBSDumpCWork,
-            Purchasing
+            Purchasing,
+            SuppliesWorkLoad,
+            PBSDump,
+            BNTransactions,
+            TradeWorkLoad,
+            SubBalanceLoad,
+            Feeds
         }
 
         public enum JobLogMessageType

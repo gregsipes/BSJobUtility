@@ -26,7 +26,6 @@ namespace CircDumpPopulate
         {
             try
             {
-
                 List<Dictionary<string, object>> dumpControls = ExecuteSQL(DatabaseConnectionStringNames.CircDumpWorkPopulate, "Proc_Select_BN_Distinct_DumpControl_To_Populate",
                                                                                new SqlParameter("@pintGroupNumber", GroupNumber)).ToList();
 
@@ -34,6 +33,8 @@ namespace CircDumpPopulate
 
                 if (dumpControls != null && dumpControls.Count() > 0)
                 {
+                    WriteToJobLog(JobLogMessageType.INFO, $"Group Number: {GroupNumber}");
+
                     foreach (Dictionary<string, object> dumpControl in dumpControls)
                     {
                         List<string> tablesToPopulate = DetermineTablesToPopulate(Convert.ToInt64(dumpControl["loads_dumpcontrol_id"]));
@@ -145,11 +146,11 @@ namespace CircDumpPopulate
                                                         new SqlParameter("@pbintLoadsTablesID", loadsTableId));
 
                 //delete unsuccessful touch file if one exists
-                //if (File.Exists($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.unsuccessful"))
-                //    File.Delete($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.unsuccessful");
+                if (File.Exists($"{GetConfigurationKeyValue("TableTouchDirectory")}\\{tableName}.unsuccessful"))
+                    File.Delete($"{GetConfigurationKeyValue("TableTouchDirectory")}\\{tableName}.unsuccessful");
 
-                ////create a successul file (this is the file that gets cleaned up in the next step of the process (CircDumpPost)
-                //File.Create($"{GetConfigurationKeyValue("TableTouchDirectory")}{GroupNumber}\\{tableName}.successful");
+                //create a successul file (this is the file that gets cleaned up in the next step of the process (CircDumpPost)
+                File.Create($"{GetConfigurationKeyValue("TableTouchDirectory")}\\{tableName}.successful");
 
             }
             else

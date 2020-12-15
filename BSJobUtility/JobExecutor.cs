@@ -11,14 +11,16 @@ namespace BSJobUtility
     {
         private readonly string _jobName;
         private readonly string _group;
+        private readonly string _version;
         private JobBase _managedJob;
 
-        public JobExecutor(string jobName, string group, string[] args)
+        public JobExecutor(string jobName, string group, string version, string[] args)
         {
             try
             {
                 _jobName = jobName;
                 _group = group;
+                _version = version;
 
                 // setup job
                 SetupJob();
@@ -85,12 +87,28 @@ namespace BSJobUtility
                 _managedJob = new PrepackInsertLoad.Job();
             else if (_jobName == "PBSDumpWorkload")
                 _managedJob = new PBSDumpWorkload.Job() { GroupName = _group };
+            else if (_jobName == "PBSDumpPopulate")
+                _managedJob = new PBSDumpPopulate.Job() { GroupName = _group, GroupNumber = _version };
+            else if (_jobName == "PBSDumpPost")
+                _managedJob = new PBSDumpPost.Job() { GroupName = _group, GroupNumber =  _version};
             else if (_jobName == "CircDumpWorkload")
                 _managedJob = new CircDumpWorkLoad.Job() { GroupNumber = Convert.ToInt32(_group) };
             else if (_jobName == "CircDumpPopulate")
                 _managedJob = new CircDumpPopulate.Job() { GroupNumber = Convert.ToInt32(_group) };
-            //else if (_jobName == "CircDumpPost")  //with the refractoring that has been done, this job/step should no longer be needed
-            //    _managedJob = new CircDumpPost.Job() { GroupNumber = Convert.ToInt32(_group) };
+            else if (_jobName == "CircDumpPost")
+                _managedJob = new CircDumpPost.Job() { GroupNumber = Convert.ToInt32(_group) };
+            else if (_jobName == "SuppliesWorkload")
+                _managedJob = new SuppliesWorkload.Job();
+            else if (_jobName == "TradeWorkload")
+                _managedJob = new TradeWorkload.Job();
+            else if (_jobName == "SubBalanceLoad")
+                _managedJob = new SubBalanceLoad.Job();
+            else if (_jobName == "DeleteFile")
+                _managedJob = new DeleteFile.Job();
+            else if (_jobName == "DeleteEmptyTMPFiles")
+                _managedJob = new DeleteEmptyTMPFiles.Job();
+            else if (_jobName == "Feeds")
+                _managedJob = new Feeds.Job() { Version = _version };
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

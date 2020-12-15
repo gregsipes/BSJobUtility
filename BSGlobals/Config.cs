@@ -33,7 +33,7 @@ namespace BSGlobals
 
             try
             {
-                if (section != null)
+                if (section != null && section.AllKeys.Contains(keyName))
                     value = section[keyName].ToString();
             }
             catch (Exception ex)
@@ -142,8 +142,8 @@ namespace BSGlobals
 
             switch (name)
             {
-                case DatabaseConnectionStringNames.EventLogs:
-                    connectionString = GetConnectionString("eventlogs");
+                case DatabaseConnectionStringNames.BSJobUtility:
+                    connectionString = GetConnectionString("bsjobutility");
                     break;
                 case DatabaseConnectionStringNames.Parking:
                     connectionString = GetConnectionString("parking");
@@ -217,8 +217,17 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.CircDumpWorkPopulate:
                     connectionString = GetConnectionString("circdumpwork_populate");
                     break;
-                case DatabaseConnectionStringNames.PBSDumpAWork:
-                    connectionString = GetConnectionString("pbsdumpawork");
+                case DatabaseConnectionStringNames.CircDumpPost:
+                    connectionString = GetConnectionString("circdumpwork_post");
+                    break;
+                case DatabaseConnectionStringNames.PBSDumpAWorkLoad:
+                    connectionString = GetConnectionString("pbsdumpawork_load");
+                    break;
+                case DatabaseConnectionStringNames.PBSDumpAWorkPopulate:
+                    connectionString = GetConnectionString("pbsdumpawork_populate");
+                    break; 
+                case DatabaseConnectionStringNames.PBSDumpPost:
+                    connectionString = GetConnectionString("pbsdumpawork_post");
                     break;
                 case DatabaseConnectionStringNames.PBSDumpBWork:
                     connectionString = GetConnectionString("pbsdumpbwork");
@@ -228,6 +237,24 @@ namespace BSGlobals
                     break;
                 case DatabaseConnectionStringNames.Purchasing:
                     connectionString = GetConnectionString("purchasing");
+                    break;
+                case DatabaseConnectionStringNames.SuppliesWorkLoad:
+                    connectionString = GetConnectionString("supplieswork");
+                    break;
+                case DatabaseConnectionStringNames.PBSDump:
+                    connectionString = GetConnectionString("pbsdump");
+                    break;
+                case DatabaseConnectionStringNames.BNTransactions:
+                    connectionString = GetConnectionString("bntransactions");
+                    break;
+                case DatabaseConnectionStringNames.TradeWorkLoad:
+                    connectionString = GetConnectionString("tradework");
+                    break;
+                case DatabaseConnectionStringNames.SubBalanceLoad:
+                    connectionString = GetConnectionString("subbalancework");
+                    break;
+                case DatabaseConnectionStringNames.Feeds:
+                    connectionString = GetConnectionString("feeds");
                     break;
                 default:
                     break;

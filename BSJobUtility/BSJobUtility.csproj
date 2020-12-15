@@ -52,6 +52,12 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ConfigFiles\connectionStringsProd.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ConfigFiles\connectionStringsDev.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoRenew\AutoRenew.csproj">
@@ -66,17 +72,33 @@
       <Project>{58a03971-0c97-42bc-9b51-fb93db910bd0}</Project>
       <Name>CircDumpPopulate</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CircDumpWorkLoad\CircDumpWorkLoad.csproj">
+    <ProjectReference Include="..\CircDumpPost\CircDumpPost.csproj">
+      <Project>{b09c645a-5f72-42d8-8b04-51a3d1ca44ff}</Project>
+      <Name>CircDumpPost</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CircDumpWorkLoad\CircDumpWorkload.csproj">
       <Project>{0c8c80c8-b156-4211-9566-b1531e86c906}</Project>
-      <Name>CircDumpWorkLoad</Name>
+      <Name>CircDumpWorkload</Name>
     </ProjectReference>
     <ProjectReference Include="..\CommissionsCreate\CommissionsCreate.csproj">
       <Project>{9927a52d-b824-47ec-8653-cf444c79f7d8}</Project>
       <Name>CommissionsCreate</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeleteEmptyTMPFiles\DeleteEmptyTMPFiles.csproj">
+      <Project>{1532ee23-f637-40fa-bba8-10b2f7c1a36d}</Project>
+      <Name>DeleteEmptyTMPFiles</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeleteFile\DeleteFile.csproj">
+      <Project>{69a6a58d-770a-406b-ae1c-14d87e9866c2}</Project>
+      <Name>DeleteFile</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DMMail\DMMail.csproj">
       <Project>{960455ab-e26b-4a6f-b065-7a1e500757f9}</Project>
       <Name>DMMail</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Feeds\Feeds.csproj">
+      <Project>{ebde7e14-5db4-49ea-ace0-b4b5d61fdcb8}</Project>
+      <Name>Feeds</Name>
     </ProjectReference>
     <ProjectReference Include="..\ManifestFreeLoad\ManifestFreeLoad.csproj">
       <Project>{8c9f48e7-4657-4917-a999-838260bf1784}</Project>
@@ -105,6 +127,14 @@
     <ProjectReference Include="..\PayByScanLoadWegmans\PayByScanLoadWegmans.csproj">
       <Project>{d31351eb-64a1-48b8-a407-2c7dc0493b0b}</Project>
       <Name>PayByScanLoadWegmans</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBSDumpPopulate\PBSDumpPopulate.csproj">
+      <Project>{b31d42d9-bae1-4a78-a1c6-fc33d68ab464}</Project>
+      <Name>PBSDumpPopulate</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PBSDumpPost\PBSDumpPost.csproj">
+      <Project>{194e1ff3-bde2-4800-8b3a-d63a194ce067}</Project>
+      <Name>PBSDumpPost</Name>
     </ProjectReference>
     <ProjectReference Include="..\PBSDumpWorkload\PBSDumpWorkload.csproj">
       <Project>{7cd71798-c122-4145-a08e-506a88273108}</Project>
@@ -142,9 +172,21 @@
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SubBalanceLoad\SubBalanceLoad.csproj">
+      <Project>{8e87415b-a7ea-4165-9aee-8fb6d88496ae}</Project>
+      <Name>SubBalanceLoad</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SuppliesWorkload\SuppliesWorkload.csproj">
+      <Project>{6f83d1fd-0ab8-47f5-a320-8cfcd6dca26a}</Project>
+      <Name>SuppliesWorkload</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TestJob\TestJob.csproj">
       <Project>{428258fe-950a-4ffd-883c-7faea65e05b3}</Project>
       <Name>TestJob</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TradeWorkload\TradeWorkload.csproj">
+      <Project>{7846f18e-0d22-4b7b-919c-e7c579091c8a}</Project>
+      <Name>TradeWorkload</Name>
     </ProjectReference>
     <ProjectReference Include="..\UnzipNewscycleExportFiles\UnzipNewscycleExportFiles.csproj">
       <Project>{5908ef09-95b9-4ec0-91c2-a404c8545853}</Project>

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CircDumpPost")]
+[assembly: AssemblyTitle("DeleteEmptyTMPFiles")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CircDumpPost")]
+[assembly: AssemblyProduct("DeleteEmptyTMPFiles")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b09c645a-5f72-42d8-8b04-51a3d1ca44ff")]
+[assembly: Guid("1532ee23-f637-40fa-bba8-10b2f7c1a36d")]
 
 // Version information for an assembly consists of the following four values:
 //

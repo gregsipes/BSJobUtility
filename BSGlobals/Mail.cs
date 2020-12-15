@@ -40,7 +40,7 @@ namespace BSGlobals
                             message.Attachments.Add(attach);
                         }
 
-                        // clean up recipients
+
                         if (recipients == null)
                             message.To.Add(new MailAddress(Config.GetConfigurationKeyValue("BSJobUtilitySection", "DefaultRecipient")));
                         else
@@ -56,7 +56,6 @@ namespace BSGlobals
 
                         if (ccs != null)
                         {
-                            // clean up recipients
                             ccs = ccs.Replace(",", ";");
 
                             foreach (var cc in ccs.Split(';'))
@@ -68,7 +67,7 @@ namespace BSGlobals
 
                         if (bccs != null)
                         {
-                            // clean up recipients
+
                             bccs = bccs.Replace(",", ";");
 
                             foreach (var bcc in bccs.Split(';'))

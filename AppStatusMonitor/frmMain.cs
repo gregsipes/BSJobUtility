@@ -72,7 +72,7 @@ namespace AppStatusMonitor
                 ActivityParams[0] = new SqlParameter("@pvintLookbackInDays", LookbackInDays);
                 ActivityParams[1] = new SqlParameter("@pvintMaxActivities", NumCycles);
                 SqlDataReader rdr = DataIO.ExecuteQuery(
-                    Enums.DatabaseConnectionStringNames.EventLogs,
+                    Enums.DatabaseConnectionStringNames.BSJobUtility,
                     CommandType.StoredProcedure,
                     "Proc_Select_Last_N_Activities_All_Jobs", ActivityParams);
 
@@ -116,7 +116,7 @@ namespace AppStatusMonitor
                     param = new SqlParameter("@pvintLookbackInSeconds", Config.GetConfigurationKeyValue("AppStatusMonitor", "UpdateIntervalInSecs"));
                 }
                 List<Dictionary<string, object>> results =
-                    DataIO.ExecuteSQL(Enums.DatabaseConnectionStringNames.EventLogs,
+                    DataIO.ExecuteSQL(Enums.DatabaseConnectionStringNames.BSJobUtility,
                     sprocname,
                     param);
 

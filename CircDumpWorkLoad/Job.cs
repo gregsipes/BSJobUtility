@@ -39,8 +39,9 @@ namespace CircDumpWorkLoad
         //22. Check for new error file at \\Omaha\BulkInsertFromCirc\CircDump_Work_Load_<groupNumber>\<timestamp>\<tableName>.error, throw exception and exit if one is found
         //23. Remove last record from insert, since this is a control record
         //24. Check to make sure that all of the records were correctly inserted by comparing the count file and the last record inserted into the table
-        //25. Cleanups all related files
-        //This is step 1 in the import process. Step 2 is CircDumpPopulate. Step 3 is CircDumpPostGroup. Step 3 is no longer needed.
+        //25. Creates a .successful in for the post tables load step to know which tables to update
+        //26. Cleanups all related files
+        //This is step 1 in the import process. Step 2 is CircDumpPopulate. Step 3 is CircDumpPostGroup. 
 
         public int GroupNumber { get; set; }
 
@@ -84,6 +85,8 @@ namespace CircDumpWorkLoad
 
                     if (files != null && files.Count() > 0)
                     {
+                        WriteToJobLog(JobLogMessageType.INFO, $"Group Number: {GroupNumber}");
+
                         foreach (string file in files)
                         {
                             FileInfo fileInfo = new FileInfo(file);
@@ -299,12 +302,12 @@ namespace CircDumpWorkLoad
 
             WriteToJobLog(JobLogMessageType.INFO, $"Preparing to load {table["TableName"]}");
 
-             ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables",
-                                                             new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
-                                                             new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
-                                                             new SqlParameter("@pvchrFile", fileInfo.Name),
-                                                             new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
-            
+            ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Update_BN_Loads_Tables",
+                                                            new SqlParameter("@pbintLoadsTablesID", Int32.Parse(table["LoadsTableID"].ToString())),
+                                                            new SqlParameter("@pvchrDirectory", fileInfo.DirectoryName),
+                                                            new SqlParameter("@pvchrFile", fileInfo.Name),
+                                                            new SqlParameter("@pdatFileLastModified", fileInfo.LastWriteTime));
+
 
             WriteToJobLog(JobLogMessageType.INFO, $"Clearing {table["TableName"].ToString()} table for dump control's timestamp ({timeStampDate})");
 
@@ -409,7 +412,8 @@ namespace CircDumpWorkLoad
             loopCounter = 1;
             foreach (Dictionary<string, object> columnDefinition in columnDefinitions)
             {
-                stringBuilder.AppendLine($"{PadField(loopCounter.ToString(), 8)}SQLCHAR       0       {PadField(columnDefinition["FieldLength"].ToString(), 8)}\"{PadField((loopCounter == columnDefinitions.Count() ? @"\n" : "|") + "\"", 9) }{PadField(loopCounter.ToString(), 6)}{PadField(columnDefinition["ColumnName"].ToString(), 39)}\"\"");
+                Int32 columnIndex = Convert.ToInt32(columnDefinition["ColumnIndex"].ToString());
+                stringBuilder.AppendLine($"{PadField(loopCounter.ToString(), 8)}SQLCHAR       0       {PadField(columnDefinition["FieldLength"].ToString(), 8)}\"{PadField((loopCounter == columnDefinitions.Count() ? @"\n" : "|") + "\"", 9) }{PadField(columnIndex == 0 ? "0" : columnIndex.ToString(), 6)}{PadField(columnDefinition["ColumnName"].ToString(), 39)}\"\"");
 
                 loopCounter++;
             }

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B09C645A-5F72-42D8-8B04-51A3D1CA44FF}</ProjectGuid>
+    <ProjectGuid>{69A6A58D-770A-406B-AE1C-14D87E9866C2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CircDumpPost</RootNamespace>
-    <AssemblyName>CircDumpPost</AssemblyName>
+    <RootNamespace>DeleteFile</RootNamespace>
+    <AssemblyName>DeleteFile</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

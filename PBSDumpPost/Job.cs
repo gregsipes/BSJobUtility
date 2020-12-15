@@ -9,17 +9,35 @@ using System.Text;
 using System.Threading.Tasks;
 using static BSGlobals.Enums;
 
-namespace CircDumpPost
+namespace PBSDumpPost
 {
     public class Job : JobBase
     {
-        public int GroupNumber { get; set; }
+        public string GroupName { get; set; }
+
+        public string GroupNumber { get; set; }
+
+        private DatabaseConnectionStringNames VersionSpecificConnectionString { get; set; }
 
         public override void SetupJob()
         {
-            JobName = "Circ Dump Post";
-            JobDescription = "Runs final cleanup and update tasks for circ dump.";
-            AppConfigSectionName = "CircDumpPost";
+            JobName = "PBS Dump Post";
+            JobDescription = "Runs final cleanup and update tasks for PBS dump.";
+            AppConfigSectionName = "PBSDumpPost";
+
+            //this really only ever runs for group A
+            switch (GroupName)
+            {
+                case "A":
+                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpPost;
+                    break;
+                case "B":
+                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpBWork;
+                    break;
+                case "C":
+                    VersionSpecificConnectionString = DatabaseConnectionStringNames.PBSDumpCWork;
+                    break;
+            }
 
         }
 
@@ -27,10 +45,10 @@ namespace CircDumpPost
         {
             try
             {
-                if (GroupNumber > 0)
-                    GroupPost();
+                if (GroupNumber != "")
+                    GroupPost();        //only group 2 actually executes anything
                 else
-                    TablePost();
+                    TablePost();        //this doesn't currently get called, ever
             }
             catch (Exception ex)
             {
@@ -41,18 +59,19 @@ namespace CircDumpPost
 
         private void GroupPost()
         {
+
             //only run this code if a successful file exists. This files gets deleted after the table post  (last) step of the job is complete
-            List<string> files = Directory.GetFiles($"{GetConfigurationKeyValue("TableTouchDirectory")}", "*.successful").ToList();
+            List<string> files = Directory.GetFiles(String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName), "*.successful").ToList();
 
             if (files.Count() > 0)
             {
-                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpPost, "Proc_Select_BN_Groups_Post_Load",
+                List<Dictionary<string, object>> results = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_BN_Groups_Post_Load",
                                                                             new SqlParameter("@pintGroupNumber", GroupNumber));
 
-                if (GroupNumber == -1)
+                if (GroupName == "")
                     WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for all tables");
                 else
-                    WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for group number {GroupNumber}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for group number {GroupName}");
 
                 Exception sprocResult = null;
                 foreach (Dictionary<string, object> result in results)
@@ -66,6 +85,12 @@ namespace CircDumpPost
                             throw new Exception(sprocResult.ToString());
                     }
                 }
+
+                foreach (string file in files)
+                {
+                    File.Delete(file);
+                }
+
             }
 
         }
@@ -105,13 +130,12 @@ namespace CircDumpPost
 
         private string RetrieveParameters(bool isGroup, Int64 postLoadId, string tableName, bool quote)
         {
-
             List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
             if (isGroup)
-                results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpPost, "Proc_Select_BN_Groups_Post_Load_Parameters", new SqlParameter("@pintBNGroupsPostLoadID", postLoadId)).ToList();
+                results = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_BN_Groups_Post_Load_Parameters", new SqlParameter("@pintBNGroupsPostLoadID", postLoadId)).ToList();
             else
-                results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpPost, "Proc_Select_BN_Tables_Post_Load_Parameters", new SqlParameter("@pintBNTablesPostLoadID", postLoadId)).ToList();
+                results = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_BN_Tables_Post_Load_Parameters", new SqlParameter("@pintBNTablesPostLoadID", postLoadId)).ToList();
 
             string parameterString = "";
 
@@ -140,8 +164,9 @@ namespace CircDumpPost
 
         private void TablePost()
         {
+            //all of the stored_procedure values are null for this version of the job, so this code doesn't currently do anything
 
-            List<string> files = Directory.GetFiles($"{GetConfigurationKeyValue("TableTouchDirectory")}", "*.successful").ToList();
+            List<string> files = Directory.GetFiles(String.Format(GetConfigurationKeyValue("TableTouchDirectory"), GroupName), "*.successful").ToList();
 
             foreach (string file in files)
             {
@@ -149,18 +174,18 @@ namespace CircDumpPost
 
                 string tableName = fileInfo.Name.Substring(0, fileInfo.Name.LastIndexOf("."));
 
-                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.CircDumpPost, "Proc_Select_BN_Tables_Post_Load",
+                List<Dictionary<string, object>> results = ExecuteSQL(VersionSpecificConnectionString, "Proc_Select_BN_Tables_Post_Load",
                                                                                new SqlParameter("@pvchrTableName", tableName));
 
-                WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for group number {GroupNumber}");
+                WriteToJobLog(JobLogMessageType.INFO, $"Preparing to execute {results.Count()} post-load routines for group number {GroupName}");
 
                 Exception sprocResult = null;
                 foreach (Dictionary<string, object> result in results)
                 {
                     if (result["stored_procedure"].ToString() != null && result["stored_procedure"].ToString() != "")
                         sprocResult = ExecuteStoredProcedure(false, Convert.ToInt64(result["bn_tables_post_load_id"].ToString()), result["stored_procedure"].ToString(), tableName, Convert.ToInt32(result["database_number"].ToString())); //execute sproc
-                   //  else
-                        //  ExecuteExecutable();   //execute INI file? This doesn't appear to be in use any longer
+                                                                                                                                                                                                                                            //  else
+                                                                                                                                                                                                                                            //  ExecuteExecutable();   //execute INI file? This doesn't appear to be in use any longer
 
 
                     //if something went wrong, determine if the job should continue processing or exit
