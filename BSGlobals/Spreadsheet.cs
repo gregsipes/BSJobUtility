@@ -29,6 +29,8 @@ namespace BSGlobals
     //    Row Height
     //    Fit to Page Width
     //    Margins (Narrow, Normal)
+    //    Max Rows
+    //    Max Columns
 
     // NOTES
     //    OLE process threads are notoriously difficult to consistently kill (they hang out in Task Manager as orphaned processes, taking up space).
@@ -197,12 +199,70 @@ namespace BSGlobals
         }
 
         /// <summary>
+        /// Return the number of used spreadsheet rows.  Return -1 on error
+        /// </summary>
+        /// <returns></returns>
+        public int GetNumRows()
+        {
+            try
+            {
+                int lastUsedRow = ExcelWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                    false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                return (lastUsedRow);
+            }
+            catch
+            {
+                return (-1); // error
+            }
+        }
+
+        /// <summary>
+        /// Return the number of used spreadsheet columns.  Return -1 on error
+        /// </summary>
+        /// <returns></returns>
+        public int GetNumColumns()
+        {
+            try
+            {
+                int lastUsedColumn = ExcelWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    Excel.XlSearchOrder.xlByColumns, Excel.XlSearchDirection.xlPrevious,
+                    false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Column;
+                return (lastUsedColumn);
+            }
+            catch
+            {
+                return (-1); // error
+            }
+        }
+
+        /// <summary>
+        /// Get a specific call value
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns>object</returns>
+        public object GetCellValue(int row, int col)
+        {
+            try
+            {
+                return (ExcelWorksheet.Cells[row, col].Value);
+            }
+            catch
+            {
+                return (null);
+            }
+        }
+
+        /// <summary>
         /// Set a specific cell value
         /// </summary>
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <param name="value"></param>
-        /// <returns></returns>
+        /// <returns>true if successful</returns>
         public bool SetCellValue(int row, int col, object value)
         {
             try
@@ -1561,7 +1621,7 @@ namespace BSGlobals
 
                     return (true);
                 }
-                catch (Exception ex)
+                catch 
                 {
                     return (false);
                 }

@@ -116,7 +116,7 @@ namespace BSGlobals
             try
             {
                 // Allow manual insertion of verion
-                Strip.Items[NumSegments - 1].Text = "V" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                Strip.Items[NumSegments - 1].Text = "V" + ParentForm.ProductVersion;
                 return (true);
             }
             catch (Exception ex)

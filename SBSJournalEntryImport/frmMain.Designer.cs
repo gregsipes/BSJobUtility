@@ -102,6 +102,7 @@
             this.CmdImport.TabIndex = 6;
             this.CmdImport.Text = "Import Data";
             this.CmdImport.UseVisualStyleBackColor = true;
+            this.CmdImport.Click += new System.EventHandler(this.CmdImport_Click);
             // 
             // FrmMain
             // 
@@ -116,7 +117,8 @@
             this.Controls.Add(this.TxtImportFile);
             this.Controls.Add(this.label1);
             this.Name = "FrmMain";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Journal Entry Spreadsheet Import";
             this.ResumeLayout(false);
             this.PerformLayout();
 
