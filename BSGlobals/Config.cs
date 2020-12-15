@@ -44,44 +44,6 @@ namespace BSGlobals
             return value;
         }
 
-
-
-#if false // 9/27/20 PEB - This does not work in its current form as app.config is a read-only collection.  See updated function below this one.
-
-        /// <summary>
-        /// Update an existing configuration key value
-        /// </summary>
-        /// <param name="sectionName"></param>
-        /// <param name="keyName"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static bool SetConfigurationKeyValue(string sectionName, string keyName, string value)
-        {
-            NameValueCollection section = null;
-
-            try
-            {
-                section = ConfigurationManager.GetSection(sectionName) as NameValueCollection;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Failed to locate section {sectionName} in configuration file.", ex);
-            }
-
-            try
-            {
-                if (section != null)
-                    section[keyName] = value;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Failed to locate key {keyName} in section {sectionName} in configuration file.", ex);
-            }
-
-            return (true);
-        }
-#endif
-
         public static bool SetConfigurationKeyValue(string sectionName, string keyName, string value)
         {
 
@@ -255,6 +217,15 @@ namespace BSGlobals
                     break;
                 case DatabaseConnectionStringNames.Feeds:
                     connectionString = GetConnectionString("feeds");
+                    break;
+                case DatabaseConnectionStringNames.ISInventory:
+                    connectionString = GetConnectionString("isinventory");
+                    break;
+                case DatabaseConnectionStringNames.SynergyReportMaintenance:
+                    connectionString = GetConnectionString("synergyreportmaintenance");
+                    break;
+                case DatabaseConnectionStringNames.SBSJournalEntryImport:
+                    connectionString = GetConnectionString("sbsjournalentryimport");
                     break;
                 default:
                     break;

@@ -254,6 +254,11 @@ namespace BSGlobals
             }
         }
 
+        public bool HasCredential(int userIndex, string credential)
+        {
+            return (_ADUser[userIndex].HasCredential(credential));
+        }
+
         public string Credential { get { return this._Credential; } }
         public bool IsBSOUCredential { get { return this._ISBSOUCredential; } }
         public List<ADUserClass> ADUser { get { return this._ADUser; } }
@@ -284,6 +289,11 @@ namespace BSGlobals
             _UserName = "<undefined>";
             _AccountEnabled = false;
             _Credentials = new List<string>();
+        }
+
+        public bool HasCredential(string credential)
+        {
+            return (_Credentials.FindIndex(x => x.ToLower().Equals(credential.ToLower())) >= 0);
         }
 
         public void PopulateUser(string firstname, string lastname, string username, bool accountenabled)

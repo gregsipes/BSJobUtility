@@ -19,6 +19,8 @@ namespace PurchaseOrders
         ActiveDirectory UserInfo = new ActiveDirectory();
         Spreadsheet POSpreadsheet;
         Spreadsheet ERSpreadsheet;
+        VersionStatusBar StatusBar;
+
         #endregion
 
         #region Initialization
@@ -55,7 +57,6 @@ namespace PurchaseOrders
             PnlOrderDetail.Visible = false;
             LblCreatingSpreadsheet.Visible = false;
 
-
             chkFilterByVendor.Checked = false;
             cmbFilterByVendor.Enabled = false;
 
@@ -66,7 +67,6 @@ namespace PurchaseOrders
             UdLookbackInYears.Value = LookbackInYears;
 
             CmdSaveConfiguration.Enabled = false;
-
 
             PopulateExistingOrderGrid("");
             PopulateVendorComboBox(CmbVendorName, "");
@@ -85,6 +85,10 @@ namespace PurchaseOrders
 
             // Create order text change events
             TxtDate.TextChanged += new System.EventHandler(this.OrderTxtBox_TextChanged);
+
+            // Add status bar (2 segment default, with version)
+            StatusBar = new VersionStatusBar(this);
+
         }
         #endregion
 
@@ -183,7 +187,7 @@ namespace PurchaseOrders
                     rdrPONum.Read();
                     {
                         // Update the PO# on the main page.
-                        StuffTextBox(TxtPONumber, rdrPONum, "OrdID");
+                        SafeTextBox(TxtPONumber, rdrPONum, "OrdID");
                         bool PONumOkay = int.TryParse(TxtPONumber.Text, out int PONum);
                         order.UpdatePONumber(PONum);
                         LblPONumber.Text = "Purchase Order D" + PONum.ToString("D5");
@@ -203,14 +207,14 @@ namespace PurchaseOrders
             return (order);
         }
 
-        private void AutoCreateNewPORecord(OrderItemClass selectedOrderItem)
+        private void AutoCreateNewPORecord(OrderClass order, OrderItemClass selectedOrderItem)
         {
             // Create a new PO from the row that was selected from the existing PO List
             // Only a single row (row 0) is created if selectedOrderItem.SingleItemOnly is set
             // Note that we are forced to create an order record here to prevent anyone else from using this PO Number.
             //   If we don't complete the PO order we can delete it at the end.
 
-            CurrentOrder = CreateNewPORecord();
+            order = CreateNewPORecord();
 
             // Get all vendor info associated with this item
 
@@ -223,8 +227,8 @@ namespace PurchaseOrders
                 {
                     // Put order into order object and display
 
-                    CurrentOrder.LoadOrderFromSQL(rdrOrder);
-                    DisplayOrder(CurrentOrder);
+                    order.LoadOrderFromSQL(rdrOrder);
+                    DisplayOrder(order);
 
                     // Put vendor into vendor object and display
 
@@ -255,13 +259,13 @@ namespace PurchaseOrders
                     PopulateChargeToComboBox(row);
                     PopulateClassificationComboBox(row);
                     DisplayLineItems(GrdOrderDetails.Rows[row], rdrItem);
-                    CurrentOrder.LoadLineItemsFromSQL(rdrItem, true);
+                    order.LoadLineItemsFromSQL(rdrItem, true);
                     if (selectedOrderItem.SingleItemOnly) break; // If only a single entry was copied, exit the loop after a single iteration
                     row++;
                 }
             }
 
-            TxtPOTotal.Text = CurrentOrder.ComputeOrderTotal().ToString("C2");
+            TxtPOTotal.Text = order.ComputeOrderTotal().ToString("C2");
         }
 
         private void SavePORecord(OrderClass currentOrder)
@@ -437,13 +441,13 @@ namespace PurchaseOrders
             try
             {
                 OrderClass o = currentOrder;
-                StuffTextBox(TxtDate, o.OrderDate.Value.ToShortDateString());
-                StuffTextBox(TxtDeliverto, o.DeliverTo);
-                StuffTextBox(TxtDeliverToPhone, o.DeliverToPhone);
-                StuffTextBox(TxtDepartment, o.Department);
-                StuffTextBox(TxtTerms, o.Terms);
-                StuffTextBox(TxtOrderReference, o.OrderReference);
-                StuffTextBox(TxtComments, o.Comments);
+                SafeTextBox(TxtDate, o.OrderDate.Value.ToShortDateString());
+                SafeTextBox(TxtDeliverto, o.DeliverTo);
+                SafeTextBox(TxtDeliverToPhone, o.DeliverToPhone);
+                SafeTextBox(TxtDepartment, o.Department);
+                SafeTextBox(TxtTerms, o.Terms);
+                SafeTextBox(TxtOrderReference, o.OrderReference);
+                SafeTextBox(TxtComments, o.Comments);
 
             }
             catch (Exception ex)
@@ -458,14 +462,14 @@ namespace PurchaseOrders
             // Displays the current order's line items on the grid
             try
             {
-                StuffTextBox(dgvr.Cells["Qty"], rdrItem, "Qty");
-                StuffTextBox(dgvr.Cells["Units"], rdrItem, "Units");
-                StuffTextBox(dgvr.Cells["PartNumber"], rdrItem, "Description");
-                StuffTextBox(dgvr.Cells["ItemUnitPrice"], rdrItem, "UnitPrice");
-                StuffTextBox(dgvr.Cells["Purpose"], rdrItem, "Purpose");
-                StuffTextBox((DataGridViewComboBoxCell)dgvr.Cells["ChargeTo"], rdrItem, "ChargeTo");
-                StuffTextBox((DataGridViewComboBoxCell)dgvr.Cells["Classification"], rdrItem, "Class");
-                StuffTextBox((DataGridViewCheckBoxCell)dgvr.Cells["Taxable"], rdrItem, "Taxable");
+                SafeTextBox(dgvr.Cells["Qty"], rdrItem, "Qty");
+                SafeTextBox(dgvr.Cells["Units"], rdrItem, "Units");
+                SafeTextBox(dgvr.Cells["PartNumber"], rdrItem, "Description");
+                SafeTextBox(dgvr.Cells["ItemUnitPrice"], rdrItem, "UnitPrice");
+                SafeTextBox(dgvr.Cells["Purpose"], rdrItem, "Purpose");
+                SafeTextBox((DataGridViewComboBoxCell)dgvr.Cells["ChargeTo"], rdrItem, "ChargeTo");
+                SafeTextBox((DataGridViewComboBoxCell)dgvr.Cells["Classification"], rdrItem, "Class");
+                SafeTextBox((DataGridViewCheckBoxCell)dgvr.Cells["Taxable"], rdrItem, "Taxable");
 
                 string s = "";
                 try
@@ -514,18 +518,18 @@ namespace PurchaseOrders
             {
             VendorClass v = currentVendors.VendorList[currentVendors.SelectedListIndex];
             CurrentVendors.DisableSelectionEvent = true;
-            StuffTextBox(CmbVendorName, v.VendorName);  // We DON'T want a selected_change event to happen here, so disable the event
+            SafeTextBox(CmbVendorName, v.VendorName);  // We DON'T want a selected_change event to happen here, so disable the event
             CurrentVendors.DisableSelectionEvent = false;
 
-            StuffTextBox(TxtAddressLine1, v.AddrLine1);
-            StuffTextBox(TxtAddressLine2, v.AddrLine2);
-            StuffTextBox(TxtCity, v.City);
-            StuffTextBox(TxtState, v.State);
-            StuffTextBox(TxtZipCode, v.Zip);
-            StuffTextBox(TxtContact, v.Contact);
-            StuffTextBox(TxtTelephone, v.Phone);
-            StuffTextBox(TxtFax, v.Fax);
-            StuffTextBox(TxtNewsAccount, v.AcctNum);
+            SafeTextBox(TxtAddressLine1, v.AddrLine1);
+            SafeTextBox(TxtAddressLine2, v.AddrLine2);
+            SafeTextBox(TxtCity, v.City);
+            SafeTextBox(TxtState, v.State);
+            SafeTextBox(TxtZipCode, v.Zip);
+            SafeTextBox(TxtContact, v.Contact);
+            SafeTextBox(TxtTelephone, v.Phone);
+            SafeTextBox(TxtFax, v.Fax);
+            SafeTextBox(TxtNewsAccount, v.AcctNum);
 
             // As this was a new insert onto the Vendor panel, 
             //   reset the "VendorInfoChanged" flag as no data mods to the Vendor record have actually occurred.
@@ -621,7 +625,7 @@ namespace PurchaseOrders
         // Functions to assign a value directly from a SQL field (or a string) into a control's text,
         //   with error capture.
 
-        private void StuffTextBox(DataGridViewCheckBoxCell t, SqlDataReader rdr, string s)
+        private void SafeTextBox(DataGridViewCheckBoxCell t, SqlDataReader rdr, string s)
         {
             try
             {
@@ -634,7 +638,7 @@ namespace PurchaseOrders
             }
         }
 
-        private void StuffTextBox(DataGridViewComboBoxCell t, SqlDataReader rdr, string s)
+        private void SafeTextBox(DataGridViewComboBoxCell t, SqlDataReader rdr, string s)
         {
             try
             {
@@ -647,7 +651,7 @@ namespace PurchaseOrders
             }
         }
 
-        private void StuffTextBox(DataGridViewCell t, SqlDataReader rdr, string s)
+        private void SafeTextBox(DataGridViewCell t, SqlDataReader rdr, string s)
         {
             try
             {
@@ -660,7 +664,7 @@ namespace PurchaseOrders
             }
         }
 
-        private void StuffTextBox(TextBox t, SqlDataReader rdr, string s)
+        private void SafeTextBox(TextBox t, SqlDataReader rdr, string s)
         {
             try
             {
@@ -673,7 +677,7 @@ namespace PurchaseOrders
             }
         }
 
-        private void StuffTextBox(ComboBox t, SqlDataReader rdr, string s)
+        private void SafeTextBox(ComboBox t, SqlDataReader rdr, string s)
         {
             try
             {
@@ -687,7 +691,7 @@ namespace PurchaseOrders
         }
 
 
-        private string StuffTextBoxStr(SqlDataReader rdr, string s)
+        private string SafeTextBoxStr(SqlDataReader rdr, string s)
         {
             try
             {
@@ -700,7 +704,7 @@ namespace PurchaseOrders
             }
         }
 
-        private int StuffTextBoxInt(SqlDataReader rdr, string s)
+        private int SafeTextBoxInt(SqlDataReader rdr, string s)
         {
             try
             {
@@ -715,7 +719,7 @@ namespace PurchaseOrders
             }
         }
 
-        private double StuffTextBoxDouble(SqlDataReader rdr, string s)
+        private double SaveTextBoxDouble(SqlDataReader rdr, string s)
         {
             try
             {
@@ -730,7 +734,7 @@ namespace PurchaseOrders
             }
         }
 
-        private void StuffTextBox(TextBox t, string s)
+        private void SafeTextBox(TextBox t, string s)
         {
             try
             {
@@ -743,7 +747,7 @@ namespace PurchaseOrders
             }
         }
 
-        private void StuffTextBox(ComboBox t, string s)
+        private void SafeTextBox(ComboBox t, string s)
         {
             try
             {
@@ -884,5 +888,6 @@ namespace PurchaseOrders
         }
 
         #endregion
+
     }
 }

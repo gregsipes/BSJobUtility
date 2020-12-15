@@ -23,6 +23,7 @@ namespace AppStatusMonitor
         DateTime StartupTime = DateTime.Now;
         Size MonitorSize = new Size(0, 0);
         bool SingleLineMode = true;
+        VersionStatusBar StatusBar;
 
         public frmMain()
         {
@@ -40,6 +41,10 @@ namespace AppStatusMonitor
 
             SetPanelSize();
             DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting", JobName);
+
+            StatusBar = new VersionStatusBar(this);
+            StatusBar.Strip.BackColor = Color.Black;
+            StatusBar.Strip.ForeColor = Color.White;
         }
 
         private void SetPanelSize()

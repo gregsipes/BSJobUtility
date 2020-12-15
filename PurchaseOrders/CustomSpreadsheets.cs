@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Windows.Forms;
 using BSGlobals;
-using Excel = Microsoft.Office.Interop.Excel;
 
 namespace PurchaseOrders
 {
@@ -56,7 +55,11 @@ namespace PurchaseOrders
 
                 Point POCELL = new Point(11, 2);
                 xlPO.Alignment.MergeCells(POCELL.Y, POCELL.X, POCELL.Y, POCELL.X + 1);
-                xlPO.Style.Box(POCELL.Y, POCELL.X, POCELL.Y, POCELL.X + 1, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick, Color.Black);
+
+                xlPO.Style.Box(POCELL.Y, POCELL.X, POCELL.Y, POCELL.X + 1, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thick, Color.Black);
+
+                xlPO.Style.Box(POCELL.Y, POCELL.X, POCELL.Y, POCELL.X + 1, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thick, Color.Black);
+                xlPO.Style.Box(POCELL.Y, POCELL.X, POCELL.Y, POCELL.X + 1, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thick, Color.Black);
                 xlPO.Font.Size(POCELL.Y, POCELL.X, 36);
                 xlPO.Font.Bold(POCELL.Y, POCELL.X);
                 xlPO.Alignment.Center(POCELL.Y, POCELL.X);
@@ -66,7 +69,7 @@ namespace PurchaseOrders
 
                 Point VENDORBOXUL = new Point(6, 5);
                 Point VENDORBOXLR = new Point(12, 13);
-                xlPO.Style.Box(VENDORBOXUL.Y, VENDORBOXUL.X, VENDORBOXLR.Y, VENDORBOXLR.X, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick, Color.Black);
+                xlPO.Style.Box(VENDORBOXUL.Y, VENDORBOXUL.X, VENDORBOXLR.Y, VENDORBOXLR.X, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thick, Color.Black);
                 xlPO.Font.Bold(VENDORBOXUL.Y, VENDORBOXUL.X, VENDORBOXLR.Y, VENDORBOXLR.X);
                 xlPO.Font.Italic(VENDORBOXUL.Y, VENDORBOXUL.X, VENDORBOXLR.Y, VENDORBOXLR.X);
                 xlPO.SetCellValue(VENDORBOXUL.Y - 1, VENDORBOXUL.X, "Vendor");
@@ -102,15 +105,15 @@ namespace PurchaseOrders
                 xlPO.Alignment.MergeCells(ROWDGHEADNG, COLDESCSTRT, ROWDGHEADNG, COLDESCREND);
                 xlPO.Alignment.MergeCells(ROWDGHEADNG, COLCHPUSTRT, ROWDGHEADNG, COLCLASSEND);
 
-                xlPO.Style.Box(ROWDGHEADNG, COLQUANTITY, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
-                xlPO.Style.Box(ROWDGHEADNG, COLUNITDESC, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
-                xlPO.Style.Box(ROWDGHEADNG, COLRECEIVED, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
-                xlPO.Style.Box(ROWDGHEADNG, COLDESCSTRT, ROWDGHEADNG, 10, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
-                xlPO.Style.Box(ROWDGHEADNG, COLUNITPRIC, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
-                xlPO.Style.Box(ROWDGHEADNG, COLTOTLPRIC, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
-                xlPO.Style.Box(ROWDGHEADNG, COLTAXABLEX, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
-                xlPO.Style.Box(ROWDGHEADNG, COLCHGTITLE, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
-                xlPO.Style.Box(ROWDGHEADNG, COLCHPUSTRT, ROWDGHEADNG, 20, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLQUANTITY, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLUNITDESC, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLRECEIVED, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLDESCSTRT, ROWDGHEADNG, 10, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLUNITPRIC, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLTOTLPRIC, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLTAXABLEX, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLCHGTITLE, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
+                xlPO.Style.Box(ROWDGHEADNG, COLCHPUSTRT, ROWDGHEADNG, 20, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);
 
                 xlPO.SetCellValue(ROWDGHEADNG, COLQUANTITY, "Qty");
                 xlPO.SetCellValue(ROWDGHEADNG, COLUNITDESC, "Units");
@@ -215,19 +218,19 @@ namespace PurchaseOrders
                     xlPO.SetCellValue(row1, COLCLASSTIT, "Class");
 
                     // Add Borders
-                    xlPO.Style.Box(row1, COLQUANTITY, row2, COLQUANTITY, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <quantity>
-                    xlPO.Style.Box(row1, COLUNITDESC, row2, COLUNITDESC, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <units>
-                    xlPO.Style.Box(row1, COLRECEIVED, row2, COLRECEIVED, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <received>
-                    xlPO.Style.Box(row1, COLDESCSTRT, row2, COLDESCREND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <description>
-                    xlPO.Style.Box(row1, COLUNITPRIC, row2, COLUNITPRIC, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <unit price>
-                    xlPO.Style.Box(row1, COLTOTLPRIC, row2, COLTOTLPRIC, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <total price>
-                    xlPO.Style.Box(row1, COLTAXABLEX, row2, COLTAXABLEX, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <taxable>
-                    xlPO.Style.Box(row1, COLCHGTITLE, row1, COLCHGTITLE, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // Charge Title
-                    xlPO.Style.Box(row1, COLCHPUSTRT, row1, COLCHARGEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <charge>
-                    xlPO.Style.Box(row1, COLCLASSTIT, row1, COLCLASSTIT, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // Class Title
-                    xlPO.Style.Box(row1, COLCLASSTRT, row1, COLCLASSEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <classification>
-                    xlPO.Style.Box(row2, COLPURTITLE, row2, COLPURTITLE, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // Purpose Title
-                    xlPO.Style.Box(row2, COLCHPUSTRT, row2, COLPURPSEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <purpose>
+                    xlPO.Style.Box(row1, COLQUANTITY, row2, COLQUANTITY, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <quantity>
+                    xlPO.Style.Box(row1, COLUNITDESC, row2, COLUNITDESC, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <units>
+                    xlPO.Style.Box(row1, COLRECEIVED, row2, COLRECEIVED, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <received>
+                    xlPO.Style.Box(row1, COLDESCSTRT, row2, COLDESCREND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <description>
+                    xlPO.Style.Box(row1, COLUNITPRIC, row2, COLUNITPRIC, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <unit price>
+                    xlPO.Style.Box(row1, COLTOTLPRIC, row2, COLTOTLPRIC, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <total price>
+                    xlPO.Style.Box(row1, COLTAXABLEX, row2, COLTAXABLEX, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <taxable>
+                    xlPO.Style.Box(row1, COLCHGTITLE, row1, COLCHGTITLE, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // Charge Title
+                    xlPO.Style.Box(row1, COLCHPUSTRT, row1, COLCHARGEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <charge>
+                    xlPO.Style.Box(row1, COLCLASSTIT, row1, COLCLASSTIT, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // Class Title
+                    xlPO.Style.Box(row1, COLCLASSTRT, row1, COLCLASSEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <classification>
+                    xlPO.Style.Box(row2, COLPURTITLE, row2, COLPURTITLE, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // Purpose Title
+                    xlPO.Style.Box(row2, COLCHPUSTRT, row2, COLPURPSEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <purpose>
 
                     // Populate these cells with text
                     xlPO.SetCellValue(row1, COLCHGTITLE, "Charge");
@@ -304,20 +307,20 @@ namespace PurchaseOrders
                 xlPO.Alignment.MergeCells(ROW3SIGS, COLCOMMNSTRT, ROW3SIGS + 1, COLCOMMNTEND);  // <comments>
 
                 // Add Boxes 
-                xlPO.Style.Box(ROW1SIGS, COLORDEREDBY, ROW1SIGS + 1, COLORDRBYEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // <ordered by>
-                xlPO.Style.Box(ROW1SIGS, COLEXTENSION, ROW1SIGS + 1, COLEXTENSEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // Extension
-                xlPO.Style.Box(ROW1SIGS, COLORDERDATE, ROW1SIGS + 1, COLORDERDATE, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // Order Date    
-                xlPO.Style.Box(ROW1SIGS, COLTRMTITSTR, ROW1SIGS + 1, COLTRMTITEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // Terms
-                xlPO.Style.Box(ROW1SIGS, COLTERMSSTRT, ROW1SIGS + 1, COLTERMSXEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // <terms>
-                xlPO.Style.Box(ROW2SIGS, COLDELIVERTO, ROW2SIGS + 1, COLDELTOSEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // Deliver To
-                xlPO.Style.Box(ROW2SIGS, COLDEPARTMNT, ROW2SIGS + 1, COLDEPARTEND + 1, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);  // <dept>
-                xlPO.Style.Box(ROW2SIGS, COLREFTITSTR, ROW2SIGS + 1, COLREFTITEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // Ref #
-                xlPO.Style.Box(ROW2SIGS, COLREFNUSTRT, ROW2SIGS + 1, COLREFNUMEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // <ref #>
-                xlPO.Style.Box(ROW3SIGS, COLAPPROVALX, ROW3SIGS + 1, COLAPPROVEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // <approval>
-                xlPO.Style.Box(ROW3SIGS, COLRECEIVDBY, ROW3SIGS + 1, COLRCVDBYEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // <Received By>
-                xlPO.Style.Box(ROW3SIGS, COLRECVDDATE, ROW3SIGS + 1, COLRECVDDATE, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // <date>
-                xlPO.Style.Box(ROW3SIGS, COLCOMTITSTR, ROW3SIGS + 1, COLCOMTITEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // Comments
-                xlPO.Style.Box(ROW3SIGS, COLCOMMNSTRT, ROW3SIGS + 1, COLCOMMNTEND, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, Color.Black);      // <comments>
+                xlPO.Style.Box(ROW1SIGS, COLORDEREDBY, ROW1SIGS + 1, COLORDRBYEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // <ordered by>
+                xlPO.Style.Box(ROW1SIGS, COLEXTENSION, ROW1SIGS + 1, COLEXTENSEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // Extension
+                xlPO.Style.Box(ROW1SIGS, COLORDERDATE, ROW1SIGS + 1, COLORDERDATE, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // Order Date    
+                xlPO.Style.Box(ROW1SIGS, COLTRMTITSTR, ROW1SIGS + 1, COLTRMTITEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // Terms
+                xlPO.Style.Box(ROW1SIGS, COLTERMSSTRT, ROW1SIGS + 1, COLTERMSXEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // <terms>
+                xlPO.Style.Box(ROW2SIGS, COLDELIVERTO, ROW2SIGS + 1, COLDELTOSEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // Deliver To
+                xlPO.Style.Box(ROW2SIGS, COLDEPARTMNT, ROW2SIGS + 1, COLDEPARTEND + 1, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);  // <dept>
+                xlPO.Style.Box(ROW2SIGS, COLREFTITSTR, ROW2SIGS + 1, COLREFTITEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // Ref #
+                xlPO.Style.Box(ROW2SIGS, COLREFNUSTRT, ROW2SIGS + 1, COLREFNUMEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // <ref #>
+                xlPO.Style.Box(ROW3SIGS, COLAPPROVALX, ROW3SIGS + 1, COLAPPROVEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // <approval>
+                xlPO.Style.Box(ROW3SIGS, COLRECEIVDBY, ROW3SIGS + 1, COLRCVDBYEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // <Received By>
+                xlPO.Style.Box(ROW3SIGS, COLRECVDDATE, ROW3SIGS + 1, COLRECVDDATE, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // <date>
+                xlPO.Style.Box(ROW3SIGS, COLCOMTITSTR, ROW3SIGS + 1, COLCOMTITEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // Comments
+                xlPO.Style.Box(ROW3SIGS, COLCOMMNSTRT, ROW3SIGS + 1, COLCOMMNTEND, Spreadsheet.LineStyle.Continuous, Spreadsheet.BorderWeight.Thin, Color.Black);      // <comments>
 
                 // Shade a few boxes
                 xlPO.Style.Backcolor(ROW1SIGS, COLTRMTITSTR, ROW1SIGS + 1, COLTRMTITEND, Color.SlateGray);         // Terms

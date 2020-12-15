@@ -48,6 +48,10 @@ namespace BSGlobals
             TradeWorkLoad,
             SubBalanceLoad,
             Feeds
+            Purchasing,
+            ISInventory,
+            SynergyReportMaintenance,
+            SBSJournalEntryImport
         }
 
         public enum JobLogMessageType

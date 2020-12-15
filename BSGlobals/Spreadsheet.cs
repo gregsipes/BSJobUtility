@@ -29,6 +29,8 @@ namespace BSGlobals
     //    Row Height
     //    Fit to Page Width
     //    Margins (Narrow, Normal)
+    //    Max Rows
+    //    Max Columns
 
     // NOTES
     //    OLE process threads are notoriously difficult to consistently kill (they hang out in Task Manager as orphaned processes, taking up space).
@@ -36,11 +38,58 @@ namespace BSGlobals
     //    AutoFit rows and AutoFit columns do not appear to work when used according to Microsoft documentation.
     //    To keep this class as generic as possible, no log-writing is performed here.  Instead, most functions will return true normally,
     //       and false if any kind of exception occurred.  A public LastException string will be populated with the exception should one occur.
+    //
+    //    THIS IS NOT YET OPTIMIZED and as such it will run very slowly for any complex spreadsheet.  
+    //       One optimization step that is sorely needed is a way to collect data flowing to individual cells and to encapsulate
+    //       that data into a 2D array instead; and ONLY after the data has been fully assigned should the array be written to the spreadsheet via OLE.
+    //       (Note that this will reduce OLE calls but not eliminate those related to formatting.  However, it will do wonders for large datasets that
+    //       simply need to be written to Excel.
 
     public class Spreadsheet
     {
 
         #region Declarations
+
+        // Enums types that allow us to remove any user dependencies on Microsoft.Office.Interop.Excel
+
+        public enum LineStyle
+        {
+            Continuous = 1,
+            Dash = -4115,
+            DashDot = 4,
+            DashDotDot = 5,
+            Dot = -4118,
+            Double = -4119,
+            None = -4142,
+            SlantDashDot = 13
+        };
+
+        public enum BorderWeight
+        {
+            Hairline = 1,
+            Medium = -4138,
+            Thick = 4,
+            Thin = 2
+        };
+
+        public enum FileFormat
+        {
+            CSV = 6,
+            CSVWindows = 23,
+            CurrentPlatformText = -4158,
+            DIF = 9,
+            HTML = 44,
+            OpenDocumentSpreadsheet = 60,
+            OpenXMLTemplate = 54,
+            OpenXMLTemplateMacroEnabled = 52,
+            TabDelimited = 20,
+            Template = 17,
+            TextMSDOS = 21,
+            TextWindows = 20,
+            WorkbookDefault = 51,
+            XMLSpreadhseet = 46
+        }
+
         public FontClass Font;
         public PageSetupClass PageSetup;
         public AlignmentClass Alignment;
@@ -150,12 +199,70 @@ namespace BSGlobals
         }
 
         /// <summary>
+        /// Return the number of used spreadsheet rows.  Return -1 on error
+        /// </summary>
+        /// <returns></returns>
+        public int GetNumRows()
+        {
+            try
+            {
+                int lastUsedRow = ExcelWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                    false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                return (lastUsedRow);
+            }
+            catch
+            {
+                return (-1); // error
+            }
+        }
+
+        /// <summary>
+        /// Return the number of used spreadsheet columns.  Return -1 on error
+        /// </summary>
+        /// <returns></returns>
+        public int GetNumColumns()
+        {
+            try
+            {
+                int lastUsedColumn = ExcelWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    Excel.XlSearchOrder.xlByColumns, Excel.XlSearchDirection.xlPrevious,
+                    false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Column;
+                return (lastUsedColumn);
+            }
+            catch
+            {
+                return (-1); // error
+            }
+        }
+
+        /// <summary>
+        /// Get a specific call value
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns>object</returns>
+        public object GetCellValue(int row, int col)
+        {
+            try
+            {
+                return (ExcelWorksheet.Cells[row, col].Value);
+            }
+            catch
+            {
+                return (null);
+            }
+        }
+
+        /// <summary>
         /// Set a specific cell value
         /// </summary>
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <param name="value"></param>
-        /// <returns></returns>
+        /// <returns>true if successful</returns>
         public bool SetCellValue(int row, int col, object value)
         {
             try
@@ -163,7 +270,7 @@ namespace BSGlobals
                 ExcelWorksheet.Cells[row, col].Value = value;
                 return (true);
             }
-            catch 
+            catch
             {
                 return (false);
             }
@@ -549,7 +656,7 @@ namespace BSGlobals
         {
             Spreadsheet SP;
 
-            public FormatClass (Spreadsheet sp)
+            public FormatClass(Spreadsheet sp)
             {
                 SP = sp;
             }
@@ -705,7 +812,7 @@ namespace BSGlobals
             /// <returns></returns>
             /// 
             public bool Custom(int startRow, int startCol, int endRow, int endCol, string format)
-            {                
+            {
                 try
                 {
                     Excel.Range range = SP.SetRange(startRow, startCol, endRow, endCol);
@@ -738,7 +845,7 @@ namespace BSGlobals
         {
             Spreadsheet SP;
 
-            public AlignmentClass (Spreadsheet sp)
+            public AlignmentClass(Spreadsheet sp)
             {
                 SP = sp;
             }
@@ -1189,8 +1296,6 @@ namespace BSGlobals
             {
                 return (Backcolor(row, col, row, col, color));
             }
-
-
             /// <summary>
             /// Places a box around the perimeter of the specified range of cells.
             /// </summary>
@@ -1202,12 +1307,12 @@ namespace BSGlobals
             /// <param name="weight"></param>
             /// <param name="color"></param>
             /// <returns></returns>
-            public bool Box(int startRow, int startCol, int endRow, int EndCol, Excel.XlLineStyle style, Excel.XlBorderWeight weight, Color color)
+            public bool Box(int startRow, int startCol, int endRow, int EndCol, LineStyle style, BorderWeight weight, Color color)
             {
                 try
                 {
                     Excel.Range range = SP.SetRange(startRow, startCol, endRow, EndCol);
-                    range.BorderAround2(style, weight, Excel.XlColorIndex.xlColorIndexNone, ColorTranslator.ToOle(color));
+                    range.BorderAround2((Excel.XlLineStyle)style, (Excel.XlBorderWeight)weight, Excel.XlColorIndex.xlColorIndexNone, ColorTranslator.ToOle(color));
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(range);
                     return (true);
                 }
@@ -1227,20 +1332,19 @@ namespace BSGlobals
             /// <param name="weight"></param>
             /// <param name="color"></param>
             /// <returns></returns>
-            public bool Box(int row, int col, Excel.XlLineStyle style, Excel.XlBorderWeight weight, Color color)
+            public bool Box(int row, int col, LineStyle style, BorderWeight weight, Color color)
             {
                 return (Box(row, col, row, col, style, weight, color));
             }
-
         }
         #endregion
 
         #region PageSetupClass
-        public class PageSetupClass 
+        public class PageSetupClass
         {
             Spreadsheet SP;
 
-            public PageSetupClass (Spreadsheet sp)
+            public PageSetupClass(Spreadsheet sp)
             {
                 SP = sp;
             }
@@ -1443,6 +1547,87 @@ namespace BSGlobals
                     return (false);
                 }
             }
+
+            public bool SaveAs(string saveAsPath, FileFormat spreadsheetFormat, bool DeleteFirst)
+            {
+                // Save the file as a type specified in the parameters.  Useful for conversion to CSV
+                try
+                {
+                    if (DeleteFirst)
+                    {
+                        if (System.IO.File.Exists(saveAsPath))
+                        {
+                            System.IO.File.Delete(saveAsPath);
+                        }
+                    }
+                    SP.ExcelApp.DisplayAlerts = true;
+
+                    object fileFormat = Excel.XlFileFormat.xlWorkbookDefault;
+                    switch (spreadsheetFormat)
+                    {
+                        case FileFormat.CSV:
+                            fileFormat = Excel.XlFileFormat.xlCSV;
+                            break;
+                        case FileFormat.CSVWindows:
+                            fileFormat = Excel.XlFileFormat.xlCSVWindows;
+                            break;
+                        case FileFormat.CurrentPlatformText:
+                            fileFormat = Excel.XlFileFormat.xlCurrentPlatformText;
+                            break;
+                        case FileFormat.DIF:
+                            fileFormat = Excel.XlFileFormat.xlDIF;
+                            break;
+                        case FileFormat.HTML:
+                            fileFormat = Excel.XlFileFormat.xlHtml;
+                            break;
+                        case FileFormat.OpenDocumentSpreadsheet:
+                            fileFormat = Excel.XlFileFormat.xlOpenDocumentSpreadsheet;
+                            break;
+                        case FileFormat.OpenXMLTemplate:
+                            fileFormat = Excel.XlFileFormat.xlOpenXMLTemplate;
+                            break;
+                        case FileFormat.OpenXMLTemplateMacroEnabled:
+                            fileFormat = Excel.XlFileFormat.xlOpenXMLTemplateMacroEnabled;
+                            break;
+                        case FileFormat.TabDelimited: // Same as FileFormat.TextWindows
+                            fileFormat = Excel.XlFileFormat.xlTextWindows;
+                            break;
+                        case FileFormat.Template:
+                            fileFormat = Excel.XlFileFormat.xlTemplate;
+                            break;
+                        case FileFormat.TextMSDOS:
+                            fileFormat = Excel.XlFileFormat.xlTextMSDOS;
+                            break;
+                        case FileFormat.WorkbookDefault:
+                            fileFormat = Excel.XlFileFormat.xlWorkbookDefault;
+                            break;
+                        case FileFormat.XMLSpreadhseet:
+                            fileFormat = Excel.XlFileFormat.xlXMLSpreadsheet;
+                            break;
+                    }
+
+                    SP.ExcelWorkbook.SaveAs(
+                        saveAsPath,
+                        fileFormat,
+                        Type.Missing,
+                        Type.Missing,
+                        Type.Missing,
+                        Type.Missing,
+                        Excel.XlSaveAsAccessMode.xlNoChange,
+                        Type.Missing,
+                        Type.Missing,
+                        Type.Missing,
+                        Type.Missing);
+
+                    return (true);
+                }
+                catch 
+                {
+                    return (false);
+                }
+            }
+
+
         }
         #endregion
 
