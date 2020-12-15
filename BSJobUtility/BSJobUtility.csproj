@@ -52,12 +52,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ConfigFiles\connectionStringsProd.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="ConfigFiles\connectionStringsDev.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoRenew\AutoRenew.csproj">
@@ -167,6 +161,10 @@
     <ProjectReference Include="..\PressRoomLoad\PressRoomLoad.csproj">
       <Project>{a67f8644-dd1c-4bcf-ac9c-a67292f39196}</Project>
       <Name>PressRoomLoad</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PurgeFeeds\PurgeFeeds.csproj">
+      <Project>{0c087b83-42d0-416b-8efb-76637d1ffde0}</Project>
+      <Name>PurgeFeeds</Name>
     </ProjectReference>
     <ProjectReference Include="..\QualificationReportLoad\QualificationReportLoad.csproj">
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
