@@ -47,8 +47,7 @@ namespace BSGlobals
             BNTransactions,
             TradeWorkLoad,
             SubBalanceLoad,
-            Feeds
-            Purchasing,
+            Feeds,
             ISInventory,
             SynergyReportMaintenance,
             SBSJournalEntryImport
