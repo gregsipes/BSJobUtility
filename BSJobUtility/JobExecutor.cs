@@ -111,6 +111,8 @@ namespace BSJobUtility
                 _managedJob = new Feeds.Job() { Version = _version };
             else if (_jobName == "PurgeFeeds")
                 _managedJob = new PurgeFeeds.Job();
+            else if (_jobName == "PackageAssignmentLoad")
+                _managedJob = new PackageAssignmentLoad.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

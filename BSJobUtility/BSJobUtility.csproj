@@ -110,6 +110,10 @@
       <Project>{a599015d-4696-40a1-bd42-4eb5f3c70a01}</Project>
       <Name>OfficePay</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PackageAssignmentLoad\PackageAssignmentLoad.csproj">
+      <Project>{0534ef1f-036e-47c4-bedc-f569f0f910fc}</Project>
+      <Name>PackageAssignmentLoad</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ParkingPayroll\ParkingPayroll.csproj">
       <Project>{a175a62f-3230-409d-a1d9-6c63cf332910}</Project>
       <Name>ParkingPayroll</Name>

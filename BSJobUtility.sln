@@ -87,6 +87,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IS Inventory", "IS Inventor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeFeeds", "PurgeFeeds\PurgeFeeds.csproj", "{0C087B83-42D0-416B-8EFB-76637D1FFDE0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackageAssignmentLoad", "PackageAssignmentLoad\PackageAssignmentLoad.csproj", "{0534EF1F-036E-47C4-BEDC-F569F0F910FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -257,6 +259,10 @@ Global
 		{0C087B83-42D0-416B-8EFB-76637D1FFDE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C087B83-42D0-416B-8EFB-76637D1FFDE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C087B83-42D0-416B-8EFB-76637D1FFDE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0534EF1F-036E-47C4-BEDC-F569F0F910FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0534EF1F-036E-47C4-BEDC-F569F0F910FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0534EF1F-036E-47C4-BEDC-F569F0F910FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0534EF1F-036E-47C4-BEDC-F569F0F910FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -296,6 +302,7 @@ Global
 		{1532EE23-F637-40FA-BBA8-10B2F7C1A36D} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{EBDE7E14-5DB4-49EA-ACE0-B4B5D61FDCB8} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 		{0C087B83-42D0-416B-8EFB-76637D1FFDE0} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
+		{0534EF1F-036E-47C4-BEDC-F569F0F910FC} = {1FEDF0C8-B6B5-4A7F-B2BB-793CADA55E44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4B6BBAC-F8D9-456E-BDE8-8B8D95746B27}
