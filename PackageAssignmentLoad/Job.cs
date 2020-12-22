@@ -16,7 +16,7 @@ namespace PackageAssignmentLoad
         public override void SetupJob()
         {
             JobName = "PackageAssignmentLoad";
-            JobDescription = "TODO";
+            JobDescription = "Parses a fixed width file containing packages and preprints";
             AppConfigSectionName = "PackageAssignmentLoad";
 
         }
