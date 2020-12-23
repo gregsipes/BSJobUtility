@@ -341,10 +341,11 @@ namespace SBSJournalEntryImport
                 else
                 {
                     DataIO.WriteToJobLog(Enums.JobLogMessageType.INFO, "Spreadsheet " + TxtImportFile.Text + " passes consistency checks", JobName);
+                    StatusBar.AddText(0, "Spreadsheet passes consistency checks");
                 }
 
                 // Save as tab-delimited file (delete any identically-named file first)
-                string CSVFilename = WorkingFolder + " SBSJournalEntry_" + UserInfo.Username + ".txt";
+                string CSVFilename = WorkingFolder + "SBSJournalEntry_" + UserInfo.Username + ".txt";
                 import.File.SaveAs(CSVFilename, Spreadsheet.FileFormat.TabDelimited, true);
                 import.Terminate();
 
@@ -357,6 +358,7 @@ namespace SBSJournalEntryImport
                 BulkParams[0] = new SqlParameter("strCSVFilename", CSVFilename);
                 BulkParams[1] = new SqlParameter("strNumHeaderRows", NumHeaderRowsInFile.ToString());
                 SqlDataReader rdr = SQLQuery("Proc_BulkInsertSBSJournalEntries", BulkParams);
+                rdr.Read();
 
                 // If the returned Sum(Amount) is nonzero, generate a message to warn the user before proceeding
                 // NOTE Do a read here to collect any Exception error from the query:
