@@ -227,6 +227,12 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.SBSJournalEntryImport:
                     connectionString = GetConnectionString("sbsjournalentryimport");
                     break;
+                case DatabaseConnectionStringNames.AutoPrintPDF:
+                    connectionString = GetConnectionString("autoprintpdf");
+                    break;
+                case DatabaseConnectionStringNames.PBSGeneral:
+                    connectionString = GetConnectionString("pbsgeneral");
+                    break;
                 default:
                     break;
             }
