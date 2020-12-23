@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BSGlobals;
@@ -240,17 +241,11 @@ namespace SBSJournalEntryImport
         {
             // Currency-formatted strings can only have the following character values:
             //   0-9 $ ( ) - , and space
-            // TBD replace with RegEx
+            // 12/23/20 Replaced with RegEx
 
-            for (int i = 0; i < cellval.Length; i++)
-            {
-                char c = cellval[i];
-                if (!(c >= '0' && c <= '9') || (c == '$') || (c == '(') || (c == ')') || (c == '-') || (c == ',') || (c == ' '))
-                {
-                    return (false);
-                }
-            }
-            return (true);
+            Regex rgx = new Regex(@"^-?[0-9][0-9,\.$]*$");
+            bool iscurrency = (rgx.IsMatch(cellval));
+            return (iscurrency);
         }
 
         #endregion
@@ -344,9 +339,22 @@ namespace SBSJournalEntryImport
                     StatusBar.AddText(0, "Spreadsheet passes consistency checks");
                 }
 
+                // Count up to the first blank row - we'll be saving this much of the file into CSV format
+                int LastNonBlankRow = GetLastNonBlankRow(import);
+                int LastActualRow = import.GetNumRows();
+                if (LastNonBlankRow < LastActualRow)
+                {
+                    // Delete all rows between last non-blank row and last actual row
+                    bool success = import.DeleteRows(LastNonBlankRow + 1, LastActualRow);
+                }
+
                 // Save as tab-delimited file (delete any identically-named file first)
                 string CSVFilename = WorkingFolder + "SBSJournalEntry_" + UserInfo.Username + ".txt";
-                import.File.SaveAs(CSVFilename, Spreadsheet.FileFormat.TabDelimited, true);
+                bool saved = import.File.SaveAs(CSVFilename, Spreadsheet.FileFormat.TabDelimited, true);
+                if (!saved)
+                {
+                    BroadcastError("ERROR:  Unable to convert spreadsheet to CSV format: " + import.LastException, null);
+                }
                 import.Terminate();
 
                 // Truncate, then bulk insert the CSV file into table tblJournalEntries_Imported
@@ -367,6 +375,10 @@ namespace SBSJournalEntryImport
                 //   the next queries into the above procedure, so we put them here to collect the data we need
                 //   regarding consistency checks on the successfully-imported data.  As a once-a-month process there isn't much need for optimization.
 
+                // 12/23/20 PEB V1.0.0.3 - Statistics values were added to the bottom of the spreadsheet which creates nonzero sums.  
+                //   This section is disabled until further notice.
+
+#if false
                 string query = "SELECT Sum(PARSE([Amount] AS MONEY)) AS SumAmount FROM  tblJournalEntries_Imported";
                 List<Dictionary<string, object>> Fields = DataIO.ExecuteSQL(Enums.DatabaseConnectionStringNames.SBSJournalEntryImport, CommandType.Text, query);
                 bool AmountOkay = double.TryParse(Fields[0]["SumAmount"].ToString(), out double TotalAmount);
@@ -380,12 +392,13 @@ namespace SBSJournalEntryImport
                         return;
                     }
                 }
+#endif
 
                 // Confirm that we read all file lines (or 1 less than the file if an extraneous LF was inserted during Accounting's load into the spreadsheet).
-                query = "SELECT count(*) AS Count FROM  tblJournalEntries_Imported";
-                Fields = DataIO.ExecuteSQL(Enums.DatabaseConnectionStringNames.SBSJournalEntryImport, CommandType.Text, query);
+                string query2 = "SELECT count(*) AS Count FROM  tblJournalEntries_Imported";
+                List<Dictionary<string, object>> Fields2 = DataIO.ExecuteSQL(Enums.DatabaseConnectionStringNames.SBSJournalEntryImport, CommandType.Text, query2);
 
-                numrows = (int)Fields[0]["Count"];
+                numrows = (int)Fields2[0]["Count"];
                 if (NumSpreadsheetRows - numrows > 1)
                 {
                     // Generate this error only if we differ by more than one line.
@@ -432,11 +445,27 @@ namespace SBSJournalEntryImport
             StatusBar.AddText(0, "Done!");
         }
 
+        private int GetLastNonBlankRow(Spreadsheet import)
+        {
+            // For efficiency, try using a binary search to find the first non-blank row in this spreadsheet.
+            int numrows = import.GetNumRows();
+
+            bool isblank = import.RowIsBlank(numrows);
+            if (!isblank) return (numrows);
+
+            // Last row is blank, so we have to search for the first blank row and return that value instead.
+
+
+            // TBD
+            return (numrows);  // This is probably irrelevant as the bulk insert will likely handle this
+
+        }
+
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed", JobName);
         }
-        #endregion
+#endregion
 
 
     }
