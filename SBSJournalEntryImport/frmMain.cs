@@ -387,7 +387,7 @@ namespace SBSJournalEntryImport
                 if (NumSpreadsheetRows - numrows > 1)
                 {
                     // Generate this error only if we differ by more than one line.
-                    BroadcastError("ERROR trying import spreadsheet " + TxtImportFile.Text, null);
+                    BroadcastError("ERROR trying to import spreadsheet " + TxtImportFile.Text + " (row count difference is " + (NumSpreadsheetRows - numrows).ToString() + ")", null);
                     StatusBar.AddText(0, "ERROR");
                     return;
                 }
@@ -395,7 +395,7 @@ namespace SBSJournalEntryImport
             }
             catch (Exception ex)
             {
-                BroadcastError("ERROR trying import spreadsheet " + TxtImportFile.Text, ex);
+                BroadcastError("ERROR trying to import spreadsheet " + TxtImportFile.Text, ex);
                 StatusBar.AddText(0, "ERROR");
                 return;
             }

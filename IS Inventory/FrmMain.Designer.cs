@@ -28,28 +28,28 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle36 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle37 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle38 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle39 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle40 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle41 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle42 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TabInventory = new System.Windows.Forms.TabControl();
             this.TabPCsAndMacs = new System.Windows.Forms.TabPage();
             this.RadPCsAndMacsFilter = new System.Windows.Forms.GroupBox();
@@ -58,6 +58,7 @@
             this.RadPCsAndMacsFilterInactive = new System.Windows.Forms.RadioButton();
             this.GrdPCsAndMacs = new System.Windows.Forms.DataGridView();
             this.PnlPCUser = new System.Windows.Forms.Panel();
+            this.CmbPCType = new IS_Inventory.ComboBoxUnlocked();
             this.label21 = new System.Windows.Forms.Label();
             this.PnlPCRadActiveInactive = new System.Windows.Forms.GroupBox();
             this.RadPCActive = new System.Windows.Forms.RadioButton();
@@ -163,12 +164,15 @@
             this.RadServersRaidFilterActive = new System.Windows.Forms.RadioButton();
             this.RadServersRaidFilterInactive = new System.Windows.Forms.RadioButton();
             this.label100 = new System.Windows.Forms.Label();
+            this.CmbServerRAM = new IS_Inventory.ComboBoxUnlocked();
             this.label99 = new System.Windows.Forms.Label();
             this.label98 = new System.Windows.Forms.Label();
             this.CmdServerSaveRAID = new System.Windows.Forms.Button();
             this.CmdServerNewRAID = new System.Windows.Forms.Button();
             this.PnlServerRAID = new System.Windows.Forms.Panel();
+            this.CmbServerContainerType = new IS_Inventory.ComboBoxUnlocked();
             this.TxtServerRAIDNotes = new System.Windows.Forms.TextBox();
+            this.CmbServerRaidType = new IS_Inventory.ComboBoxUnlocked();
             this.label95 = new System.Windows.Forms.Label();
             this.TxtServerContainerSize = new System.Windows.Forms.TextBox();
             this.label93 = new System.Windows.Forms.Label();
@@ -196,6 +200,7 @@
             this.TxtServerProcessorDescription = new System.Windows.Forms.TextBox();
             this.label84 = new System.Windows.Forms.Label();
             this.label83 = new System.Windows.Forms.Label();
+            this.CmbServerProcessor = new IS_Inventory.ComboBoxUnlocked();
             this.TabServerNetworks = new System.Windows.Forms.TabPage();
             this.RadServersNetworkFilter = new System.Windows.Forms.GroupBox();
             this.RadServersNetworkFilterBoth = new System.Windows.Forms.RadioButton();
@@ -234,6 +239,7 @@
             this.CmdServerNewContact = new System.Windows.Forms.Button();
             this.PnlServerContact = new System.Windows.Forms.Panel();
             this.TxtServerContactSiteCodeID = new System.Windows.Forms.TextBox();
+            this.CmbServerContactType = new IS_Inventory.ComboBoxUnlocked();
             this.label107 = new System.Windows.Forms.Label();
             this.TxtServerContactLicenseKey = new System.Windows.Forms.TextBox();
             this.LblServerContactSiteCodeID = new System.Windows.Forms.Label();
@@ -256,6 +262,7 @@
             this.CmdServerSaveOwner = new System.Windows.Forms.Button();
             this.CmdServerNewOwner = new System.Windows.Forms.Button();
             this.PnlServerOwner = new System.Windows.Forms.Panel();
+            this.CmbServerOwner = new IS_Inventory.ComboBoxUnlocked();
             this.label113 = new System.Windows.Forms.Label();
             this.PnlServerOwnerActiveInactive = new System.Windows.Forms.GroupBox();
             this.RadServerOwnerActive = new System.Windows.Forms.RadioButton();
@@ -286,7 +293,7 @@
             this.PnlServerActiveInactive = new System.Windows.Forms.GroupBox();
             this.RadServerActive = new System.Windows.Forms.RadioButton();
             this.RadServerInactive = new System.Windows.Forms.RadioButton();
-            this.label82 = new System.Windows.Forms.Label();
+            this.LblBuildDate = new System.Windows.Forms.Label();
             this.TxtServerSlotNumber = new System.Windows.Forms.TextBox();
             this.TxtServerLocationOther = new System.Windows.Forms.TextBox();
             this.label81 = new System.Windows.Forms.Label();
@@ -300,7 +307,9 @@
             this.TxtServerSerialNumber = new System.Windows.Forms.TextBox();
             this.label75 = new System.Windows.Forms.Label();
             this.label74 = new System.Windows.Forms.Label();
+            this.CmbServerModel = new IS_Inventory.ComboBoxUnlocked();
             this.label73 = new System.Windows.Forms.Label();
+            this.CmbServerManufacturer = new IS_Inventory.ComboBoxUnlocked();
             this.TxtServerPurpose = new System.Windows.Forms.TextBox();
             this.label72 = new System.Windows.Forms.Label();
             this.label66 = new System.Windows.Forms.Label();
@@ -329,10 +338,8 @@
             this.CmdDocumentNew = new System.Windows.Forms.Button();
             this.CmdDocumentSave = new System.Windows.Forms.Button();
             this.PnlDocumentationVersion = new System.Windows.Forms.Panel();
-            this.CmdDocumentationVersionBrowse = new System.Windows.Forms.Button();
+            this.CmdViewDocumentVersion = new System.Windows.Forms.Button();
             this.label118 = new System.Windows.Forms.Label();
-            this.TxtDocumentURL = new System.Windows.Forms.TextBox();
-            this.label120 = new System.Windows.Forms.Label();
             this.DTDocumentationVersionDate = new System.Windows.Forms.DateTimePicker();
             this.TxtDocumentationVersionDescription = new System.Windows.Forms.TextBox();
             this.label122 = new System.Windows.Forms.Label();
@@ -341,9 +348,13 @@
             this.RadDocumentationVersionInactive = new System.Windows.Forms.RadioButton();
             this.label126 = new System.Windows.Forms.Label();
             this.PnlDocumentation = new System.Windows.Forms.Panel();
+            this.CmdDocumentationViewDocument = new System.Windows.Forms.Button();
             this.label119 = new System.Windows.Forms.Label();
+            this.CmdDocumentationVersionBrowse = new System.Windows.Forms.Button();
             this.TxTDocumentationSubject = new System.Windows.Forms.TextBox();
             this.label104 = new System.Windows.Forms.Label();
+            this.TxtDocumentURL = new System.Windows.Forms.TextBox();
+            this.label120 = new System.Windows.Forms.Label();
             this.RadDocumentationActiveInactive = new System.Windows.Forms.GroupBox();
             this.RadDocumentationActive = new System.Windows.Forms.RadioButton();
             this.RadDocumentationInactive = new System.Windows.Forms.RadioButton();
@@ -358,11 +369,30 @@
             this.RadHWTemplateFilterInactive = new System.Windows.Forms.RadioButton();
             this.GrdHardwareTemplate = new System.Windows.Forms.DataGridView();
             this.PnlHardwareTemplate = new System.Windows.Forms.Panel();
+            this.CmbPCmiscellaneouscard_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCmanufacturers_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCspeakers_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCmice_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCmiscdrives_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCram_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCcddevices_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCcabinets_id = new IS_Inventory.ComboBoxUnlocked();
             this.GrpActiveFlags = new System.Windows.Forms.GroupBox();
             this.RadPCactive_flag = new System.Windows.Forms.RadioButton();
             this.RadPCinactive_flag = new System.Windows.Forms.RadioButton();
+            this.CmbPCsoundcards_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCmonitor2_id = new IS_Inventory.ComboBoxUnlocked();
             this.label42 = new System.Windows.Forms.Label();
+            this.CmbPCharddrive2_id = new IS_Inventory.ComboBoxUnlocked();
             this.TxtPCtemplate_name = new System.Windows.Forms.TextBox();
+            this.CmbPCprocessors_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCmodels_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCkeyboards_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCnics_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCvideocards_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCmonitor1_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCharddrive1_id = new IS_Inventory.ComboBoxUnlocked();
+            this.CmbPCmotherboards_id = new IS_Inventory.ComboBoxUnlocked();
             this.label52 = new System.Windows.Forms.Label();
             this.label32 = new System.Windows.Forms.Label();
             this.label33 = new System.Windows.Forms.Label();
@@ -392,6 +422,10 @@
             this.PnlCategoryEditNewSave = new System.Windows.Forms.Panel();
             this.CmdCategoryEditNewItem = new System.Windows.Forms.Button();
             this.CmdCategoryEditSaveItem = new System.Windows.Forms.Button();
+            this.GrpCategoryActiveFlags = new System.Windows.Forms.GroupBox();
+            this.RadCategoryListBoth = new System.Windows.Forms.RadioButton();
+            this.RadCategoryListActive = new System.Windows.Forms.RadioButton();
+            this.RadCategoryListInactive = new System.Windows.Forms.RadioButton();
             this.label53 = new System.Windows.Forms.Label();
             this.PnlCategoryEditItem = new System.Windows.Forms.Panel();
             this.RadCateogryEdit = new System.Windows.Forms.GroupBox();
@@ -399,42 +433,8 @@
             this.RadCategoryInactive = new System.Windows.Forms.RadioButton();
             this.label55 = new System.Windows.Forms.Label();
             this.TxtItemName = new System.Windows.Forms.TextBox();
-            this.GrdSelectedList = new System.Windows.Forms.DataGridView();
-            this.RadCategoryListInactive = new System.Windows.Forms.RadioButton();
-            this.RadCategoryListActive = new System.Windows.Forms.RadioButton();
-            this.RadCategoryListBoth = new System.Windows.Forms.RadioButton();
-            this.GrpCategoryActiveFlags = new System.Windows.Forms.GroupBox();
-            this.CmbPCType = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbServerRAM = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbServerContainerType = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbServerRaidType = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbServerProcessor = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbServerContactType = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbServerOwner = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbServerModel = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbServerManufacturer = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCmiscellaneouscard_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCmanufacturers_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCspeakers_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCmice_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCmiscdrives_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCram_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCcddevices_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCcabinets_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCsoundcards_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCmonitor2_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCharddrive2_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCprocessors_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCmodels_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCkeyboards_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCnics_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCvideocards_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCmonitor1_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCharddrive1_id = new IS_Inventory.ComboBoxUnlocked();
-            this.CmbPCmotherboards_id = new IS_Inventory.ComboBoxUnlocked();
             this.CmbSelectedList = new IS_Inventory.ComboBoxUnlocked();
-            this.CmdDocumentationViewDocument = new System.Windows.Forms.Button();
-            this.CmdViewDocumentVersion = new System.Windows.Forms.Button();
+            this.GrdSelectedList = new System.Windows.Forms.DataGridView();
             this.TabInventory.SuspendLayout();
             this.TabPCsAndMacs.SuspendLayout();
             this.RadPCsAndMacsFilter.SuspendLayout();
@@ -495,10 +495,10 @@
             this.SubtabCategoryEdit.SuspendLayout();
             this.SubtabLists.SuspendLayout();
             this.PnlCategoryEditNewSave.SuspendLayout();
+            this.GrpCategoryActiveFlags.SuspendLayout();
             this.PnlCategoryEditItem.SuspendLayout();
             this.RadCateogryEdit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GrdSelectedList)).BeginInit();
-            this.GrpCategoryActiveFlags.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabInventory
@@ -597,22 +597,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdPCsAndMacs.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdPCsAndMacs.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdPCsAndMacs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle24.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle24.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle24.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle24.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle24.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle24.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdPCsAndMacs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle24;
             this.GrdPCsAndMacs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdPCsAndMacs.Location = new System.Drawing.Point(2, 304);
             this.GrdPCsAndMacs.Margin = new System.Windows.Forms.Padding(2);
             this.GrdPCsAndMacs.MultiSelect = false;
             this.GrdPCsAndMacs.Name = "GrdPCsAndMacs";
             this.GrdPCsAndMacs.ReadOnly = true;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdPCsAndMacs.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle25.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdPCsAndMacs.RowsDefaultCellStyle = dataGridViewCellStyle25;
             this.GrdPCsAndMacs.RowTemplate.Height = 20;
             this.GrdPCsAndMacs.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdPCsAndMacs.Size = new System.Drawing.Size(1269, 378);
@@ -652,6 +652,18 @@
             this.PnlPCUser.Name = "PnlPCUser";
             this.PnlPCUser.Size = new System.Drawing.Size(436, 268);
             this.PnlPCUser.TabIndex = 93;
+            // 
+            // CmbPCType
+            // 
+            this.CmbPCType.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCType.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCType.FormattingEnabled = true;
+            this.CmbPCType.Location = new System.Drawing.Point(222, 10);
+            this.CmbPCType.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCType.Name = "CmbPCType";
+            this.CmbPCType.Size = new System.Drawing.Size(88, 21);
+            this.CmbPCType.TabIndex = 120;
+            this.CmbPCType.SelectedIndexChanged += new System.EventHandler(this.PCsAndMacs_TextChanged);
             // 
             // label21
             // 
@@ -1683,22 +1695,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdIPAddresses.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdIPAddresses.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdIPAddresses.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle26.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle26.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle26.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle26.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle26.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle26.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdIPAddresses.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle26;
             this.GrdIPAddresses.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdIPAddresses.Location = new System.Drawing.Point(0, 172);
             this.GrdIPAddresses.Margin = new System.Windows.Forms.Padding(2);
             this.GrdIPAddresses.MultiSelect = false;
             this.GrdIPAddresses.Name = "GrdIPAddresses";
             this.GrdIPAddresses.ReadOnly = true;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdIPAddresses.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle27.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdIPAddresses.RowsDefaultCellStyle = dataGridViewCellStyle27;
             this.GrdIPAddresses.RowTemplate.Height = 20;
             this.GrdIPAddresses.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdIPAddresses.Size = new System.Drawing.Size(1265, 510);
@@ -1789,7 +1801,7 @@
             this.PnlServer.Controls.Add(this.label71);
             this.PnlServer.Controls.Add(this.TxtServerRackNumber);
             this.PnlServer.Controls.Add(this.PnlServerActiveInactive);
-            this.PnlServer.Controls.Add(this.label82);
+            this.PnlServer.Controls.Add(this.LblBuildDate);
             this.PnlServer.Controls.Add(this.TxtServerSlotNumber);
             this.PnlServer.Controls.Add(this.TxtServerLocationOther);
             this.PnlServer.Controls.Add(this.label81);
@@ -1937,6 +1949,19 @@
             this.label100.Text = "Attached RAID Devices";
             this.label100.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // CmbServerRAM
+            // 
+            this.CmbServerRAM.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbServerRAM.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbServerRAM.FormattingEnabled = true;
+            this.CmbServerRAM.Location = new System.Drawing.Point(149, 37);
+            this.CmbServerRAM.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbServerRAM.MaxDropDownItems = 50;
+            this.CmbServerRAM.Name = "CmbServerRAM";
+            this.CmbServerRAM.Size = new System.Drawing.Size(233, 21);
+            this.CmbServerRAM.TabIndex = 3;
+            this.CmbServerRAM.SelectedIndexChanged += new System.EventHandler(this.Event_ServerEntryComplete);
+            // 
             // label99
             // 
             this.label99.AutoSize = true;
@@ -2002,6 +2027,16 @@
             this.PnlServerRAID.Size = new System.Drawing.Size(658, 54);
             this.PnlServerRAID.TabIndex = 166;
             // 
+            // CmbServerContainerType
+            // 
+            this.CmbServerContainerType.FormattingEnabled = true;
+            this.CmbServerContainerType.Location = new System.Drawing.Point(233, 2);
+            this.CmbServerContainerType.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbServerContainerType.Name = "CmbServerContainerType";
+            this.CmbServerContainerType.Size = new System.Drawing.Size(103, 21);
+            this.CmbServerContainerType.TabIndex = 102;
+            this.CmbServerContainerType.SelectedIndexChanged += new System.EventHandler(this.Event_ServerRaidEntryComplete);
+            // 
             // TxtServerRAIDNotes
             // 
             this.TxtServerRAIDNotes.Location = new System.Drawing.Point(67, 26);
@@ -2011,6 +2046,20 @@
             this.TxtServerRAIDNotes.Size = new System.Drawing.Size(426, 20);
             this.TxtServerRAIDNotes.TabIndex = 4;
             this.TxtServerRAIDNotes.TextChanged += new System.EventHandler(this.Servers_RaidTextChanged);
+            // 
+            // CmbServerRaidType
+            // 
+            this.CmbServerRaidType.FormattingEnabled = true;
+            this.CmbServerRaidType.Items.AddRange(new object[] {
+            "Hardware",
+            "Software",
+            "Unknown"});
+            this.CmbServerRaidType.Location = new System.Drawing.Point(66, 1);
+            this.CmbServerRaidType.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbServerRaidType.Name = "CmbServerRaidType";
+            this.CmbServerRaidType.Size = new System.Drawing.Size(75, 21);
+            this.CmbServerRaidType.TabIndex = 0;
+            this.CmbServerRaidType.SelectedIndexChanged += new System.EventHandler(this.Event_ServerRaidEntryComplete);
             // 
             // label95
             // 
@@ -2135,22 +2184,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdServerRaid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdServerRaid.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServerRaid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle28.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle28.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle28.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle28.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle28.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle28.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServerRaid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle28;
             this.GrdServerRaid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdServerRaid.Location = new System.Drawing.Point(5, 242);
             this.GrdServerRaid.Margin = new System.Windows.Forms.Padding(2);
             this.GrdServerRaid.MultiSelect = false;
             this.GrdServerRaid.Name = "GrdServerRaid";
             this.GrdServerRaid.ReadOnly = true;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServerRaid.RowsDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle29.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServerRaid.RowsDefaultCellStyle = dataGridViewCellStyle29;
             this.GrdServerRaid.RowTemplate.Height = 20;
             this.GrdServerRaid.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdServerRaid.Size = new System.Drawing.Size(658, 99);
@@ -2331,6 +2380,16 @@
             this.label83.TabIndex = 144;
             this.label83.Text = "Processor:";
             this.label83.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // CmbServerProcessor
+            // 
+            this.CmbServerProcessor.FormattingEnabled = true;
+            this.CmbServerProcessor.Location = new System.Drawing.Point(248, 10);
+            this.CmbServerProcessor.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbServerProcessor.Name = "CmbServerProcessor";
+            this.CmbServerProcessor.Size = new System.Drawing.Size(134, 21);
+            this.CmbServerProcessor.TabIndex = 1;
+            this.CmbServerProcessor.SelectedIndexChanged += new System.EventHandler(this.Event_ServerEntryComplete);
             // 
             // TabServerNetworks
             // 
@@ -2592,22 +2651,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdServerNetwork.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdServerNetwork.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServerNetwork.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle30.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle30.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle30.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle30.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle30.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle30.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServerNetwork.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle30;
             this.GrdServerNetwork.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdServerNetwork.Location = new System.Drawing.Point(5, 160);
             this.GrdServerNetwork.Margin = new System.Windows.Forms.Padding(2);
             this.GrdServerNetwork.MultiSelect = false;
             this.GrdServerNetwork.Name = "GrdServerNetwork";
             this.GrdServerNetwork.ReadOnly = true;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServerNetwork.RowsDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle31.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServerNetwork.RowsDefaultCellStyle = dataGridViewCellStyle31;
             this.GrdServerNetwork.RowTemplate.Height = 20;
             this.GrdServerNetwork.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdServerNetwork.Size = new System.Drawing.Size(662, 185);
@@ -2818,6 +2877,20 @@
             this.TxtServerContactSiteCodeID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TxtServerContactSiteCodeID.TextChanged += new System.EventHandler(this.Servers_ContactTextChanged);
             // 
+            // CmbServerContactType
+            // 
+            this.CmbServerContactType.FormattingEnabled = true;
+            this.CmbServerContactType.Items.AddRange(new object[] {
+            "Hardware",
+            "Software",
+            "Unknown"});
+            this.CmbServerContactType.Location = new System.Drawing.Point(89, 4);
+            this.CmbServerContactType.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbServerContactType.Name = "CmbServerContactType";
+            this.CmbServerContactType.Size = new System.Drawing.Size(103, 21);
+            this.CmbServerContactType.TabIndex = 0;
+            this.CmbServerContactType.SelectedIndexChanged += new System.EventHandler(this.Event_ServerContactEntryComplete);
+            // 
             // label107
             // 
             this.label107.AutoSize = true;
@@ -2973,22 +3046,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdServerContact.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdServerContact.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServerContact.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle32.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle32.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle32.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle32.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle32.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle32.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServerContact.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle32;
             this.GrdServerContact.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdServerContact.Location = new System.Drawing.Point(3, 158);
             this.GrdServerContact.Margin = new System.Windows.Forms.Padding(2);
             this.GrdServerContact.MultiSelect = false;
             this.GrdServerContact.Name = "GrdServerContact";
             this.GrdServerContact.ReadOnly = true;
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServerContact.RowsDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle33.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServerContact.RowsDefaultCellStyle = dataGridViewCellStyle33;
             this.GrdServerContact.RowTemplate.Height = 20;
             this.GrdServerContact.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdServerContact.Size = new System.Drawing.Size(662, 185);
@@ -3094,6 +3167,20 @@
             this.PnlServerOwner.Size = new System.Drawing.Size(347, 64);
             this.PnlServerOwner.TabIndex = 178;
             // 
+            // CmbServerOwner
+            // 
+            this.CmbServerOwner.FormattingEnabled = true;
+            this.CmbServerOwner.Items.AddRange(new object[] {
+            "Hardware",
+            "Software",
+            "Unknown"});
+            this.CmbServerOwner.Location = new System.Drawing.Point(89, 4);
+            this.CmbServerOwner.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbServerOwner.Name = "CmbServerOwner";
+            this.CmbServerOwner.Size = new System.Drawing.Size(237, 21);
+            this.CmbServerOwner.TabIndex = 0;
+            this.CmbServerOwner.SelectedIndexChanged += new System.EventHandler(this.Event_ServerOwnerEntryComplete);
+            // 
             // label113
             // 
             this.label113.AutoSize = true;
@@ -3152,22 +3239,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdServerOwner.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdServerOwner.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServerOwner.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle34.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle34.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle34.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle34.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle34.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle34.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServerOwner.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle34;
             this.GrdServerOwner.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdServerOwner.Location = new System.Drawing.Point(3, 100);
             this.GrdServerOwner.Margin = new System.Windows.Forms.Padding(2);
             this.GrdServerOwner.MultiSelect = false;
             this.GrdServerOwner.Name = "GrdServerOwner";
             this.GrdServerOwner.ReadOnly = true;
-            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServerOwner.RowsDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle35.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServerOwner.RowsDefaultCellStyle = dataGridViewCellStyle35;
             this.GrdServerOwner.RowTemplate.Height = 20;
             this.GrdServerOwner.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdServerOwner.Size = new System.Drawing.Size(347, 123);
@@ -3464,16 +3551,16 @@
             this.RadServerInactive.UseVisualStyleBackColor = true;
             this.RadServerInactive.CheckedChanged += new System.EventHandler(this.Servers_RadioButtonChanged);
             // 
-            // label82
+            // LblBuildDate
             // 
-            this.label82.AutoSize = true;
-            this.label82.Location = new System.Drawing.Point(20, 194);
-            this.label82.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label82.Name = "label82";
-            this.label82.Size = new System.Drawing.Size(59, 13);
-            this.label82.TabIndex = 179;
-            this.label82.Text = "Build Date:";
-            this.label82.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.LblBuildDate.AutoSize = true;
+            this.LblBuildDate.Location = new System.Drawing.Point(20, 194);
+            this.LblBuildDate.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.LblBuildDate.Name = "LblBuildDate";
+            this.LblBuildDate.Size = new System.Drawing.Size(59, 13);
+            this.LblBuildDate.TabIndex = 179;
+            this.LblBuildDate.Text = "Build Date:";
+            this.LblBuildDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // TxtServerSlotNumber
             // 
@@ -3614,6 +3701,16 @@
             this.label74.Text = "Model:";
             this.label74.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // CmbServerModel
+            // 
+            this.CmbServerModel.FormattingEnabled = true;
+            this.CmbServerModel.Location = new System.Drawing.Point(82, 142);
+            this.CmbServerModel.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbServerModel.Name = "CmbServerModel";
+            this.CmbServerModel.Size = new System.Drawing.Size(217, 21);
+            this.CmbServerModel.TabIndex = 5;
+            this.CmbServerModel.SelectedIndexChanged += new System.EventHandler(this.Event_ServerEntryComplete);
+            // 
             // label73
             // 
             this.label73.AutoSize = true;
@@ -3624,6 +3721,16 @@
             this.label73.TabIndex = 163;
             this.label73.Text = "Manufacturer:";
             this.label73.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // CmbServerManufacturer
+            // 
+            this.CmbServerManufacturer.FormattingEnabled = true;
+            this.CmbServerManufacturer.Location = new System.Drawing.Point(82, 118);
+            this.CmbServerManufacturer.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbServerManufacturer.Name = "CmbServerManufacturer";
+            this.CmbServerManufacturer.Size = new System.Drawing.Size(217, 21);
+            this.CmbServerManufacturer.TabIndex = 3;
+            this.CmbServerManufacturer.SelectedIndexChanged += new System.EventHandler(this.Event_ServerEntryComplete);
             // 
             // TxtServerPurpose
             // 
@@ -3699,22 +3806,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdServers.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdServers.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle22.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle22.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle22;
             this.GrdServers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdServers.Location = new System.Drawing.Point(3, 417);
             this.GrdServers.Margin = new System.Windows.Forms.Padding(2);
             this.GrdServers.MultiSelect = false;
             this.GrdServers.Name = "GrdServers";
             this.GrdServers.ReadOnly = true;
-            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdServers.RowsDefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle23.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdServers.RowsDefaultCellStyle = dataGridViewCellStyle23;
             this.GrdServers.RowTemplate.Height = 20;
             this.GrdServers.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdServers.Size = new System.Drawing.Size(1262, 265);
@@ -3989,20 +4096,16 @@
             this.PnlDocumentationVersion.Size = new System.Drawing.Size(629, 173);
             this.PnlDocumentationVersion.TabIndex = 97;
             // 
-            // CmdDocumentationVersionBrowse
+            // CmdViewDocumentVersion
             // 
-            this.CmdDocumentationVersionBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CmdDocumentationVersionBrowse.Image = ((System.Drawing.Image)(resources.GetObject("CmdDocumentationVersionBrowse.Image")));
-            this.CmdDocumentationVersionBrowse.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.CmdDocumentationVersionBrowse.Location = new System.Drawing.Point(550, 26);
-            this.CmdDocumentationVersionBrowse.Margin = new System.Windows.Forms.Padding(2);
-            this.CmdDocumentationVersionBrowse.Name = "CmdDocumentationVersionBrowse";
-            this.CmdDocumentationVersionBrowse.Size = new System.Drawing.Size(74, 22);
-            this.CmdDocumentationVersionBrowse.TabIndex = 194;
-            this.CmdDocumentationVersionBrowse.Text = "Browse";
-            this.CmdDocumentationVersionBrowse.TextAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.CmdDocumentationVersionBrowse.UseVisualStyleBackColor = true;
-            this.CmdDocumentationVersionBrowse.Click += new System.EventHandler(this.CmdDocumentationVersionBrowse_Click);
+            this.CmdViewDocumentVersion.Location = new System.Drawing.Point(92, 137);
+            this.CmdViewDocumentVersion.Margin = new System.Windows.Forms.Padding(2);
+            this.CmdViewDocumentVersion.Name = "CmdViewDocumentVersion";
+            this.CmdViewDocumentVersion.Size = new System.Drawing.Size(100, 24);
+            this.CmdViewDocumentVersion.TabIndex = 196;
+            this.CmdViewDocumentVersion.Text = "View Version";
+            this.CmdViewDocumentVersion.UseVisualStyleBackColor = true;
+            this.CmdViewDocumentVersion.Click += new System.EventHandler(this.CmdViewDocumentVersion_Click);
             // 
             // label118
             // 
@@ -4015,27 +4118,6 @@
             this.label118.TabIndex = 190;
             this.label118.Text = "Version Edit";
             this.label118.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // TxtDocumentURL
-            // 
-            this.TxtDocumentURL.Location = new System.Drawing.Point(90, 27);
-            this.TxtDocumentURL.Margin = new System.Windows.Forms.Padding(2);
-            this.TxtDocumentURL.MaxLength = 50;
-            this.TxtDocumentURL.Name = "TxtDocumentURL";
-            this.TxtDocumentURL.Size = new System.Drawing.Size(459, 20);
-            this.TxtDocumentURL.TabIndex = 192;
-            this.TxtDocumentURL.TextChanged += new System.EventHandler(this.Documentation_TextChanged);
-            // 
-            // label120
-            // 
-            this.label120.AutoSize = true;
-            this.label120.Location = new System.Drawing.Point(3, 31);
-            this.label120.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label120.Name = "label120";
-            this.label120.Size = new System.Drawing.Size(84, 13);
-            this.label120.TabIndex = 193;
-            this.label120.Text = "Document URL:";
-            this.label120.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // DTDocumentationVersionDate
             // 
@@ -4133,6 +4215,17 @@
             this.PnlDocumentation.Size = new System.Drawing.Size(628, 146);
             this.PnlDocumentation.TabIndex = 96;
             // 
+            // CmdDocumentationViewDocument
+            // 
+            this.CmdDocumentationViewDocument.Location = new System.Drawing.Point(90, 110);
+            this.CmdDocumentationViewDocument.Margin = new System.Windows.Forms.Padding(2);
+            this.CmdDocumentationViewDocument.Name = "CmdDocumentationViewDocument";
+            this.CmdDocumentationViewDocument.Size = new System.Drawing.Size(100, 24);
+            this.CmdDocumentationViewDocument.TabIndex = 195;
+            this.CmdDocumentationViewDocument.Text = "View Document";
+            this.CmdDocumentationViewDocument.UseVisualStyleBackColor = true;
+            this.CmdDocumentationViewDocument.Click += new System.EventHandler(this.CmdDocumentationViewDocument_Click);
+            // 
             // label119
             // 
             this.label119.AutoSize = true;
@@ -4144,6 +4237,21 @@
             this.label119.TabIndex = 191;
             this.label119.Text = "Document Edit";
             this.label119.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // CmdDocumentationVersionBrowse
+            // 
+            this.CmdDocumentationVersionBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CmdDocumentationVersionBrowse.Image = ((System.Drawing.Image)(resources.GetObject("CmdDocumentationVersionBrowse.Image")));
+            this.CmdDocumentationVersionBrowse.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.CmdDocumentationVersionBrowse.Location = new System.Drawing.Point(550, 26);
+            this.CmdDocumentationVersionBrowse.Margin = new System.Windows.Forms.Padding(2);
+            this.CmdDocumentationVersionBrowse.Name = "CmdDocumentationVersionBrowse";
+            this.CmdDocumentationVersionBrowse.Size = new System.Drawing.Size(74, 22);
+            this.CmdDocumentationVersionBrowse.TabIndex = 194;
+            this.CmdDocumentationVersionBrowse.Text = "Browse";
+            this.CmdDocumentationVersionBrowse.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.CmdDocumentationVersionBrowse.UseVisualStyleBackColor = true;
+            this.CmdDocumentationVersionBrowse.Click += new System.EventHandler(this.CmdDocumentationVersionBrowse_Click);
             // 
             // TxTDocumentationSubject
             // 
@@ -4167,6 +4275,27 @@
             this.label104.TabIndex = 98;
             this.label104.Text = "Subject:";
             this.label104.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // TxtDocumentURL
+            // 
+            this.TxtDocumentURL.Location = new System.Drawing.Point(90, 27);
+            this.TxtDocumentURL.Margin = new System.Windows.Forms.Padding(2);
+            this.TxtDocumentURL.MaxLength = 50;
+            this.TxtDocumentURL.Name = "TxtDocumentURL";
+            this.TxtDocumentURL.Size = new System.Drawing.Size(459, 20);
+            this.TxtDocumentURL.TabIndex = 192;
+            this.TxtDocumentURL.TextChanged += new System.EventHandler(this.Documentation_TextChanged);
+            // 
+            // label120
+            // 
+            this.label120.AutoSize = true;
+            this.label120.Location = new System.Drawing.Point(3, 31);
+            this.label120.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label120.Name = "label120";
+            this.label120.Size = new System.Drawing.Size(84, 13);
+            this.label120.TabIndex = 193;
+            this.label120.Text = "Document URL:";
+            this.label120.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // RadDocumentationActiveInactive
             // 
@@ -4215,22 +4344,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdDocumentation.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdDocumentation.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdDocumentation.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle36.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle36.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle36.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle36.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle36.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle36.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle36.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdDocumentation.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle36;
             this.GrdDocumentation.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdDocumentation.Location = new System.Drawing.Point(3, 223);
             this.GrdDocumentation.Margin = new System.Windows.Forms.Padding(2);
             this.GrdDocumentation.MultiSelect = false;
             this.GrdDocumentation.Name = "GrdDocumentation";
             this.GrdDocumentation.ReadOnly = true;
-            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdDocumentation.RowsDefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle37.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdDocumentation.RowsDefaultCellStyle = dataGridViewCellStyle37;
             this.GrdDocumentation.RowTemplate.Height = 20;
             this.GrdDocumentation.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdDocumentation.Size = new System.Drawing.Size(1262, 259);
@@ -4245,22 +4374,22 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GrdDocumentationVersion.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.GrdDocumentationVersion.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdDocumentationVersion.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle38.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle38.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle38.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle38.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle38.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle38.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle38.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdDocumentationVersion.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle38;
             this.GrdDocumentationVersion.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GrdDocumentationVersion.Location = new System.Drawing.Point(4, 499);
             this.GrdDocumentationVersion.Margin = new System.Windows.Forms.Padding(2);
             this.GrdDocumentationVersion.MultiSelect = false;
             this.GrdDocumentationVersion.Name = "GrdDocumentationVersion";
             this.GrdDocumentationVersion.ReadOnly = true;
-            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdDocumentationVersion.RowsDefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle39.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdDocumentationVersion.RowsDefaultCellStyle = dataGridViewCellStyle39;
             this.GrdDocumentationVersion.RowTemplate.Height = 20;
             this.GrdDocumentationVersion.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdDocumentationVersion.Size = new System.Drawing.Size(1262, 183);
@@ -4374,8 +4503,8 @@
             this.GrdHardwareTemplate.MultiSelect = false;
             this.GrdHardwareTemplate.Name = "GrdHardwareTemplate";
             this.GrdHardwareTemplate.ReadOnly = true;
-            dataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.GrdHardwareTemplate.RowsDefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewCellStyle40.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.GrdHardwareTemplate.RowsDefaultCellStyle = dataGridViewCellStyle40;
             this.GrdHardwareTemplate.RowTemplate.Height = 20;
             this.GrdHardwareTemplate.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.GrdHardwareTemplate.Size = new System.Drawing.Size(1256, 349);
@@ -4434,6 +4563,102 @@
             this.PnlHardwareTemplate.Size = new System.Drawing.Size(842, 269);
             this.PnlHardwareTemplate.TabIndex = 28;
             // 
+            // CmbPCmiscellaneouscard_id
+            // 
+            this.CmbPCmiscellaneouscard_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCmiscellaneouscard_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCmiscellaneouscard_id.FormattingEnabled = true;
+            this.CmbPCmiscellaneouscard_id.Location = new System.Drawing.Point(644, 145);
+            this.CmbPCmiscellaneouscard_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCmiscellaneouscard_id.MaxDropDownItems = 50;
+            this.CmbPCmiscellaneouscard_id.Name = "CmbPCmiscellaneouscard_id";
+            this.CmbPCmiscellaneouscard_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCmiscellaneouscard_id.TabIndex = 86;
+            // 
+            // CmbPCmanufacturers_id
+            // 
+            this.CmbPCmanufacturers_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCmanufacturers_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCmanufacturers_id.FormattingEnabled = true;
+            this.CmbPCmanufacturers_id.Location = new System.Drawing.Point(88, 25);
+            this.CmbPCmanufacturers_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCmanufacturers_id.MaxDropDownItems = 50;
+            this.CmbPCmanufacturers_id.Name = "CmbPCmanufacturers_id";
+            this.CmbPCmanufacturers_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCmanufacturers_id.TabIndex = 68;
+            // 
+            // CmbPCspeakers_id
+            // 
+            this.CmbPCspeakers_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCspeakers_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCspeakers_id.FormattingEnabled = true;
+            this.CmbPCspeakers_id.Location = new System.Drawing.Point(644, 120);
+            this.CmbPCspeakers_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCspeakers_id.MaxDropDownItems = 50;
+            this.CmbPCspeakers_id.Name = "CmbPCspeakers_id";
+            this.CmbPCspeakers_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCspeakers_id.TabIndex = 85;
+            // 
+            // CmbPCmice_id
+            // 
+            this.CmbPCmice_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCmice_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCmice_id.FormattingEnabled = true;
+            this.CmbPCmice_id.Location = new System.Drawing.Point(362, 167);
+            this.CmbPCmice_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCmice_id.MaxDropDownItems = 50;
+            this.CmbPCmice_id.Name = "CmbPCmice_id";
+            this.CmbPCmice_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCmice_id.TabIndex = 81;
+            // 
+            // CmbPCmiscdrives_id
+            // 
+            this.CmbPCmiscdrives_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCmiscdrives_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCmiscdrives_id.FormattingEnabled = true;
+            this.CmbPCmiscdrives_id.Location = new System.Drawing.Point(644, 74);
+            this.CmbPCmiscdrives_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCmiscdrives_id.MaxDropDownItems = 50;
+            this.CmbPCmiscdrives_id.Name = "CmbPCmiscdrives_id";
+            this.CmbPCmiscdrives_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCmiscdrives_id.TabIndex = 84;
+            // 
+            // CmbPCram_id
+            // 
+            this.CmbPCram_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCram_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCram_id.FormattingEnabled = true;
+            this.CmbPCram_id.Location = new System.Drawing.Point(644, 50);
+            this.CmbPCram_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCram_id.MaxDropDownItems = 50;
+            this.CmbPCram_id.Name = "CmbPCram_id";
+            this.CmbPCram_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCram_id.TabIndex = 83;
+            // 
+            // CmbPCcddevices_id
+            // 
+            this.CmbPCcddevices_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCcddevices_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCcddevices_id.FormattingEnabled = true;
+            this.CmbPCcddevices_id.Location = new System.Drawing.Point(362, 143);
+            this.CmbPCcddevices_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCcddevices_id.MaxDropDownItems = 50;
+            this.CmbPCcddevices_id.Name = "CmbPCcddevices_id";
+            this.CmbPCcddevices_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCcddevices_id.TabIndex = 80;
+            // 
+            // CmbPCcabinets_id
+            // 
+            this.CmbPCcabinets_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCcabinets_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCcabinets_id.FormattingEnabled = true;
+            this.CmbPCcabinets_id.Location = new System.Drawing.Point(644, 25);
+            this.CmbPCcabinets_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCcabinets_id.MaxDropDownItems = 50;
+            this.CmbPCcabinets_id.Name = "CmbPCcabinets_id";
+            this.CmbPCcabinets_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCcabinets_id.TabIndex = 82;
+            // 
             // GrpActiveFlags
             // 
             this.GrpActiveFlags.Controls.Add(this.RadPCactive_flag);
@@ -4471,6 +4696,30 @@
             this.RadPCinactive_flag.Text = "Inactive";
             this.RadPCinactive_flag.UseVisualStyleBackColor = true;
             // 
+            // CmbPCsoundcards_id
+            // 
+            this.CmbPCsoundcards_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCsoundcards_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCsoundcards_id.FormattingEnabled = true;
+            this.CmbPCsoundcards_id.Location = new System.Drawing.Point(362, 119);
+            this.CmbPCsoundcards_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCsoundcards_id.MaxDropDownItems = 50;
+            this.CmbPCsoundcards_id.Name = "CmbPCsoundcards_id";
+            this.CmbPCsoundcards_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCsoundcards_id.TabIndex = 79;
+            // 
+            // CmbPCmonitor2_id
+            // 
+            this.CmbPCmonitor2_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCmonitor2_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCmonitor2_id.FormattingEnabled = true;
+            this.CmbPCmonitor2_id.Location = new System.Drawing.Point(362, 96);
+            this.CmbPCmonitor2_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCmonitor2_id.MaxDropDownItems = 50;
+            this.CmbPCmonitor2_id.Name = "CmbPCmonitor2_id";
+            this.CmbPCmonitor2_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCmonitor2_id.TabIndex = 78;
+            // 
             // label42
             // 
             this.label42.AutoSize = true;
@@ -4482,6 +4731,18 @@
             this.label42.Text = "Template Name:";
             this.label42.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // CmbPCharddrive2_id
+            // 
+            this.CmbPCharddrive2_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCharddrive2_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCharddrive2_id.FormattingEnabled = true;
+            this.CmbPCharddrive2_id.Location = new System.Drawing.Point(362, 72);
+            this.CmbPCharddrive2_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCharddrive2_id.MaxDropDownItems = 50;
+            this.CmbPCharddrive2_id.Name = "CmbPCharddrive2_id";
+            this.CmbPCharddrive2_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCharddrive2_id.TabIndex = 77;
+            // 
             // TxtPCtemplate_name
             // 
             this.TxtPCtemplate_name.Location = new System.Drawing.Point(201, 2);
@@ -4489,6 +4750,102 @@
             this.TxtPCtemplate_name.Name = "TxtPCtemplate_name";
             this.TxtPCtemplate_name.Size = new System.Drawing.Size(499, 20);
             this.TxtPCtemplate_name.TabIndex = 87;
+            // 
+            // CmbPCprocessors_id
+            // 
+            this.CmbPCprocessors_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCprocessors_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCprocessors_id.FormattingEnabled = true;
+            this.CmbPCprocessors_id.Location = new System.Drawing.Point(362, 49);
+            this.CmbPCprocessors_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCprocessors_id.MaxDropDownItems = 50;
+            this.CmbPCprocessors_id.Name = "CmbPCprocessors_id";
+            this.CmbPCprocessors_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCprocessors_id.TabIndex = 76;
+            // 
+            // CmbPCmodels_id
+            // 
+            this.CmbPCmodels_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCmodels_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCmodels_id.FormattingEnabled = true;
+            this.CmbPCmodels_id.Location = new System.Drawing.Point(362, 25);
+            this.CmbPCmodels_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCmodels_id.MaxDropDownItems = 50;
+            this.CmbPCmodels_id.Name = "CmbPCmodels_id";
+            this.CmbPCmodels_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCmodels_id.TabIndex = 75;
+            // 
+            // CmbPCkeyboards_id
+            // 
+            this.CmbPCkeyboards_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCkeyboards_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCkeyboards_id.FormattingEnabled = true;
+            this.CmbPCkeyboards_id.Location = new System.Drawing.Point(88, 167);
+            this.CmbPCkeyboards_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCkeyboards_id.MaxDropDownItems = 50;
+            this.CmbPCkeyboards_id.Name = "CmbPCkeyboards_id";
+            this.CmbPCkeyboards_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCkeyboards_id.TabIndex = 74;
+            // 
+            // CmbPCnics_id
+            // 
+            this.CmbPCnics_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCnics_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCnics_id.FormattingEnabled = true;
+            this.CmbPCnics_id.Location = new System.Drawing.Point(88, 143);
+            this.CmbPCnics_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCnics_id.MaxDropDownItems = 50;
+            this.CmbPCnics_id.Name = "CmbPCnics_id";
+            this.CmbPCnics_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCnics_id.TabIndex = 73;
+            // 
+            // CmbPCvideocards_id
+            // 
+            this.CmbPCvideocards_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCvideocards_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCvideocards_id.FormattingEnabled = true;
+            this.CmbPCvideocards_id.Location = new System.Drawing.Point(88, 119);
+            this.CmbPCvideocards_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCvideocards_id.MaxDropDownItems = 50;
+            this.CmbPCvideocards_id.Name = "CmbPCvideocards_id";
+            this.CmbPCvideocards_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCvideocards_id.TabIndex = 72;
+            // 
+            // CmbPCmonitor1_id
+            // 
+            this.CmbPCmonitor1_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCmonitor1_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCmonitor1_id.FormattingEnabled = true;
+            this.CmbPCmonitor1_id.Location = new System.Drawing.Point(88, 96);
+            this.CmbPCmonitor1_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCmonitor1_id.MaxDropDownItems = 50;
+            this.CmbPCmonitor1_id.Name = "CmbPCmonitor1_id";
+            this.CmbPCmonitor1_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCmonitor1_id.TabIndex = 71;
+            // 
+            // CmbPCharddrive1_id
+            // 
+            this.CmbPCharddrive1_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCharddrive1_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCharddrive1_id.FormattingEnabled = true;
+            this.CmbPCharddrive1_id.Location = new System.Drawing.Point(88, 72);
+            this.CmbPCharddrive1_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCharddrive1_id.MaxDropDownItems = 50;
+            this.CmbPCharddrive1_id.Name = "CmbPCharddrive1_id";
+            this.CmbPCharddrive1_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCharddrive1_id.TabIndex = 70;
+            // 
+            // CmbPCmotherboards_id
+            // 
+            this.CmbPCmotherboards_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.CmbPCmotherboards_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.CmbPCmotherboards_id.FormattingEnabled = true;
+            this.CmbPCmotherboards_id.Location = new System.Drawing.Point(88, 49);
+            this.CmbPCmotherboards_id.Margin = new System.Windows.Forms.Padding(0);
+            this.CmbPCmotherboards_id.MaxDropDownItems = 50;
+            this.CmbPCmotherboards_id.Name = "CmbPCmotherboards_id";
+            this.CmbPCmotherboards_id.Size = new System.Drawing.Size(185, 21);
+            this.CmbPCmotherboards_id.TabIndex = 69;
             // 
             // label52
             // 
@@ -4814,6 +5171,57 @@
             this.CmdCategoryEditSaveItem.UseVisualStyleBackColor = true;
             this.CmdCategoryEditSaveItem.Click += new System.EventHandler(this.CmdCategoryEditSaveItem_Click);
             // 
+            // GrpCategoryActiveFlags
+            // 
+            this.GrpCategoryActiveFlags.Controls.Add(this.RadCategoryListBoth);
+            this.GrpCategoryActiveFlags.Controls.Add(this.RadCategoryListActive);
+            this.GrpCategoryActiveFlags.Controls.Add(this.RadCategoryListInactive);
+            this.GrpCategoryActiveFlags.Location = new System.Drawing.Point(380, 3);
+            this.GrpCategoryActiveFlags.Margin = new System.Windows.Forms.Padding(2);
+            this.GrpCategoryActiveFlags.Name = "GrpCategoryActiveFlags";
+            this.GrpCategoryActiveFlags.Padding = new System.Windows.Forms.Padding(2);
+            this.GrpCategoryActiveFlags.Size = new System.Drawing.Size(264, 23);
+            this.GrpCategoryActiveFlags.TabIndex = 96;
+            this.GrpCategoryActiveFlags.TabStop = false;
+            // 
+            // RadCategoryListBoth
+            // 
+            this.RadCategoryListBoth.AutoSize = true;
+            this.RadCategoryListBoth.Location = new System.Drawing.Point(172, 6);
+            this.RadCategoryListBoth.Margin = new System.Windows.Forms.Padding(2);
+            this.RadCategoryListBoth.Name = "RadCategoryListBoth";
+            this.RadCategoryListBoth.Size = new System.Drawing.Size(77, 17);
+            this.RadCategoryListBoth.TabIndex = 91;
+            this.RadCategoryListBoth.Text = "Show Both";
+            this.RadCategoryListBoth.UseVisualStyleBackColor = true;
+            this.RadCategoryListBoth.CheckedChanged += new System.EventHandler(this.RadCategoryActiveStatus_Changed);
+            // 
+            // RadCategoryListActive
+            // 
+            this.RadCategoryListActive.AutoSize = true;
+            this.RadCategoryListActive.Checked = true;
+            this.RadCategoryListActive.Location = new System.Drawing.Point(5, 6);
+            this.RadCategoryListActive.Margin = new System.Windows.Forms.Padding(2);
+            this.RadCategoryListActive.Name = "RadCategoryListActive";
+            this.RadCategoryListActive.Size = new System.Drawing.Size(79, 17);
+            this.RadCategoryListActive.TabIndex = 89;
+            this.RadCategoryListActive.TabStop = true;
+            this.RadCategoryListActive.Text = "Active Only";
+            this.RadCategoryListActive.UseVisualStyleBackColor = true;
+            this.RadCategoryListActive.CheckedChanged += new System.EventHandler(this.RadCategoryActiveStatus_Changed);
+            // 
+            // RadCategoryListInactive
+            // 
+            this.RadCategoryListInactive.AutoSize = true;
+            this.RadCategoryListInactive.Location = new System.Drawing.Point(84, 6);
+            this.RadCategoryListInactive.Margin = new System.Windows.Forms.Padding(2);
+            this.RadCategoryListInactive.Name = "RadCategoryListInactive";
+            this.RadCategoryListInactive.Size = new System.Drawing.Size(87, 17);
+            this.RadCategoryListInactive.TabIndex = 90;
+            this.RadCategoryListInactive.Text = "Inactive Only";
+            this.RadCategoryListInactive.UseVisualStyleBackColor = true;
+            this.RadCategoryListInactive.CheckedChanged += new System.EventHandler(this.RadCategoryActiveStatus_Changed);
+            // 
             // label53
             // 
             this.label53.AutoSize = true;
@@ -4894,423 +5302,6 @@
             this.TxtItemName.TabIndex = 87;
             this.TxtItemName.TextChanged += new System.EventHandler(this.TxtItemName_TextChanged);
             // 
-            // GrdSelectedList
-            // 
-            this.GrdSelectedList.AllowUserToAddRows = false;
-            this.GrdSelectedList.AllowUserToDeleteRows = false;
-            this.GrdSelectedList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.GrdSelectedList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
-            this.GrdSelectedList.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle20.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle20.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle20.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdSelectedList.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle20;
-            this.GrdSelectedList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.GrdSelectedList.Location = new System.Drawing.Point(2, 132);
-            this.GrdSelectedList.Margin = new System.Windows.Forms.Padding(2);
-            this.GrdSelectedList.MultiSelect = false;
-            this.GrdSelectedList.Name = "GrdSelectedList";
-            this.GrdSelectedList.ReadOnly = true;
-            dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.GrdSelectedList.RowsDefaultCellStyle = dataGridViewCellStyle21;
-            this.GrdSelectedList.RowTemplate.Height = 20;
-            this.GrdSelectedList.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.GrdSelectedList.Size = new System.Drawing.Size(1256, 525);
-            this.GrdSelectedList.TabIndex = 30;
-            this.GrdSelectedList.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.GrdSelectedList_CellMouseClick);
-            // 
-            // RadCategoryListInactive
-            // 
-            this.RadCategoryListInactive.AutoSize = true;
-            this.RadCategoryListInactive.Location = new System.Drawing.Point(84, 6);
-            this.RadCategoryListInactive.Margin = new System.Windows.Forms.Padding(2);
-            this.RadCategoryListInactive.Name = "RadCategoryListInactive";
-            this.RadCategoryListInactive.Size = new System.Drawing.Size(87, 17);
-            this.RadCategoryListInactive.TabIndex = 90;
-            this.RadCategoryListInactive.Text = "Inactive Only";
-            this.RadCategoryListInactive.UseVisualStyleBackColor = true;
-            this.RadCategoryListInactive.CheckedChanged += new System.EventHandler(this.RadCategoryActiveStatus_Changed);
-            // 
-            // RadCategoryListActive
-            // 
-            this.RadCategoryListActive.AutoSize = true;
-            this.RadCategoryListActive.Checked = true;
-            this.RadCategoryListActive.Location = new System.Drawing.Point(5, 6);
-            this.RadCategoryListActive.Margin = new System.Windows.Forms.Padding(2);
-            this.RadCategoryListActive.Name = "RadCategoryListActive";
-            this.RadCategoryListActive.Size = new System.Drawing.Size(79, 17);
-            this.RadCategoryListActive.TabIndex = 89;
-            this.RadCategoryListActive.TabStop = true;
-            this.RadCategoryListActive.Text = "Active Only";
-            this.RadCategoryListActive.UseVisualStyleBackColor = true;
-            this.RadCategoryListActive.CheckedChanged += new System.EventHandler(this.RadCategoryActiveStatus_Changed);
-            // 
-            // RadCategoryListBoth
-            // 
-            this.RadCategoryListBoth.AutoSize = true;
-            this.RadCategoryListBoth.Location = new System.Drawing.Point(172, 6);
-            this.RadCategoryListBoth.Margin = new System.Windows.Forms.Padding(2);
-            this.RadCategoryListBoth.Name = "RadCategoryListBoth";
-            this.RadCategoryListBoth.Size = new System.Drawing.Size(77, 17);
-            this.RadCategoryListBoth.TabIndex = 91;
-            this.RadCategoryListBoth.Text = "Show Both";
-            this.RadCategoryListBoth.UseVisualStyleBackColor = true;
-            this.RadCategoryListBoth.CheckedChanged += new System.EventHandler(this.RadCategoryActiveStatus_Changed);
-            // 
-            // GrpCategoryActiveFlags
-            // 
-            this.GrpCategoryActiveFlags.Controls.Add(this.RadCategoryListBoth);
-            this.GrpCategoryActiveFlags.Controls.Add(this.RadCategoryListActive);
-            this.GrpCategoryActiveFlags.Controls.Add(this.RadCategoryListInactive);
-            this.GrpCategoryActiveFlags.Location = new System.Drawing.Point(380, 3);
-            this.GrpCategoryActiveFlags.Margin = new System.Windows.Forms.Padding(2);
-            this.GrpCategoryActiveFlags.Name = "GrpCategoryActiveFlags";
-            this.GrpCategoryActiveFlags.Padding = new System.Windows.Forms.Padding(2);
-            this.GrpCategoryActiveFlags.Size = new System.Drawing.Size(264, 23);
-            this.GrpCategoryActiveFlags.TabIndex = 96;
-            this.GrpCategoryActiveFlags.TabStop = false;
-            // 
-            // CmbPCType
-            // 
-            this.CmbPCType.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCType.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCType.FormattingEnabled = true;
-            this.CmbPCType.Location = new System.Drawing.Point(222, 10);
-            this.CmbPCType.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCType.Name = "CmbPCType";
-            this.CmbPCType.Size = new System.Drawing.Size(88, 21);
-            this.CmbPCType.TabIndex = 120;
-            this.CmbPCType.SelectedIndexChanged += new System.EventHandler(this.PCsAndMacs_TextChanged);
-            // 
-            // CmbServerRAM
-            // 
-            this.CmbServerRAM.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbServerRAM.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbServerRAM.FormattingEnabled = true;
-            this.CmbServerRAM.Location = new System.Drawing.Point(149, 37);
-            this.CmbServerRAM.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbServerRAM.MaxDropDownItems = 50;
-            this.CmbServerRAM.Name = "CmbServerRAM";
-            this.CmbServerRAM.Size = new System.Drawing.Size(233, 21);
-            this.CmbServerRAM.TabIndex = 3;
-            this.CmbServerRAM.SelectedIndexChanged += new System.EventHandler(this.Event_ServerEntryComplete);
-            // 
-            // CmbServerContainerType
-            // 
-            this.CmbServerContainerType.FormattingEnabled = true;
-            this.CmbServerContainerType.Location = new System.Drawing.Point(233, 2);
-            this.CmbServerContainerType.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbServerContainerType.Name = "CmbServerContainerType";
-            this.CmbServerContainerType.Size = new System.Drawing.Size(103, 21);
-            this.CmbServerContainerType.TabIndex = 102;
-            this.CmbServerContainerType.SelectedIndexChanged += new System.EventHandler(this.Event_ServerRaidEntryComplete);
-            // 
-            // CmbServerRaidType
-            // 
-            this.CmbServerRaidType.FormattingEnabled = true;
-            this.CmbServerRaidType.Items.AddRange(new object[] {
-            "Hardware",
-            "Software",
-            "Unknown"});
-            this.CmbServerRaidType.Location = new System.Drawing.Point(66, 1);
-            this.CmbServerRaidType.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbServerRaidType.Name = "CmbServerRaidType";
-            this.CmbServerRaidType.Size = new System.Drawing.Size(75, 21);
-            this.CmbServerRaidType.TabIndex = 0;
-            this.CmbServerRaidType.SelectedIndexChanged += new System.EventHandler(this.Event_ServerRaidEntryComplete);
-            // 
-            // CmbServerProcessor
-            // 
-            this.CmbServerProcessor.FormattingEnabled = true;
-            this.CmbServerProcessor.Location = new System.Drawing.Point(248, 10);
-            this.CmbServerProcessor.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbServerProcessor.Name = "CmbServerProcessor";
-            this.CmbServerProcessor.Size = new System.Drawing.Size(134, 21);
-            this.CmbServerProcessor.TabIndex = 1;
-            this.CmbServerProcessor.SelectedIndexChanged += new System.EventHandler(this.Event_ServerEntryComplete);
-            // 
-            // CmbServerContactType
-            // 
-            this.CmbServerContactType.FormattingEnabled = true;
-            this.CmbServerContactType.Items.AddRange(new object[] {
-            "Hardware",
-            "Software",
-            "Unknown"});
-            this.CmbServerContactType.Location = new System.Drawing.Point(89, 4);
-            this.CmbServerContactType.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbServerContactType.Name = "CmbServerContactType";
-            this.CmbServerContactType.Size = new System.Drawing.Size(103, 21);
-            this.CmbServerContactType.TabIndex = 0;
-            this.CmbServerContactType.SelectedIndexChanged += new System.EventHandler(this.Event_ServerContactEntryComplete);
-            // 
-            // CmbServerOwner
-            // 
-            this.CmbServerOwner.FormattingEnabled = true;
-            this.CmbServerOwner.Items.AddRange(new object[] {
-            "Hardware",
-            "Software",
-            "Unknown"});
-            this.CmbServerOwner.Location = new System.Drawing.Point(89, 4);
-            this.CmbServerOwner.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbServerOwner.Name = "CmbServerOwner";
-            this.CmbServerOwner.Size = new System.Drawing.Size(237, 21);
-            this.CmbServerOwner.TabIndex = 0;
-            this.CmbServerOwner.SelectedIndexChanged += new System.EventHandler(this.Event_ServerOwnerEntryComplete);
-            // 
-            // CmbServerModel
-            // 
-            this.CmbServerModel.FormattingEnabled = true;
-            this.CmbServerModel.Location = new System.Drawing.Point(82, 142);
-            this.CmbServerModel.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbServerModel.Name = "CmbServerModel";
-            this.CmbServerModel.Size = new System.Drawing.Size(217, 21);
-            this.CmbServerModel.TabIndex = 5;
-            this.CmbServerModel.SelectedIndexChanged += new System.EventHandler(this.Event_ServerEntryComplete);
-            // 
-            // CmbServerManufacturer
-            // 
-            this.CmbServerManufacturer.FormattingEnabled = true;
-            this.CmbServerManufacturer.Location = new System.Drawing.Point(82, 118);
-            this.CmbServerManufacturer.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbServerManufacturer.Name = "CmbServerManufacturer";
-            this.CmbServerManufacturer.Size = new System.Drawing.Size(217, 21);
-            this.CmbServerManufacturer.TabIndex = 3;
-            this.CmbServerManufacturer.SelectedIndexChanged += new System.EventHandler(this.Event_ServerEntryComplete);
-            // 
-            // CmbPCmiscellaneouscard_id
-            // 
-            this.CmbPCmiscellaneouscard_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCmiscellaneouscard_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCmiscellaneouscard_id.FormattingEnabled = true;
-            this.CmbPCmiscellaneouscard_id.Location = new System.Drawing.Point(644, 145);
-            this.CmbPCmiscellaneouscard_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCmiscellaneouscard_id.MaxDropDownItems = 50;
-            this.CmbPCmiscellaneouscard_id.Name = "CmbPCmiscellaneouscard_id";
-            this.CmbPCmiscellaneouscard_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCmiscellaneouscard_id.TabIndex = 86;
-            // 
-            // CmbPCmanufacturers_id
-            // 
-            this.CmbPCmanufacturers_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCmanufacturers_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCmanufacturers_id.FormattingEnabled = true;
-            this.CmbPCmanufacturers_id.Location = new System.Drawing.Point(88, 25);
-            this.CmbPCmanufacturers_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCmanufacturers_id.MaxDropDownItems = 50;
-            this.CmbPCmanufacturers_id.Name = "CmbPCmanufacturers_id";
-            this.CmbPCmanufacturers_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCmanufacturers_id.TabIndex = 68;
-            // 
-            // CmbPCspeakers_id
-            // 
-            this.CmbPCspeakers_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCspeakers_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCspeakers_id.FormattingEnabled = true;
-            this.CmbPCspeakers_id.Location = new System.Drawing.Point(644, 120);
-            this.CmbPCspeakers_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCspeakers_id.MaxDropDownItems = 50;
-            this.CmbPCspeakers_id.Name = "CmbPCspeakers_id";
-            this.CmbPCspeakers_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCspeakers_id.TabIndex = 85;
-            // 
-            // CmbPCmice_id
-            // 
-            this.CmbPCmice_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCmice_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCmice_id.FormattingEnabled = true;
-            this.CmbPCmice_id.Location = new System.Drawing.Point(362, 167);
-            this.CmbPCmice_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCmice_id.MaxDropDownItems = 50;
-            this.CmbPCmice_id.Name = "CmbPCmice_id";
-            this.CmbPCmice_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCmice_id.TabIndex = 81;
-            // 
-            // CmbPCmiscdrives_id
-            // 
-            this.CmbPCmiscdrives_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCmiscdrives_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCmiscdrives_id.FormattingEnabled = true;
-            this.CmbPCmiscdrives_id.Location = new System.Drawing.Point(644, 74);
-            this.CmbPCmiscdrives_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCmiscdrives_id.MaxDropDownItems = 50;
-            this.CmbPCmiscdrives_id.Name = "CmbPCmiscdrives_id";
-            this.CmbPCmiscdrives_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCmiscdrives_id.TabIndex = 84;
-            // 
-            // CmbPCram_id
-            // 
-            this.CmbPCram_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCram_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCram_id.FormattingEnabled = true;
-            this.CmbPCram_id.Location = new System.Drawing.Point(644, 50);
-            this.CmbPCram_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCram_id.MaxDropDownItems = 50;
-            this.CmbPCram_id.Name = "CmbPCram_id";
-            this.CmbPCram_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCram_id.TabIndex = 83;
-            // 
-            // CmbPCcddevices_id
-            // 
-            this.CmbPCcddevices_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCcddevices_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCcddevices_id.FormattingEnabled = true;
-            this.CmbPCcddevices_id.Location = new System.Drawing.Point(362, 143);
-            this.CmbPCcddevices_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCcddevices_id.MaxDropDownItems = 50;
-            this.CmbPCcddevices_id.Name = "CmbPCcddevices_id";
-            this.CmbPCcddevices_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCcddevices_id.TabIndex = 80;
-            // 
-            // CmbPCcabinets_id
-            // 
-            this.CmbPCcabinets_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCcabinets_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCcabinets_id.FormattingEnabled = true;
-            this.CmbPCcabinets_id.Location = new System.Drawing.Point(644, 25);
-            this.CmbPCcabinets_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCcabinets_id.MaxDropDownItems = 50;
-            this.CmbPCcabinets_id.Name = "CmbPCcabinets_id";
-            this.CmbPCcabinets_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCcabinets_id.TabIndex = 82;
-            // 
-            // CmbPCsoundcards_id
-            // 
-            this.CmbPCsoundcards_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCsoundcards_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCsoundcards_id.FormattingEnabled = true;
-            this.CmbPCsoundcards_id.Location = new System.Drawing.Point(362, 119);
-            this.CmbPCsoundcards_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCsoundcards_id.MaxDropDownItems = 50;
-            this.CmbPCsoundcards_id.Name = "CmbPCsoundcards_id";
-            this.CmbPCsoundcards_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCsoundcards_id.TabIndex = 79;
-            // 
-            // CmbPCmonitor2_id
-            // 
-            this.CmbPCmonitor2_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCmonitor2_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCmonitor2_id.FormattingEnabled = true;
-            this.CmbPCmonitor2_id.Location = new System.Drawing.Point(362, 96);
-            this.CmbPCmonitor2_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCmonitor2_id.MaxDropDownItems = 50;
-            this.CmbPCmonitor2_id.Name = "CmbPCmonitor2_id";
-            this.CmbPCmonitor2_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCmonitor2_id.TabIndex = 78;
-            // 
-            // CmbPCharddrive2_id
-            // 
-            this.CmbPCharddrive2_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCharddrive2_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCharddrive2_id.FormattingEnabled = true;
-            this.CmbPCharddrive2_id.Location = new System.Drawing.Point(362, 72);
-            this.CmbPCharddrive2_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCharddrive2_id.MaxDropDownItems = 50;
-            this.CmbPCharddrive2_id.Name = "CmbPCharddrive2_id";
-            this.CmbPCharddrive2_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCharddrive2_id.TabIndex = 77;
-            // 
-            // CmbPCprocessors_id
-            // 
-            this.CmbPCprocessors_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCprocessors_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCprocessors_id.FormattingEnabled = true;
-            this.CmbPCprocessors_id.Location = new System.Drawing.Point(362, 49);
-            this.CmbPCprocessors_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCprocessors_id.MaxDropDownItems = 50;
-            this.CmbPCprocessors_id.Name = "CmbPCprocessors_id";
-            this.CmbPCprocessors_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCprocessors_id.TabIndex = 76;
-            // 
-            // CmbPCmodels_id
-            // 
-            this.CmbPCmodels_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCmodels_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCmodels_id.FormattingEnabled = true;
-            this.CmbPCmodels_id.Location = new System.Drawing.Point(362, 25);
-            this.CmbPCmodels_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCmodels_id.MaxDropDownItems = 50;
-            this.CmbPCmodels_id.Name = "CmbPCmodels_id";
-            this.CmbPCmodels_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCmodels_id.TabIndex = 75;
-            // 
-            // CmbPCkeyboards_id
-            // 
-            this.CmbPCkeyboards_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCkeyboards_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCkeyboards_id.FormattingEnabled = true;
-            this.CmbPCkeyboards_id.Location = new System.Drawing.Point(88, 167);
-            this.CmbPCkeyboards_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCkeyboards_id.MaxDropDownItems = 50;
-            this.CmbPCkeyboards_id.Name = "CmbPCkeyboards_id";
-            this.CmbPCkeyboards_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCkeyboards_id.TabIndex = 74;
-            // 
-            // CmbPCnics_id
-            // 
-            this.CmbPCnics_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCnics_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCnics_id.FormattingEnabled = true;
-            this.CmbPCnics_id.Location = new System.Drawing.Point(88, 143);
-            this.CmbPCnics_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCnics_id.MaxDropDownItems = 50;
-            this.CmbPCnics_id.Name = "CmbPCnics_id";
-            this.CmbPCnics_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCnics_id.TabIndex = 73;
-            // 
-            // CmbPCvideocards_id
-            // 
-            this.CmbPCvideocards_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCvideocards_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCvideocards_id.FormattingEnabled = true;
-            this.CmbPCvideocards_id.Location = new System.Drawing.Point(88, 119);
-            this.CmbPCvideocards_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCvideocards_id.MaxDropDownItems = 50;
-            this.CmbPCvideocards_id.Name = "CmbPCvideocards_id";
-            this.CmbPCvideocards_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCvideocards_id.TabIndex = 72;
-            // 
-            // CmbPCmonitor1_id
-            // 
-            this.CmbPCmonitor1_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCmonitor1_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCmonitor1_id.FormattingEnabled = true;
-            this.CmbPCmonitor1_id.Location = new System.Drawing.Point(88, 96);
-            this.CmbPCmonitor1_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCmonitor1_id.MaxDropDownItems = 50;
-            this.CmbPCmonitor1_id.Name = "CmbPCmonitor1_id";
-            this.CmbPCmonitor1_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCmonitor1_id.TabIndex = 71;
-            // 
-            // CmbPCharddrive1_id
-            // 
-            this.CmbPCharddrive1_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCharddrive1_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCharddrive1_id.FormattingEnabled = true;
-            this.CmbPCharddrive1_id.Location = new System.Drawing.Point(88, 72);
-            this.CmbPCharddrive1_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCharddrive1_id.MaxDropDownItems = 50;
-            this.CmbPCharddrive1_id.Name = "CmbPCharddrive1_id";
-            this.CmbPCharddrive1_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCharddrive1_id.TabIndex = 70;
-            // 
-            // CmbPCmotherboards_id
-            // 
-            this.CmbPCmotherboards_id.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.CmbPCmotherboards_id.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.CmbPCmotherboards_id.FormattingEnabled = true;
-            this.CmbPCmotherboards_id.Location = new System.Drawing.Point(88, 49);
-            this.CmbPCmotherboards_id.Margin = new System.Windows.Forms.Padding(0);
-            this.CmbPCmotherboards_id.MaxDropDownItems = 50;
-            this.CmbPCmotherboards_id.Name = "CmbPCmotherboards_id";
-            this.CmbPCmotherboards_id.Size = new System.Drawing.Size(185, 21);
-            this.CmbPCmotherboards_id.TabIndex = 69;
-            // 
             // CmbSelectedList
             // 
             this.CmbSelectedList.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
@@ -5348,27 +5339,36 @@
             this.CmbSelectedList.TabIndex = 94;
             this.CmbSelectedList.SelectedIndexChanged += new System.EventHandler(this.CmbSelectedList_SelectedIndexChanged);
             // 
-            // CmdDocumentationViewDocument
+            // GrdSelectedList
             // 
-            this.CmdDocumentationViewDocument.Location = new System.Drawing.Point(90, 110);
-            this.CmdDocumentationViewDocument.Margin = new System.Windows.Forms.Padding(2);
-            this.CmdDocumentationViewDocument.Name = "CmdDocumentationViewDocument";
-            this.CmdDocumentationViewDocument.Size = new System.Drawing.Size(100, 24);
-            this.CmdDocumentationViewDocument.TabIndex = 195;
-            this.CmdDocumentationViewDocument.Text = "View Document";
-            this.CmdDocumentationViewDocument.UseVisualStyleBackColor = true;
-            this.CmdDocumentationViewDocument.Click += new System.EventHandler(this.CmdDocumentationViewDocument_Click);
-            // 
-            // CmdViewDocumentVersion
-            // 
-            this.CmdViewDocumentVersion.Location = new System.Drawing.Point(92, 137);
-            this.CmdViewDocumentVersion.Margin = new System.Windows.Forms.Padding(2);
-            this.CmdViewDocumentVersion.Name = "CmdViewDocumentVersion";
-            this.CmdViewDocumentVersion.Size = new System.Drawing.Size(100, 24);
-            this.CmdViewDocumentVersion.TabIndex = 196;
-            this.CmdViewDocumentVersion.Text = "View Version";
-            this.CmdViewDocumentVersion.UseVisualStyleBackColor = true;
-            this.CmdViewDocumentVersion.Click += new System.EventHandler(this.CmdViewDocumentVersion_Click);
+            this.GrdSelectedList.AllowUserToAddRows = false;
+            this.GrdSelectedList.AllowUserToDeleteRows = false;
+            this.GrdSelectedList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.GrdSelectedList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            this.GrdSelectedList.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
+            dataGridViewCellStyle41.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle41.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle41.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle41.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle41.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle41.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle41.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdSelectedList.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle41;
+            this.GrdSelectedList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.GrdSelectedList.Location = new System.Drawing.Point(2, 132);
+            this.GrdSelectedList.Margin = new System.Windows.Forms.Padding(2);
+            this.GrdSelectedList.MultiSelect = false;
+            this.GrdSelectedList.Name = "GrdSelectedList";
+            this.GrdSelectedList.ReadOnly = true;
+            dataGridViewCellStyle42.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.GrdSelectedList.RowsDefaultCellStyle = dataGridViewCellStyle42;
+            this.GrdSelectedList.RowTemplate.Height = 20;
+            this.GrdSelectedList.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.GrdSelectedList.Size = new System.Drawing.Size(1256, 525);
+            this.GrdSelectedList.TabIndex = 30;
+            this.GrdSelectedList.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.GrdSelectedList_CellMouseClick);
             // 
             // FrmMain
             // 
@@ -5477,13 +5477,13 @@
             this.SubtabLists.ResumeLayout(false);
             this.SubtabLists.PerformLayout();
             this.PnlCategoryEditNewSave.ResumeLayout(false);
+            this.GrpCategoryActiveFlags.ResumeLayout(false);
+            this.GrpCategoryActiveFlags.PerformLayout();
             this.PnlCategoryEditItem.ResumeLayout(false);
             this.PnlCategoryEditItem.PerformLayout();
             this.RadCateogryEdit.ResumeLayout(false);
             this.RadCateogryEdit.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GrdSelectedList)).EndInit();
-            this.GrpCategoryActiveFlags.ResumeLayout(false);
-            this.GrpCategoryActiveFlags.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -5758,7 +5758,7 @@
         private System.Windows.Forms.GroupBox PnlServerActiveInactive;
         private System.Windows.Forms.RadioButton RadServerActive;
         private System.Windows.Forms.RadioButton RadServerInactive;
-        private System.Windows.Forms.Label label82;
+        private System.Windows.Forms.Label LblBuildDate;
         private System.Windows.Forms.TextBox TxtServerSlotNumber;
         private System.Windows.Forms.TextBox TxtServerLocationOther;
         private System.Windows.Forms.Label label81;
