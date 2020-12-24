@@ -72,6 +72,7 @@ namespace SBSJournalEntryImport
 
             // Add status bar (2 segment default, with version)
             StatusBar = new VersionStatusBar(this);
+            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, StatusBar.GetVersion(), JobName);
 
         }
         #endregion
