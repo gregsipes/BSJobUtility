@@ -322,21 +322,45 @@ namespace SBSJournalEntryImport
             int numrows = 0;
             try
             {
+                // First, delete any old files (and ignore any deletion errors assocatied with them)
+                string basefilename = "SBSJournalEntry_" + UserInfo.Username;
+                string basepath = WorkingFolder + basefilename;
+                string wildcard = basefilename + "*.txt";
+                var dir = new System.IO.DirectoryInfo(WorkingFolder);
+                try
+                {
+                    foreach (var file in dir.EnumerateFiles(wildcard))
+                    {
+                        try
+                        {
+                            file.Delete();
+                        }
+                        catch
+                        {
+                            // Ignore any errors - these can result from Excel being improperly closed.  These generally resolve after reboot.
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    BroadcastWarning("WARNING:  Unable to remove temporary files", ex);
+                }
+
                 // Open the spreadsheet
                 StatusBar.AddText(0, "Converting spreadsheet to tab-delimited file...");
                 Spreadsheet import = new Spreadsheet(TxtImportFile.Text);
 
                 // Confirm that it conforms to table design.  The return value will either be the starting data row OR -1 if failure.
                 int FirstDataRow = ConfirmSpreadsheetFormat(import);
-                if (FirstDataRow == -1)
-                {
-                    StatusBar.AddText(0, "SPREADSHEET PARSING ERROR");
-                    return;
-                }
-                else
+                if (FirstDataRow != -1)
                 {
                     DataIO.WriteToJobLog(Enums.JobLogMessageType.INFO, "Spreadsheet " + TxtImportFile.Text + " passes consistency checks", JobName);
                     StatusBar.AddText(0, "Spreadsheet passes consistency checks");
+                }
+                else
+                {
+                    StatusBar.AddText(0, "SPREADSHEET PARSING ERROR");
+                    return;
                 }
 
                 // Count up to the first blank row - we'll be saving this much of the file into CSV format
@@ -348,9 +372,10 @@ namespace SBSJournalEntryImport
                     bool success = import.DeleteRows(LastNonBlankRow + 1, LastActualRow);
                 }
 
-                // Save as tab-delimited file (delete any identically-named file first)
-                string CSVFilename = WorkingFolder + "SBSJournalEntry_" + UserInfo.Username + ".txt";
-                bool saved = import.File.SaveAs(CSVFilename, Spreadsheet.FileFormat.TabDelimited, true);
+                // Save as a unique tab-delimited file.
+                string mmddyy_hhmmss = DateTime.Now.ToString("yyMMdd_HHmmss");
+                string CSVFilename = basepath + "_" + mmddyy_hhmmss + ".txt";
+                bool saved = import.File.SaveAs(CSVFilename, Spreadsheet.FileFormat.TabDelimited, false);
                 if (!saved)
                 {
                     BroadcastError("ERROR:  Unable to convert spreadsheet to CSV format: " + import.LastException, null);
@@ -366,7 +391,6 @@ namespace SBSJournalEntryImport
                 BulkParams[0] = new SqlParameter("strCSVFilename", CSVFilename);
                 BulkParams[1] = new SqlParameter("strNumHeaderRows", NumHeaderRowsInFile.ToString());
                 SqlDataReader rdr = SQLQuery("Proc_BulkInsertSBSJournalEntries", BulkParams);
-                rdr.Read();
 
                 // If the returned Sum(Amount) is nonzero, generate a message to warn the user before proceeding
                 // NOTE Do a read here to collect any Exception error from the query:
