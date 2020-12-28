@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -112,7 +113,73 @@ namespace AutoPrintPDF
                     return;
                 }
 
-                string outputDirectory = GetConfigurationKeyValue("WorkDirectory") + Version;
+                Int32 subDirectoryCount = 1;
+
+                //create output path. ex - \\omaha\AutoPrintPDF_AutoRenew\20201021090010_3FBFFF3498914385BE6B2E0E3919E046\1\
+                string baseOutputDirectory = GetConfigurationKeyValue("WorkDirectory") + Version + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + Guid.NewGuid().ToString().Replace("-", "") + "\\";
+
+                if (!Directory.Exists(baseOutputDirectory))
+                    Directory.CreateDirectory(baseOutputDirectory);
+
+                WriteToJobLog(JobLogMessageType.INFO, $"{results.Count()} {description} notices to be created for renewal run date(s) {load["renewal_run_dates"].ToString()}");
+                WriteToJobLog(JobLogMessageType.INFO, $".pdf's being created in {baseOutputDirectory}");
+
+                Int32 totalCounter = 0;
+
+                foreach (Dictionary<string, object> result in results)
+                {
+                    totalCounter++;
+
+                   string outputDirectory = baseOutputDirectory + subDirectoryCount.ToString() + "\\";
+
+                    if (!Directory.Exists(outputDirectory))
+                        Directory.CreateDirectory(outputDirectory);
+
+                    string outputFileName = result["subscription_number_without_check_digit"].ToString() + Convert.ToDateTime(result["renewal_run_date"].ToString()).ToString("MMddyyyy") + "INVOICE.pdf";
+
+                    if (Version == "AutoRenew")
+                    {
+                        //todo: call reports here
+
+
+
+                        //create record in AutoPrintPDF database
+                        ExecuteNonQuery(DatabaseConnectionStringNames.AutoPrintPDF, "Proc_Insert_AutoRenew",
+                                                    new SqlParameter("@pvchrFileName", outputFileName),
+                                                    new SqlParameter("@psdatRenewalDate", Convert.ToDateTime(result["renewal_run_date"].ToString()).ToShortDateString()));
+                    }
+
+                    else
+                    {
+                        //todo: call reports here
+
+
+                        //create record in AutoPrintPDF database
+                        ExecuteNonQuery(DatabaseConnectionStringNames.AutoPrintPDF, "Proc_Insert_OfficePay",
+                                                    new SqlParameter("@pvchrFileName", outputFileName),
+                                                    new SqlParameter("@psdatRenewalDate", Convert.ToDateTime(result["renewal_run_date"].ToString()).ToShortDateString()));
+                    }
+
+
+                    //log every 60th file
+                    if (totalCounter % 60 == 0)
+                    {
+                        WriteToJobLog(JobLogMessageType.INFO, $"{totalCounter} {description} notices created in work directory...");
+
+                    }
+
+                    //after 9,900 files, create a new sub directory
+                    if (totalCounter % 9900 == 0)
+                         subDirectoryCount++;
+
+
+                    //      todo:      flgFTP = FTPPDFs(lngTotalCounter)
+                    //      todo:        flgCopy = CopyPDFs()
+
+                }
+
+
+
 
             }
 

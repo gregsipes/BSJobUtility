@@ -54,5 +54,15 @@
       <Name>BSJobBase</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Reports\rptAutoRenew.rpt" />
+    <None Include="Reports\rptAutoRenewPrintDigital.rpt" />
+    <None Include="Reports\rptAutoRenewSun.rpt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Reports\rptAutoRenew.vb" />
+    <Content Include="Reports\rptAutoRenewPrintDigital.vb" />
+    <Content Include="Reports\rptAutoRenewSun.vb" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
