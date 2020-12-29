@@ -30,7 +30,7 @@ namespace AutoPrintPDF
                 {
                     case "OfficePay":
                     case "AutoRenew":
-                        //todo:
+                        AutoRenewOrOfficePay();
                         break;
                     case "PBSInvoices":
                         //todo:
@@ -173,17 +173,62 @@ namespace AutoPrintPDF
                          subDirectoryCount++;
 
 
-                    //      todo:      flgFTP = FTPPDFs(lngTotalCounter)
-                    //      todo:        flgCopy = CopyPDFs()
+                    //copy files to cmpdf directory
+                    File.Copy(outputDirectory + outputFileName, GetConfigurationKeyValue("CopyDirectory") + outputFileName);
+
+                    WriteToJobLog(JobLogMessageType.INFO, $"File copied to {GetConfigurationKeyValue("CopyDirectory") + outputFileName}");
 
                 }
 
+                //run update sproc
+                if (Version == "AutoRenew")
+                    ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "Proc_Insert_Loads_Successful_AutoPrint_To_PDF",
+                                            new SqlParameter("@pintLoadsID", load["loads_id"].ToString()),
+                                            new SqlParameter("@pvchrPublicationName", load["publication_name"].ToString()));
+                else
+                    ExecuteNonQuery(DatabaseConnectionStringNames.OfficePay, "Proc_Insert_Loads_Successful_AutoPrint_To_PDF",
+                                            new SqlParameter("@pintLoadsID", load["loads_id"].ToString()),
+                                            new SqlParameter("@pvchrPublicationName", load["publication_name"].ToString()));
 
 
 
             }
 
+            //remove work directory files
 
+
+            WriteToJobLog(JobLogMessageType.INFO, "AutoRenewOrOfficePay processing completed");
+
+        }
+
+        private void PBSInvoices()
+        {
+            WriteToJobLog(JobLogMessageType.INFO, "Determining latest invoice date");
+
+            List<Dictionary<string, object>> loads = ExecuteSQL(DatabaseConnectionStringNames.AutoRenew, "Proc_Select_Loads_Bill_Dates_Pages").ToList();
+
+            if (loads == null || loads.Count() == 0)
+            {
+                WriteToJobLog(JobLogMessageType.INFO, "No invoice dates for which .pdf is to be created exist in database");
+                return;
+            }
+
+            foreach(Dictionary<string, object> load in loads)
+            {
+                WriteToJobLog(JobLogMessageType.INFO, $"Found loads_id {load["loads_id"].ToString()}");
+                WriteToJobLog(JobLogMessageType.INFO, $"Retrieving invoices for {load["bill_date"].ToString()}");
+
+                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Header_Body_By_Bill_Date_No_Additional_Copies",
+                                                                        new SqlParameter("@psdatBillDate", load["bill_date"].ToString())).ToList();
+
+                if (results.Count() == 0)
+                    WriteToJobLog(JobLogMessageType.INFO, $"No invoices exists for {load["bill_date"].ToString()}");
+                else
+                {
+
+                }
+
+            }
         }
 
     }
