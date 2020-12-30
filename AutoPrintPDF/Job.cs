@@ -33,7 +33,7 @@ namespace AutoPrintPDF
                         AutoRenewOrOfficePay();
                         break;
                     case "PBSInvoices":
-                        //todo:
+                        PBSInvoices();
                         break;
                     case "PBSInvoicesByCarrierID":
                         //todo:
@@ -191,11 +191,10 @@ namespace AutoPrintPDF
                                             new SqlParameter("@pvchrPublicationName", load["publication_name"].ToString()));
 
 
-
+                //remove work directory files
+                WriteToJobLog(JobLogMessageType.INFO, $"Deleting work directory {baseOutputDirectory}");
+                Directory.Delete(baseOutputDirectory, true);
             }
-
-            //remove work directory files
-
 
             WriteToJobLog(JobLogMessageType.INFO, "AutoRenewOrOfficePay processing completed");
 
@@ -205,7 +204,7 @@ namespace AutoPrintPDF
         {
             WriteToJobLog(JobLogMessageType.INFO, "Determining latest invoice date");
 
-            List<Dictionary<string, object>> loads = ExecuteSQL(DatabaseConnectionStringNames.AutoRenew, "Proc_Select_Loads_Bill_Dates_Pages").ToList();
+            List<Dictionary<string, object>> loads = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Loads_Bill_Dates_Pages").ToList();
 
             if (loads == null || loads.Count() == 0)
             {
@@ -222,13 +221,90 @@ namespace AutoPrintPDF
                                                                         new SqlParameter("@psdatBillDate", load["bill_date"].ToString())).ToList();
 
                 if (results.Count() == 0)
-                    WriteToJobLog(JobLogMessageType.INFO, $"No invoices exists for {load["bill_date"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"No invoices exist for {load["bill_date"].ToString()}");
                 else
                 {
+                    string outputFile = GetConfigurationKeyValue("PBSInvoiceDirectory") + Convert.ToDateTime(load["bill_date"].ToString()).ToShortDateString() + ".pdf";
+
+                    //if the file already exists, delete it
+                    if (File.Exists(outputFile))
+                        File.Delete(outputFile);
+
+                    WriteToJobLog(JobLogMessageType.INFO, $"Sending invoices to {outputFile}");
+
+                    //todo: call reports here
+
+                    DeleteTemp();
+
+                    //run update sproc
+                    ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "Proc_Update_Loads_Successful_AutoPrint_to_PDF_Flag",
+                                                    new SqlParameter("@pintLoadsID", load["loads_id"].ToString()));
+
+                    WriteToJobLog(JobLogMessageType.INFO, $"{outputFile} successfully created");
 
                 }
 
             }
+        }
+
+        private void PBSInvoicesByCarrierID()
+        {
+            WriteToJobLog(JobLogMessageType.INFO, "Determining latest invoice date");
+
+            List<Dictionary<string, object>> loads = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Loads_Bill_Dates_Pages_For_AutoPrint_to_PDF_By_CarrierID").ToList();
+
+            if (loads == null || loads.Count() == 0)
+            {
+                WriteToJobLog(JobLogMessageType.INFO, "No invoice dates for which .pdf is to be created exist in database");
+                return;
+            }
+
+            //todo: install font?
+
+            foreach(Dictionary<string, object> load in loads)
+            {
+                WriteToJobLog(JobLogMessageType.INFO, $"Found loads_id {load["loads_id"].ToString()}");
+                WriteToJobLog(JobLogMessageType.INFO, $"Bill Date = {load["bill_date"].ToString()}");
+                WriteToJobLog(JobLogMessageType.INFO, $"Bill Source = {load["bill_source"].ToString()}");
+
+                List<Dictionary<string, object>> carriers = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Header_Distinct_Carrier",
+                                                                                        new SqlParameter("@psdatBillDate", load["bill_date"].ToString()),
+                                                                                        new SqlParameter("@pvchrBillSource", load["bill_source"].ToString())).ToList();
+
+                if (carriers == null || carriers.Count() == 0)
+                    WriteToJobLog(JobLogMessageType.INFO, "No invoices exist for this load, bill date, bill source & print type");
+                else
+                {
+                    foreach (Dictionary<string, object> carrier in carriers)
+                    {
+
+                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Header_Body_By_Bill_Date_No_Additional_Copies_By_CarrierID",
+                                                                                        new SqlParameter("@psdatBillDate", load["bill_date"].ToString()),
+                                                                                        new SqlParameter("@pvchrBillSource", load["bill_source"].ToString()),
+                                                                                        new SqlParameter("@pvchrCarrier", carrier["carrier"].ToString())).ToList();
+
+                        //string outputFileName = 
+
+                        //todo:
+                    }
+                }
+            }
+
+        }
+
+        private void DeleteTemp()
+        {
+            //GDS - I'm not sure why this is needed here or why these temp files are getting created. From
+            //the current logs, it looks like this code is still in use, so it has been carried over
+
+            List<string> tempFiles = Directory.GetFiles(Path.GetTempPath(), "ctm*.tmp").ToList();
+
+            foreach(string tempFile in tempFiles)
+            {
+                WriteToJobLog(JobLogMessageType.INFO, $"Delete temp file {tempFile}");
+                File.Delete(tempFile);
+            }
+
         }
 
     }
