@@ -164,7 +164,7 @@ namespace PBSInvoiceTotals
                             if (line.Contains("@") && line.IndexOf("@") == 42)
                             {
                                 string description = line.Substring(0, 32).Trim();
-                                Int32 drawTotal = Int32.Parse(line.Substring(0, line.IndexOf("@")).Replace(description, "").Replace(",", "").Trim());
+                                Int32 drawTotal = Int32.Parse(line.Substring(0, line.IndexOf("@")).Replace(description, "").Replace(",", "").Trim()); //TBD 12/30/20 - Int32.Parse(FormatNumber(line.Substring(0, line.IndexOf("@")).Replace(description, "").Replace(",", "").Trim()).ToString()); 
                                 decimal rate = decimal.Parse(FormatNumber(line.Substring(43, 11).Trim().Replace(",", "")).ToString());
                                 decimal total = decimal.Parse(FormatNumber(line.Substring(54).Trim().Replace(",", "")).ToString());
 
