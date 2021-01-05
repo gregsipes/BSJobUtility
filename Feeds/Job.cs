@@ -394,15 +394,10 @@ namespace Feeds
 
             //to build the passphrase, get the user sid, replace hyphen and leading S, then reverse
 
-            string userSID = WindowsIdentity.GetCurrent().User.ToString();
-
-            WriteToJobLog(JobLogMessageType.INFO, $"User SID = {userSID}");
-            WriteToJobLog(JobLogMessageType.INFO, $"System.Security.Principal.WindowsIdentity.GetCurrent().Name = {System.Security.Principal.WindowsIdentity.GetCurrent().Name}");
-
-            //this is for debugging purposes and the switch from bs_sql to buffnews.com\bs_sql
-            // if (Debugger.IsAttached || System.Security.Principal.WindowsIdentity.GetCurrent().Name.ToLower() == "buffnews.com\bs_sql")
-            if (Debugger.IsAttached)
-                userSID = GetConfigurationKeyValue("UserSID");
+            //To maintain backwards comptability, this SID has been changed to static
+            //value as opposed to collecting the SID from the logged in user.
+            // string userSID = WindowsIdentity.GetCurrent().User.ToString();
+            string userSID = GetConfigurationKeyValue("UserSID");
 
             char[] passPhraseArray = userSID.Replace("-", "").Replace("S", "").ToCharArray();
             Array.Reverse(passPhraseArray);
@@ -451,8 +446,6 @@ namespace Feeds
 
                     WriteToJobLog(JobLogMessageType.INFO, $"SFTP Server = {feed["ftp_server"].ToString()}");
                     WriteToJobLog(JobLogMessageType.INFO, $"SFTP User = {feed["user_name"].ToString()}");
-                    WriteToJobLog(JobLogMessageType.INFO, $"Password = {feed["password"].ToString()}");
-                    WriteToJobLog(JobLogMessageType.INFO, $"Host key = {feed["host_key"].ToString()}");
                     //WriteToJobLog(JobLogMessageType.INFO, $"SBinary FTP? = {feed["binary_flag"].ToString()}");
                     WriteToJobLog(JobLogMessageType.INFO, $"Remote destination directory = {feed["put_subdirectory"].ToString()}");
 
