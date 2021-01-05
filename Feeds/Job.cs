@@ -49,6 +49,8 @@ namespace Feeds
 
             string securityPassPhrase = DeterminePassPhrase();
 
+            WriteToJobLog(JobLogMessageType.INFO, $"Running as user {System.Security.Principal.WindowsIdentity.GetCurrent().Name}");
+
             //retrieve the rest of the feed specific fields
             Dictionary<string, object> feed = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_Feeds",
                                                         new SqlParameter("@pvchrTitle", Version),
@@ -91,10 +93,11 @@ namespace Feeds
 
 
             //Invoke stored procedure Proc_Insert_Builds and create a record identifying (logging) this build.
+            var x = endDate.HasValue ? endDate.Value.ToString() : "";
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Insert_Builds",
                                              new SqlParameter("@pintFeedsID", feed["feeds_id"].ToString()),
-                                             new SqlParameter("@pvchrUserSpecifiedStartingDate", startDate.HasValue ? startDate.Value.ToString() : ""),
-                                             new SqlParameter("@pvchrUserSpecifiedEndingDate", endDate.HasValue ? endDate.Value.ToString() : ""),
+                                             new SqlParameter("@pvchrUserSpecifiedStartingDate", startDate.HasValue ? startDate.Value.ToShortDateString() : ""),
+                                             new SqlParameter("@pvchrUserSpecifiedEndingDate", endDate.HasValue ? endDate.Value.ToShortDateString() : ""),
                                              new SqlParameter("@pvchrStandardLogFileName", ""), //todo: should this be something?
                                              new SqlParameter("@pvchrUserDefinedLogFileName", ""), //todo: should this be something?
                                              new SqlParameter("@pvchrNetworkUserName", System.Security.Principal.WindowsIdentity.GetCurrent().Name),
@@ -391,9 +394,13 @@ namespace Feeds
 
             //to build the passphrase, get the user sid, replace hyphen and leading S, then reverse
 
-            string userSID = WindowsIdentity.GetCurrent().User.AccountDomainSid.ToString();
+            string userSID = WindowsIdentity.GetCurrent().User.ToString();
 
-            //this is for debugging purposes only, pretend we are the bs_sql user 
+            WriteToJobLog(JobLogMessageType.INFO, $"User SID = {userSID}");
+            WriteToJobLog(JobLogMessageType.INFO, $"System.Security.Principal.WindowsIdentity.GetCurrent().Name = {System.Security.Principal.WindowsIdentity.GetCurrent().Name}");
+
+            //this is for debugging purposes and the switch from bs_sql to buffnews.com\bs_sql
+            // if (Debugger.IsAttached || System.Security.Principal.WindowsIdentity.GetCurrent().Name.ToLower() == "buffnews.com\bs_sql")
             if (Debugger.IsAttached)
                 userSID = GetConfigurationKeyValue("UserSID");
 
@@ -444,6 +451,8 @@ namespace Feeds
 
                     WriteToJobLog(JobLogMessageType.INFO, $"SFTP Server = {feed["ftp_server"].ToString()}");
                     WriteToJobLog(JobLogMessageType.INFO, $"SFTP User = {feed["user_name"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"Password = {feed["password"].ToString()}");
+                    WriteToJobLog(JobLogMessageType.INFO, $"Host key = {feed["host_key"].ToString()}");
                     //WriteToJobLog(JobLogMessageType.INFO, $"SBinary FTP? = {feed["binary_flag"].ToString()}");
                     WriteToJobLog(JobLogMessageType.INFO, $"Remote destination directory = {feed["put_subdirectory"].ToString()}");
 
@@ -481,6 +490,9 @@ namespace Feeds
                                 {
                                     try
                                     {
+                                        //todo: test code 
+                                       // sourceFileName = "C:\\temp\\1605218.pdf";
+
                                         sFTP.UploadFile(sourceFileName, feed["put_subdirectory"].ToString(), true, true);
                                         WriteToJobLog(JobLogMessageType.INFO, $"Successfully uploaded {sourceFileName} to {destinationFileName}");
                                         fileUploadCount++;
@@ -513,6 +525,7 @@ namespace Feeds
                     }
                     else
                     {
+
                         //this code shold never be hit. All feeds have been updated to use SFTP
                         throw new Exception("FTP has been disabled");
 
