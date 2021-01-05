@@ -36,7 +36,7 @@ namespace AutoPrintPDF
                         PBSInvoices();
                         break;
                     case "PBSInvoicesByCarrierID":
-                        //todo:
+                        PBSInvoicesByCarrierID();
                         break;
                     default:
                         throw new Exception("Unknown version");
@@ -283,9 +283,23 @@ namespace AutoPrintPDF
                                                                                         new SqlParameter("@pvchrBillSource", load["bill_source"].ToString()),
                                                                                         new SqlParameter("@pvchrCarrier", carrier["carrier"].ToString())).ToList();
 
-                        //string outputFileName = 
+                        string outputFile = GetConfigurationKeyValue("PBSInvoicesByCarrierIdDirectory") + Convert.ToDateTime(load["bill_date"].ToString()).ToString("yyyy") + "\\";
 
-                        //todo:
+                        //create the directory if it doesn't already exist
+                        if (!Directory.Exists(outputFile))
+                            Directory.CreateDirectory(outputFile);
+                            
+                        outputFile += carrier["carrier"] + "_" + Convert.ToDateTime(load["bill_date"].ToString()).ToString("yyyyMMdd") + "_" + load["bill_source"].ToString() + ".pdf";
+
+                        //todo: call reports here
+
+
+                        //run update sproc
+                        ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "Proc_Update_Loads_Successful_AutoPrint_to_PDF_By_CarrierID_Flag",
+                                                        new SqlParameter("@pintLoadsID", load["loads_id"].ToString()));
+
+                        WriteToJobLog(JobLogMessageType.INFO, $"{outputFile} successfully created");
+
                     }
                 }
             }
