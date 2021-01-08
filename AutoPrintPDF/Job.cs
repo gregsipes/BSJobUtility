@@ -1,4 +1,5 @@
 ﻿using BSJobBase;
+using CrystalDecisions.Shared;
 using Reporting;
 using System;
 using System.Collections.Generic;
@@ -140,9 +141,34 @@ namespace AutoPrintPDF
 
                     if (Version == "AutoRenew")
                     {
-                        //todo: call reports here
-                        //var x = new rptAutoRenew();
-                        //var y = new rptTest();
+                        //generate and save reports
+                        if (result["report_name"].ToString() == "rptAutoRenew")
+                        {
+                            rptAutoRenew report = new rptAutoRenew();
+
+                            report.SetDataSource(result);
+
+                            //todo: I haven't found a way to mimic the old code and set a path, so we will try the saveas function
+                            //ExportOptions exportOptions = new ExportOptions();
+                            //exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
+                            //exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
+                            // exportOptions. = outputFileName;
+                            //report.Export(exportOptions);
+
+                            report.SaveAs(outputFileName, true);
+
+                        }
+                        else if (result["report_name"].ToString() == "rptAutoRenewPrintDigital")
+                        {
+                            rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital();
+                            report.SaveAs(outputFileName, true);
+
+                        }
+                        else if (result["report_name"].ToString() == "rptAutoRenewSun")
+                        {
+                            rptAutoRenewSun report = new rptAutoRenewSun();
+                            report.SaveAs(outputFileName, true);
+                        }
 
                         //create record in AutoPrintPDF database
                         ExecuteNonQuery(DatabaseConnectionStringNames.AutoPrintPDF, "Proc_Insert_AutoRenew",
@@ -152,8 +178,15 @@ namespace AutoPrintPDF
 
                     else
                     {
-                        //todo: call reports here
-
+                        //generate and save reports
+                        if (result["report_name"].ToString() == "rptOfficePayPrintDigital")
+                        {
+                            //todo:
+                        }
+                        else if (result["report_name"].ToString() == "rptOfficePaySun")
+                        {
+                            //todo:
+                        }
 
                         //create record in AutoPrintPDF database
                         ExecuteNonQuery(DatabaseConnectionStringNames.AutoPrintPDF, "Proc_Insert_OfficePay",

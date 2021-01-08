@@ -17,7 +17,6 @@ Imports CrystalDecisions.Shared
 Imports System
 Imports System.ComponentModel
 
-Namespace AutoPrintPDF
 
     Public Class rptAutoRenew
         Inherits ReportClass
@@ -158,5 +157,3 @@ Namespace AutoPrintPDF
             Return key
         End Function
     End Class
-
-End Namespace
