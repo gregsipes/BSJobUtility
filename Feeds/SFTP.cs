@@ -50,7 +50,7 @@ namespace Feeds
 
         public bool UploadFile(string sourceFilePath, string destinationFilePath, bool allowResumeSupport, bool allowPreserveTimeStamp)
         {
-            TransferOptions transferOptions = new TransferOptions() { TransferMode = TransferMode.Ascii };
+            TransferOptions transferOptions = new TransferOptions() { TransferMode = TransferMode.Binary };
 
             if (!allowResumeSupport)
                 transferOptions.ResumeSupport = new TransferResumeSupport() { State = TransferResumeSupportState.Off };

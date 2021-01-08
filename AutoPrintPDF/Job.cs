@@ -141,8 +141,8 @@ namespace AutoPrintPDF
                     if (Version == "AutoRenew")
                     {
                         //todo: call reports here
-                        var x = new rptAutoRenew();
-                        var y = new rptTest();
+                        //var x = new rptAutoRenew();
+                        //var y = new rptTest();
 
                         //create record in AutoPrintPDF database
                         ExecuteNonQuery(DatabaseConnectionStringNames.AutoPrintPDF, "Proc_Insert_AutoRenew",
