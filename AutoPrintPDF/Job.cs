@@ -1,4 +1,5 @@
 ﻿using BSJobBase;
+using Reporting;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -140,8 +141,8 @@ namespace AutoPrintPDF
                     if (Version == "AutoRenew")
                     {
                         //todo: call reports here
-
-
+                        var x = new rptAutoRenew();
+                        var y = new rptTest();
 
                         //create record in AutoPrintPDF database
                         ExecuteNonQuery(DatabaseConnectionStringNames.AutoPrintPDF, "Proc_Insert_AutoRenew",
