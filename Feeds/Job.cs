@@ -84,7 +84,11 @@ namespace Feeds
             string outputDirectory = feed["output_directory"].ToString();
             //format_of_current_datetime_in_output_subdirectory
             if (feed["format_of_current_datetime_in_output_subdirectory"].ToString() != "")
-                outputDirectory += "\\" + DateTime.Now.ToString(feed["format_of_current_datetime_in_output_subdirectory"].ToString()) + "\\";
+                outputDirectory += "\\" + DateTime.Now.ToString(feed["format_of_current_datetime_in_output_subdirectory"].ToString().Replace("m", "M").Replace("n", "m")) + "\\";
+
+
+            if (!Directory.Exists(outputDirectory))
+                Directory.CreateDirectory(outputDirectory);
 
 
             //At this point we've successfully populated all required fields, so log a message indicating that we're now building the output file.
@@ -93,7 +97,7 @@ namespace Feeds
 
 
             //Invoke stored procedure Proc_Insert_Builds and create a record identifying (logging) this build.
-            var x = endDate.HasValue ? endDate.Value.ToString() : "";
+           // var x = endDate.HasValue ? endDate.Value.ToString() : "";
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Insert_Builds",
                                              new SqlParameter("@pintFeedsID", feed["feeds_id"].ToString()),
                                              new SqlParameter("@pvchrUserSpecifiedStartingDate", startDate.HasValue ? startDate.Value.ToShortDateString() : ""),
@@ -155,6 +159,9 @@ namespace Feeds
             }
 
             //Invoke the appropriate stored procedure (from the build record field "stored_proc" in table Feeds)
+            //test code - this mimics a previously failed run
+            buildId = 51152;
+
             string parameterString = DetermineParameters(Convert.ToInt64(feed["feeds_id"].ToString()), buildId, feed["pubid"].ToString(), userSerialNumber, startDate.HasValue ? startDate.Value.ToShortDateString() : "", endDate.HasValue ? endDate.Value.ToShortDateString() : "", feed["user_name"].ToString());
 
 
@@ -198,7 +205,7 @@ namespace Feeds
 
 
             //Create output filename:  For Tearsheets it's in the form TSExport_YYMMDD_YYMMddhhmmss.txt
-            string outputFileName = DetermineOutputFileName(outputDirectory, feed["output_file_name_prefix"].ToString(), feed["format_of_user_specified_date_in_output_file_name"].ToString(),
+            string outputFileName = DetermineOutputFileName(outputDirectory, feed["output_file_name_prefix"].ToString(), feed["format_of_user_specified_date_in_output_file_name"].ToString().Replace("m", "M").Replace("n", "m"),
                                                            feed["format_of_current_datetime_in_output_file_name"].ToString(), endDate ?? startDate, feed["output_file_name_extension"].ToString());
 
             //In table Builds, set the file_creation_start_date_time field to current date/time
