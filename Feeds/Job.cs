@@ -160,7 +160,7 @@ namespace Feeds
 
             //Invoke the appropriate stored procedure (from the build record field "stored_proc" in table Feeds)
             //test code - this mimics a previously failed run
-            buildId = 51152;
+           // buildId = 51152;
 
             string parameterString = DetermineParameters(Convert.ToInt64(feed["feeds_id"].ToString()), buildId, feed["pubid"].ToString(), userSerialNumber, startDate.HasValue ? startDate.Value.ToShortDateString() : "", endDate.HasValue ? endDate.Value.ToShortDateString() : "", feed["user_name"].ToString());
 
