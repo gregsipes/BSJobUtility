@@ -114,7 +114,7 @@ namespace BSJobUtility
             else if (_jobName == "PackageAssignmentLoad")
                 _managedJob = new PackageAssignmentLoad.Job();
             else if (_jobName == "AutoPrintPDF")
-                _managedJob = new AutoPrintPDF.Job() { Version = _version };
+                _managedJob = new AutoPrintPDF.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else

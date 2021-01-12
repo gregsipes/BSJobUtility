@@ -19,7 +19,7 @@ namespace AutoPrintPDF
         public override void SetupJob()
         {
             JobName = "AutoPrintPDF";
-            JobDescription = "TODO";
+            JobDescription = "Generates PDF files for renewal notices and carrier invoices";
             AppConfigSectionName = "AutoPrintPDF";
 
         }
@@ -28,21 +28,27 @@ namespace AutoPrintPDF
         {
             try
             {
-                switch (Version)
-                {
-                    case "OfficePay":
-                    case "AutoRenew":
-                        AutoRenewOrOfficePay();
-                        break;
-                    case "PBSInvoices":
-                        PBSInvoices();
-                        break;
-                    case "PBSInvoicesByCarrierID":
-                        PBSInvoicesByCarrierID();
-                        break;
-                    default:
-                        throw new Exception("Unknown version");
-                }
+                //switch (Version)
+                //{
+                //    case "OfficePay":
+                //    case "AutoRenew":
+                //        AutoRenewOrOfficePay();
+                //        break;
+                //    case "PBSInvoices":
+                //        PBSInvoices();
+                //        break;
+                //    case "PBSInvoicesByCarrierID":
+                //        PBSInvoicesByCarrierID();
+                //        break;
+                //    default:
+                //        throw new Exception("Unknown version");
+                //}
+
+                AutoRenewOrOfficePay("AutoRenew");
+                AutoRenewOrOfficePay("OfficePay");
+                PBSInvoices();
+                PBSInvoicesByCarrierID();
+
             }
             catch (Exception ex)
             {
@@ -51,25 +57,25 @@ namespace AutoPrintPDF
             }
         }
 
-        private void AutoRenewOrOfficePay()
+        private void AutoRenewOrOfficePay(string version)
         {
-            string description = "renewal";
+            //string description = "renewal";
 
-            if (Version == "AutoRenew")
-                description = "autorenew";
+            //if (version == "AutoRenew")
+            //    description = "autorenew";
 
-            WriteToJobLog(JobLogMessageType.INFO, $"Determining {description} notices to send to .pdf");
+            WriteToJobLog(JobLogMessageType.INFO, $"Determining {version} notices to send to .pdf");
 
             List<Dictionary<string, object>> loads = new List<Dictionary<string, object>>();
 
-            if (Version == "AutoRenew")
+            if (version == "AutoRenew")
                 loads = ExecuteSQL(DatabaseConnectionStringNames.AutoRenew, "Proc_Select_Loads_For_AutoPrint_To_PDF").ToList();
             else
                 loads = ExecuteSQL(DatabaseConnectionStringNames.OfficePay, "Proc_Select_Loads_For_AutoPrint_To_PDF").ToList();
 
             if (loads == null || loads.Count() == 0)
             {
-                WriteToJobLog(JobLogMessageType.INFO, $"No {description} notices to create .pdf's for exist in database");
+                WriteToJobLog(JobLogMessageType.INFO, $"No {version} notices to create .pdf's for exist in database");
                 return;
             }
 
@@ -80,11 +86,11 @@ namespace AutoPrintPDF
 
             foreach (Dictionary<string, object> load in loads)
             {
-                WriteToJobLog(JobLogMessageType.INFO, $"Retrieving {description} notices for loads_id {load["loads_id"].ToString()}");
+                WriteToJobLog(JobLogMessageType.INFO, $"Retrieving {version} notices for loads_id {load["loads_id"].ToString()}");
 
                 List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
-                if (Version == "AutoRenew")
+                if (version == "AutoRenew")
                     results = ExecuteSQL(DatabaseConnectionStringNames.AutoRenew, "Proc_Select_For_AutoRenew",
                                                         new SqlParameter("@pintLoadsID", load["loads_id"].ToString()),
                                                         new SqlParameter("@pvchrPublicationName", load["publication_name"].ToString()),
@@ -111,19 +117,19 @@ namespace AutoPrintPDF
 
                 if (results == null || results.Count() == 0)
                 {
-                    WriteToJobLog(JobLogMessageType.INFO, $"No {description} notices exist for this loads_id");
+                    WriteToJobLog(JobLogMessageType.INFO, $"No {version} notices exist for this loads_id");
                     return;
                 }
 
                 Int32 subDirectoryCount = 1;
 
                 //create output path. ex - \\omaha\AutoPrintPDF_AutoRenew\20201021090010_3FBFFF3498914385BE6B2E0E3919E046\1\
-                string baseOutputDirectory = GetConfigurationKeyValue("WorkDirectory") + Version + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + Guid.NewGuid().ToString().Replace("-", "") + "\\";
+                string baseOutputDirectory = GetConfigurationKeyValue("WorkDirectory") + version + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_" + Guid.NewGuid().ToString().Replace("-", "") + "\\";
 
                 if (!Directory.Exists(baseOutputDirectory))
                     Directory.CreateDirectory(baseOutputDirectory);
 
-                WriteToJobLog(JobLogMessageType.INFO, $"{results.Count()} {description} notices to be created for renewal run date(s) {load["renewal_run_dates"].ToString()}");
+                WriteToJobLog(JobLogMessageType.INFO, $"{results.Count()} {version} notices to be created for renewal run date(s) {load["renewal_run_dates"].ToString()}");
                 WriteToJobLog(JobLogMessageType.INFO, $".pdf's being created in {baseOutputDirectory}");
 
                 Int32 totalCounter = 0;
@@ -139,7 +145,7 @@ namespace AutoPrintPDF
 
                     string outputFileName = result["subscription_number_without_check_digit"].ToString() + Convert.ToDateTime(result["renewal_run_date"].ToString()).ToString("MMddyyyy") + "INVOICE.pdf";
 
-                    if (Version == "AutoRenew")
+                    if (version == "AutoRenew")
                     {
                         //generate and save reports
                         if (result["report_name"].ToString() == "rptAutoRenew")
@@ -161,12 +167,14 @@ namespace AutoPrintPDF
                         else if (result["report_name"].ToString() == "rptAutoRenewPrintDigital")
                         {
                             rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital();
+                            report.SetDataSource(results);
                             report.SaveAs(outputFileName, true);
 
                         }
                         else if (result["report_name"].ToString() == "rptAutoRenewSun")
                         {
                             rptAutoRenewSun report = new rptAutoRenewSun();
+                            report.SetDataSource(results);
                             report.SaveAs(outputFileName, true);
                         }
 
@@ -181,11 +189,13 @@ namespace AutoPrintPDF
                         //generate and save reports
                         if (result["report_name"].ToString() == "rptOfficePayPrintDigital")
                         {
-                            //todo:
+                            rptOfficePayPrintDigital report = new rptOfficePayPrintDigital();
+                            report.SaveAs(outputFileName, true);
                         }
                         else if (result["report_name"].ToString() == "rptOfficePaySun")
                         {
-                            //todo:
+                            rptOfficePaySun report = new rptOfficePaySun();
+                            report.SaveAs(outputFileName, true);
                         }
 
                         //create record in AutoPrintPDF database
@@ -198,7 +208,7 @@ namespace AutoPrintPDF
                     //log every 60th file
                     if (totalCounter % 60 == 0)
                     {
-                        WriteToJobLog(JobLogMessageType.INFO, $"{totalCounter} {description} notices created in work directory...");
+                        WriteToJobLog(JobLogMessageType.INFO, $"{totalCounter} {version} notices created in work directory...");
 
                     }
 
@@ -215,7 +225,7 @@ namespace AutoPrintPDF
                 }
 
                 //run update sproc
-                if (Version == "AutoRenew")
+                if (version == "AutoRenew")
                     ExecuteNonQuery(DatabaseConnectionStringNames.AutoRenew, "Proc_Insert_Loads_Successful_AutoPrint_To_PDF",
                                             new SqlParameter("@pintLoadsID", load["loads_id"].ToString()),
                                             new SqlParameter("@pvchrPublicationName", load["publication_name"].ToString()));
@@ -266,7 +276,8 @@ namespace AutoPrintPDF
 
                     WriteToJobLog(JobLogMessageType.INFO, $"Sending invoices to {outputFile}");
 
-                    //todo: call reports here
+                    rptInvoices report = new rptInvoices();
+                    report.SaveAs(outputFile, true);
 
                     DeleteTemp();
 
@@ -325,7 +336,10 @@ namespace AutoPrintPDF
                             
                         outputFile += carrier["carrier"] + "_" + Convert.ToDateTime(load["bill_date"].ToString()).ToString("yyyyMMdd") + "_" + load["bill_source"].ToString() + ".pdf";
 
-                        //todo: call reports here
+                        //call reports here
+                        rptInvoices report = new rptInvoices();
+                        report.SetDataSource(results);
+                        report.SaveAs(outputFile, true);
 
 
                         //run update sproc

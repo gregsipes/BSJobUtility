@@ -103,14 +103,20 @@
       <SubType>Component</SubType>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="rptInvoices.vb">
+      <DependentUpon>rptInvoices.rpt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="rptOfficePayPrintDigital.vb">
-           <DependentUpon>rptOfficePayPrintDigital.rpt</DependentUpon>
+      <DependentUpon>rptOfficePayPrintDigital.rpt</DependentUpon>
       <AutoGen>True</AutoGen>
       <SubType>Component</SubType>
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="rptOfficePaySun.vb">
-            <DependentUpon>rptOfficePaySun.rpt</DependentUpon>
+      <DependentUpon>rptOfficePaySun.rpt</DependentUpon>
       <AutoGen>True</AutoGen>
       <SubType>Component</SubType>
       <DesignTime>True</DesignTime>
@@ -135,13 +141,17 @@
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptAutoRenew.vb</LastGenOutput>
     </EmbeddedResource>
-	    <EmbeddedResource Include="rptOfficePayPrintDigital.rpt">
+    <EmbeddedResource Include="rptOfficePayPrintDigital.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptOfficePayPrintDigital.vb</LastGenOutput>
     </EmbeddedResource>
-	    <EmbeddedResource Include="rptOfficePaySun.rpt">
+    <EmbeddedResource Include="rptOfficePaySun.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptOfficePaySun.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptInvoices.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptInvoices.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
