@@ -3,6 +3,7 @@ using CrystalDecisions.Shared;
 using Reporting;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -150,32 +151,23 @@ namespace AutoPrintPDF
                         //generate and save reports
                         if (result["report_name"].ToString() == "rptAutoRenew")
                         {
-                          //  rptAutoRenew report = new rptAutoRenew();
-                          //
-                            //report.SetDataSource(result);
-
-                            //todo: I haven't found a way to mimic the old code and set a path, so we will try the saveas function
-                            //ExportOptions exportOptions = new ExportOptions();
-                            //exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
-                            //exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
-                            // exportOptions. = outputFileName;
-                            //report.Export(exportOptions);
-
-                         //   report.SaveAs(outputFileName, true);
+                            rptAutoRenew report = new rptAutoRenew();
+                            report.SetDataSource(ConvertDictionaryToDataTable(results));
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
 
                         }
                         else if (result["report_name"].ToString() == "rptAutoRenewPrintDigital")
                         {
-                            //rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital();
-                            //report.SetDataSource(results);
-                            //report.SaveAs(outputFileName, true);
+                            rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital();
+                            report.SetDataSource(ConvertDictionaryToDataTable(results));
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
 
                         }
                         else if (result["report_name"].ToString() == "rptAutoRenewSun")
                         {
-                            //rptAutoRenewSun report = new rptAutoRenewSun();
-                            //report.SetDataSource(results);
-                            //report.SaveAs(outputFileName, true);
+                            rptAutoRenewSun report = new rptAutoRenewSun();
+                            report.SetDataSource(ConvertDictionaryToDataTable(results));
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
                         }
 
                         //create record in AutoPrintPDF database
@@ -189,13 +181,15 @@ namespace AutoPrintPDF
                         //generate and save reports
                         if (result["report_name"].ToString() == "rptOfficePayPrintDigital")
                         {
-                            //rptOfficePayPrintDigital report = new rptOfficePayPrintDigital();
-                            //report.SaveAs(outputFileName, true);
+                            rptOfficePayPrintDigital report = new rptOfficePayPrintDigital();
+                            report.SetDataSource(ConvertDictionaryToDataTable(results));
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
                         }
                         else if (result["report_name"].ToString() == "rptOfficePaySun")
                         {
-                            //rptOfficePaySun report = new rptOfficePaySun();
-                            //report.SaveAs(outputFileName, true);
+                            rptOfficePaySun report = new rptOfficePaySun();
+                            report.SetDataSource(ConvertDictionaryToDataTable(results));
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
                         }
 
                         //create record in AutoPrintPDF database
@@ -277,13 +271,13 @@ namespace AutoPrintPDF
                     WriteToJobLog(JobLogMessageType.INFO, $"Sending invoices to {outputFile}");
 
                     //test code
-                    rptTest test = new rptTest();
-                    test.SetDataSource(results);
-                    test.SaveAs(outputFile, true);
+                    //rptTest test = new rptTest();
+                    //test.SetDataSource(ConvertDictionaryToDataTable(results));
+                    //test.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
+                    rptInvoices report = new rptInvoices();
+                    report.SetDataSource(ConvertDictionaryToDataTable(results));
+                    report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
 
-                    //rptInvoices report = new rptInvoices();
-                    //report.SetDataSource(results);
-                    //report.SaveAs(outputFile, true);
 
                     DeleteTemp();
 
@@ -296,6 +290,28 @@ namespace AutoPrintPDF
                 }
 
             }
+        }
+
+        private DataTable ConvertDictionaryToDataTable(List<Dictionary<string, object>> list)
+        {
+            DataTable result = new DataTable();
+            if (list.Count == 0)
+                return result;
+
+            var columnNames = list.SelectMany(dict => dict.Keys).Distinct();
+            result.Columns.AddRange(columnNames.Select(c => new DataColumn(c)).ToArray());
+            foreach (Dictionary<string, object> item in list)
+            {
+                var row = result.NewRow();
+                foreach (var key in item.Keys)
+                {
+                    row[key] = item[key];
+                }
+
+                result.Rows.Add(row);
+            }
+
+            return result;
         }
 
         private void PBSInvoicesByCarrierID()
@@ -346,6 +362,9 @@ namespace AutoPrintPDF
                         //rptInvoices report = new rptInvoices();
                         //report.SetDataSource(results);
                         //report.SaveAs(outputFile, true);
+                        rptInvoices report = new rptInvoices();
+                        report.SetDataSource(ConvertDictionaryToDataTable(results));
+                        report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
 
 
                         //run update sproc
