@@ -336,6 +336,9 @@ namespace PurchaseOrders
                 try
                 {
                     rdrItem.Read();
+                    // TBD 12/29/20 PEB - The next line crashed after having saved the spreadsheet, gone back,
+                    //  used PREV button to change to a previous CDW account, then NEXT to get back, then getting a SAVE prompt
+                    //  after clicking EXIT and trying to save.
                     o.OrderItemID = (int)GetSQLValue(rdrItem, "RecID");
                 }
                 catch (Exception ex)
