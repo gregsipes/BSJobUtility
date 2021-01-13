@@ -44,14 +44,14 @@ namespace AutoPrintPDF
                 //        throw new Exception("Unknown version");
                 //}
 
-                AutoRenewOrOfficePay("AutoRenew");
-                AutoRenewOrOfficePay("OfficePay");
+             //   AutoRenewOrOfficePay("AutoRenew");
+           //     AutoRenewOrOfficePay("OfficePay");
                 PBSInvoices();
                 PBSInvoicesByCarrierID();
 
             }
             catch (Exception ex)
-            {
+             {
                 LogException(ex);
                 throw;
             }
@@ -104,11 +104,11 @@ namespace AutoPrintPDF
                     results = ExecuteSQL(DatabaseConnectionStringNames.OfficePay, "Proc_Select_For_Office_Pay_Bills",
                                                         new SqlParameter("@pintLoadsID", load["loads_id"].ToString()),
                                                         new SqlParameter("@pvchrPublicationName", load["publication_name"].ToString()),
-                                                        new SqlParameter("@pvchrRenewalType", null),
-                                                        new SqlParameter("@pvchrRenewalNumber", 0),
-                                                        new SqlParameter("@pflgZero", 0),
-                                                        new SqlParameter("@pflgDuplicate", 0),
-                                                        new SqlParameter("@pflgAutoPrintToPDF", 1),
+                                                        new SqlParameter("@pvchrRenewalType", DBNull.Value),
+                                                        new SqlParameter("@pvchrRenewalNumber", "0"),
+                                                        new SqlParameter("@pflgZero", false),
+                                                        new SqlParameter("@pflgDuplicate", false),
+                                                        new SqlParameter("@pflgAutoPrintToPDF", true),
                                                         new SqlParameter("@pvchrPBSGeneralServerInstance", GetConfigurationKeyValue("RemoteServerInstance")),
                                                         new SqlParameter("@pvchrPBSGeneralDatabase", GetConfigurationKeyValue("RemoteDatabaseName")),
                                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("RemoteUserName")),
@@ -150,9 +150,9 @@ namespace AutoPrintPDF
                         //generate and save reports
                         if (result["report_name"].ToString() == "rptAutoRenew")
                         {
-                            rptAutoRenew report = new rptAutoRenew();
-
-                            report.SetDataSource(result);
+                          //  rptAutoRenew report = new rptAutoRenew();
+                          //
+                            //report.SetDataSource(result);
 
                             //todo: I haven't found a way to mimic the old code and set a path, so we will try the saveas function
                             //ExportOptions exportOptions = new ExportOptions();
@@ -161,21 +161,21 @@ namespace AutoPrintPDF
                             // exportOptions. = outputFileName;
                             //report.Export(exportOptions);
 
-                            report.SaveAs(outputFileName, true);
+                         //   report.SaveAs(outputFileName, true);
 
                         }
                         else if (result["report_name"].ToString() == "rptAutoRenewPrintDigital")
                         {
-                            rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital();
-                            report.SetDataSource(results);
-                            report.SaveAs(outputFileName, true);
+                            //rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital();
+                            //report.SetDataSource(results);
+                            //report.SaveAs(outputFileName, true);
 
                         }
                         else if (result["report_name"].ToString() == "rptAutoRenewSun")
                         {
-                            rptAutoRenewSun report = new rptAutoRenewSun();
-                            report.SetDataSource(results);
-                            report.SaveAs(outputFileName, true);
+                            //rptAutoRenewSun report = new rptAutoRenewSun();
+                            //report.SetDataSource(results);
+                            //report.SaveAs(outputFileName, true);
                         }
 
                         //create record in AutoPrintPDF database
@@ -189,13 +189,13 @@ namespace AutoPrintPDF
                         //generate and save reports
                         if (result["report_name"].ToString() == "rptOfficePayPrintDigital")
                         {
-                            rptOfficePayPrintDigital report = new rptOfficePayPrintDigital();
-                            report.SaveAs(outputFileName, true);
+                            //rptOfficePayPrintDigital report = new rptOfficePayPrintDigital();
+                            //report.SaveAs(outputFileName, true);
                         }
                         else if (result["report_name"].ToString() == "rptOfficePaySun")
                         {
-                            rptOfficePaySun report = new rptOfficePaySun();
-                            report.SaveAs(outputFileName, true);
+                            //rptOfficePaySun report = new rptOfficePaySun();
+                            //report.SaveAs(outputFileName, true);
                         }
 
                         //create record in AutoPrintPDF database
@@ -268,7 +268,7 @@ namespace AutoPrintPDF
                     WriteToJobLog(JobLogMessageType.INFO, $"No invoices exist for {load["bill_date"].ToString()}");
                 else
                 {
-                    string outputFile = GetConfigurationKeyValue("PBSInvoiceDirectory") + Convert.ToDateTime(load["bill_date"].ToString()).ToShortDateString() + ".pdf";
+                    string outputFile = GetConfigurationKeyValue("PBSInvoiceDirectory") + Convert.ToDateTime(load["bill_date"].ToString()).ToString("yyyy-MM-dd") + ".pdf";
 
                     //if the file already exists, delete it
                     if (File.Exists(outputFile))
@@ -276,8 +276,14 @@ namespace AutoPrintPDF
 
                     WriteToJobLog(JobLogMessageType.INFO, $"Sending invoices to {outputFile}");
 
-                    rptInvoices report = new rptInvoices();
-                    report.SaveAs(outputFile, true);
+                    //test code
+                    rptTest test = new rptTest();
+                    test.SetDataSource(results);
+                    test.SaveAs(outputFile, true);
+
+                    //rptInvoices report = new rptInvoices();
+                    //report.SetDataSource(results);
+                    //report.SaveAs(outputFile, true);
 
                     DeleteTemp();
 
@@ -337,9 +343,9 @@ namespace AutoPrintPDF
                         outputFile += carrier["carrier"] + "_" + Convert.ToDateTime(load["bill_date"].ToString()).ToString("yyyyMMdd") + "_" + load["bill_source"].ToString() + ".pdf";
 
                         //call reports here
-                        rptInvoices report = new rptInvoices();
-                        report.SetDataSource(results);
-                        report.SaveAs(outputFile, true);
+                        //rptInvoices report = new rptInvoices();
+                        //report.SetDataSource(results);
+                        //report.SaveAs(outputFile, true);
 
 
                         //run update sproc
