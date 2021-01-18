@@ -15,7 +15,7 @@ namespace AutoPrintPDF
 {
     public class Job : JobBase
     {
-        public string Version { get; set; }
+       // public string Version { get; set; }
 
         public override void SetupJob()
         {
@@ -45,8 +45,8 @@ namespace AutoPrintPDF
                 //        throw new Exception("Unknown version");
                 //}
 
-             //   AutoRenewOrOfficePay("AutoRenew");
-           //     AutoRenewOrOfficePay("OfficePay");
+                AutoRenewOrOfficePay("AutoRenew");
+                AutoRenewOrOfficePay("OfficePay");
                 PBSInvoices();
                 PBSInvoicesByCarrierID();
 
@@ -152,27 +152,27 @@ namespace AutoPrintPDF
                         if (result["report_name"].ToString() == "rptAutoRenew")
                         {
                             rptAutoRenew report = new rptAutoRenew();
-                            report.SetDataSource(ConvertDictionaryToDataTable(results));
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
+                            report.SetDataSource((IDataReader)results);
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
 
                         }
                         else if (result["report_name"].ToString() == "rptAutoRenewPrintDigital")
                         {
                             rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital();
-                            report.SetDataSource(ConvertDictionaryToDataTable(results));
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
+                            report.SetDataSource((IDataReader)results);
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
 
                         }
                         else if (result["report_name"].ToString() == "rptAutoRenewSun")
                         {
                             rptAutoRenewSun report = new rptAutoRenewSun();
-                            report.SetDataSource(ConvertDictionaryToDataTable(results));
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
+                            report.SetDataSource((IDataReader)results);
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
                         }
 
                         //create record in AutoPrintPDF database
                         ExecuteNonQuery(DatabaseConnectionStringNames.AutoPrintPDF, "Proc_Insert_AutoRenew",
-                                                    new SqlParameter("@pvchrFileName", outputFileName),
+                                                    new SqlParameter("@pvchrFileName", outputDirectory + outputFileName),
                                                     new SqlParameter("@psdatRenewalDate", Convert.ToDateTime(result["renewal_run_date"].ToString()).ToShortDateString()));
                     }
 
@@ -182,19 +182,19 @@ namespace AutoPrintPDF
                         if (result["report_name"].ToString() == "rptOfficePayPrintDigital")
                         {
                             rptOfficePayPrintDigital report = new rptOfficePayPrintDigital();
-                            report.SetDataSource(ConvertDictionaryToDataTable(results));
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
+                            report.SetDataSource((IDataReader)results);
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
                         }
                         else if (result["report_name"].ToString() == "rptOfficePaySun")
                         {
                             rptOfficePaySun report = new rptOfficePaySun();
-                            report.SetDataSource(ConvertDictionaryToDataTable(results));
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFileName);
+                            report.SetDataSource((IDataReader)results);
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
                         }
 
                         //create record in AutoPrintPDF database
                         ExecuteNonQuery(DatabaseConnectionStringNames.AutoPrintPDF, "Proc_Insert_OfficePay",
-                                                    new SqlParameter("@pvchrFileName", outputFileName),
+                                                    new SqlParameter("@pvchrFileName", outputDirectory + outputFileName),
                                                     new SqlParameter("@psdatRenewalDate", Convert.ToDateTime(result["renewal_run_date"].ToString()).ToShortDateString()));
                     }
 
@@ -255,10 +255,12 @@ namespace AutoPrintPDF
                 WriteToJobLog(JobLogMessageType.INFO, $"Found loads_id {load["loads_id"].ToString()}");
                 WriteToJobLog(JobLogMessageType.INFO, $"Retrieving invoices for {load["bill_date"].ToString()}");
 
-                List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Header_Body_By_Bill_Date_No_Additional_Copies",
-                                                                        new SqlParameter("@psdatBillDate", load["bill_date"].ToString())).ToList();
+                SqlDataReader results = ExecuteSQLReturnDataReader(DatabaseConnectionStringNames.PBSInvoices, CommandType.StoredProcedure, "Proc_Select_Header_Body_By_Bill_Date_No_Additional_Copies",
+                                                                        new SqlParameter("@psdatBillDate", load["bill_date"].ToString()));   //todo: remove top 1, for testing only
 
-                if (results.Count() == 0)
+
+
+                if (!results.HasRows)
                     WriteToJobLog(JobLogMessageType.INFO, $"No invoices exist for {load["bill_date"].ToString()}");
                 else
                 {
@@ -270,12 +272,8 @@ namespace AutoPrintPDF
 
                     WriteToJobLog(JobLogMessageType.INFO, $"Sending invoices to {outputFile}");
 
-                    //test code
-                    //rptTest test = new rptTest();
-                    //test.SetDataSource(ConvertDictionaryToDataTable(results));
-                    //test.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
                     rptInvoices report = new rptInvoices();
-                    report.SetDataSource(ConvertDictionaryToDataTable(results));
+                    report.SetDataSource((IDataReader)results);
                     report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
 
 
@@ -290,28 +288,6 @@ namespace AutoPrintPDF
                 }
 
             }
-        }
-
-        private DataTable ConvertDictionaryToDataTable(List<Dictionary<string, object>> list)
-        {
-            DataTable result = new DataTable();
-            if (list.Count == 0)
-                return result;
-
-            var columnNames = list.SelectMany(dict => dict.Keys).Distinct();
-            result.Columns.AddRange(columnNames.Select(c => new DataColumn(c)).ToArray());
-            foreach (Dictionary<string, object> item in list)
-            {
-                var row = result.NewRow();
-                foreach (var key in item.Keys)
-                {
-                    row[key] = item[key];
-                }
-
-                result.Rows.Add(row);
-            }
-
-            return result;
         }
 
         private void PBSInvoicesByCarrierID()
@@ -345,10 +321,10 @@ namespace AutoPrintPDF
                     foreach (Dictionary<string, object> carrier in carriers)
                     {
 
-                        List<Dictionary<string, object>> results = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Header_Body_By_Bill_Date_No_Additional_Copies_By_CarrierID",
+                        SqlDataReader results = ExecuteSQLReturnDataReader(DatabaseConnectionStringNames.PBSInvoices, CommandType.StoredProcedure, "Proc_Select_Header_Body_By_Bill_Date_No_Additional_Copies_By_CarrierID",
                                                                                         new SqlParameter("@psdatBillDate", load["bill_date"].ToString()),
                                                                                         new SqlParameter("@pvchrBillSource", load["bill_source"].ToString()),
-                                                                                        new SqlParameter("@pvchrCarrier", carrier["carrier"].ToString())).ToList();
+                                                                                        new SqlParameter("@pvchrCarrier", carrier["carrier"].ToString()));
 
                         string outputFile = GetConfigurationKeyValue("PBSInvoicesByCarrierIdDirectory") + Convert.ToDateTime(load["bill_date"].ToString()).ToString("yyyy") + "\\";
 
@@ -358,12 +334,8 @@ namespace AutoPrintPDF
                             
                         outputFile += carrier["carrier"] + "_" + Convert.ToDateTime(load["bill_date"].ToString()).ToString("yyyyMMdd") + "_" + load["bill_source"].ToString() + ".pdf";
 
-                        //call reports here
-                        //rptInvoices report = new rptInvoices();
-                        //report.SetDataSource(results);
-                        //report.SaveAs(outputFile, true);
                         rptInvoices report = new rptInvoices();
-                        report.SetDataSource(ConvertDictionaryToDataTable(results));
+                        report.SetDataSource((IDataReader)results);
                         report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
 
 

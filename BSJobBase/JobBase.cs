@@ -291,6 +291,11 @@ namespace BSJobBase
             return BSGlobals.DataIO.ExecuteSQL(connectionStringName, commandType, commandText, parameters);
         }
 
+        protected SqlDataReader ExecuteSQLReturnDataReader(BSGlobals.Enums.DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
+        {
+            return BSGlobals.DataIO.ExecuteQuery(connectionStringName, commandType, commandText, parameters);
+        }
+
         /// <summary>
         /// Returns the value of key from the app.config file, uses AppConfigSectionName property for section name
         /// </summary>

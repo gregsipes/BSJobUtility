@@ -175,12 +175,6 @@
       <DependentUpon>rptOfficePaySun.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="rptTest.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>rptTest.rpt</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -212,10 +206,6 @@
     <EmbeddedResource Include="rptOfficePaySun.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptOfficePaySun.vb</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="rptTest.rpt">
-      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
-      <LastGenOutput>rptTest.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
