@@ -15,7 +15,7 @@ namespace AutoPrintPDF
 {
     public class Job : JobBase
     {
-       // public string Version { get; set; }
+        // public string Version { get; set; }
 
         public override void SetupJob()
         {
@@ -29,21 +29,6 @@ namespace AutoPrintPDF
         {
             try
             {
-                //switch (Version)
-                //{
-                //    case "OfficePay":
-                //    case "AutoRenew":
-                //        AutoRenewOrOfficePay();
-                //        break;
-                //    case "PBSInvoices":
-                //        PBSInvoices();
-                //        break;
-                //    case "PBSInvoicesByCarrierID":
-                //        PBSInvoicesByCarrierID();
-                //        break;
-                //    default:
-                //        throw new Exception("Unknown version");
-                //}
 
                 AutoRenewOrOfficePay("AutoRenew");
                 AutoRenewOrOfficePay("OfficePay");
@@ -52,7 +37,7 @@ namespace AutoPrintPDF
 
             }
             catch (Exception ex)
-             {
+            {
                 LogException(ex);
                 throw;
             }
@@ -60,11 +45,6 @@ namespace AutoPrintPDF
 
         private void AutoRenewOrOfficePay(string version)
         {
-            //string description = "renewal";
-
-            //if (version == "AutoRenew")
-            //    description = "autorenew";
-
             WriteToJobLog(JobLogMessageType.INFO, $"Determining {version} notices to send to .pdf");
 
             List<Dictionary<string, object>> loads = new List<Dictionary<string, object>>();
@@ -89,10 +69,10 @@ namespace AutoPrintPDF
             {
                 WriteToJobLog(JobLogMessageType.INFO, $"Retrieving {version} notices for loads_id {load["loads_id"].ToString()}");
 
-                List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
+                 SqlDataReader reader = null;
 
                 if (version == "AutoRenew")
-                    results = ExecuteSQL(DatabaseConnectionStringNames.AutoRenew, "Proc_Select_For_AutoRenew",
+                    reader = ExecuteSQLReturnDataReader(DatabaseConnectionStringNames.AutoRenew, CommandType.StoredProcedure, "Proc_Select_For_AutoRenew",
                                                         new SqlParameter("@pintLoadsID", load["loads_id"].ToString()),
                                                         new SqlParameter("@pvchrPublicationName", load["publication_name"].ToString()),
                                                         new SqlParameter("@pflgOnlyWithEmailAddress", false),
@@ -100,9 +80,9 @@ namespace AutoPrintPDF
                                                         new SqlParameter("@pvchrPBSGeneralServerInstance", GetConfigurationKeyValue("RemoteServerInstance")),
                                                         new SqlParameter("@pvchrPBSGeneralDatabase", GetConfigurationKeyValue("RemoteDatabaseName")),
                                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("RemoteUserName")),
-                                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemotePassword"))).ToList();
+                                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemotePassword")));
                 else
-                    results = ExecuteSQL(DatabaseConnectionStringNames.OfficePay, "Proc_Select_For_Office_Pay_Bills",
+                    reader = ExecuteSQLReturnDataReader(DatabaseConnectionStringNames.OfficePay, CommandType.StoredProcedure, "Proc_Select_For_Office_Pay_Bills",
                                                         new SqlParameter("@pintLoadsID", load["loads_id"].ToString()),
                                                         new SqlParameter("@pvchrPublicationName", load["publication_name"].ToString()),
                                                         new SqlParameter("@pvchrRenewalType", DBNull.Value),
@@ -113,10 +93,10 @@ namespace AutoPrintPDF
                                                         new SqlParameter("@pvchrPBSGeneralServerInstance", GetConfigurationKeyValue("RemoteServerInstance")),
                                                         new SqlParameter("@pvchrPBSGeneralDatabase", GetConfigurationKeyValue("RemoteDatabaseName")),
                                                         new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("RemoteUserName")),
-                                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemotePassword"))).ToList();
+                                                        new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemotePassword")));
 
 
-                if (results == null || results.Count() == 0)
+                if (reader == null || !reader.HasRows)
                 {
                     WriteToJobLog(JobLogMessageType.INFO, $"No {version} notices exist for this loads_id");
                     return;
@@ -130,44 +110,51 @@ namespace AutoPrintPDF
                 if (!Directory.Exists(baseOutputDirectory))
                     Directory.CreateDirectory(baseOutputDirectory);
 
-                WriteToJobLog(JobLogMessageType.INFO, $"{results.Count()} {version} notices to be created for renewal run date(s) {load["renewal_run_dates"].ToString()}");
                 WriteToJobLog(JobLogMessageType.INFO, $".pdf's being created in {baseOutputDirectory}");
 
                 Int32 totalCounter = 0;
 
-                foreach (Dictionary<string, object> result in results)
+                while (reader.Read())
                 {
+                    Dictionary<string, object> result = ConvertDataReaderToDictionary(reader);
+
                     totalCounter++;
 
-                   string outputDirectory = baseOutputDirectory + subDirectoryCount.ToString() + "\\";
+                    string outputDirectory = baseOutputDirectory + subDirectoryCount.ToString() + "\\";
 
                     if (!Directory.Exists(outputDirectory))
                         Directory.CreateDirectory(outputDirectory);
 
-                    string outputFileName = result["subscription_number_without_check_digit"].ToString() + Convert.ToDateTime(result["renewal_run_date"].ToString()).ToString("MMddyyyy") + "INVOICE.pdf";
+                    string outputFileName = reader["subscription_number_without_check_digit"].ToString() + Convert.ToDateTime(reader["renewal_run_date"].ToString()).ToString("MMddyyyy") + "INVOICE.pdf";
 
                     if (version == "AutoRenew")
                     {
                         //generate and save reports
-                        if (result["report_name"].ToString() == "rptAutoRenew")
+                        if (reader["report_name"].ToString() == "rptAutoRenew")
                         {
-                            rptAutoRenew report = new rptAutoRenew();
-                            report.SetDataSource((IDataReader)results);
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            using (rptAutoRenew report = new rptAutoRenew())
+                            {
+                                report.SetDataSource((IDataReader)reader);
+                                report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            }
 
                         }
-                        else if (result["report_name"].ToString() == "rptAutoRenewPrintDigital")
+                        else if (reader["report_name"].ToString() == "rptAutoRenewPrintDigital")
                         {
-                            rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital();
-                            report.SetDataSource((IDataReader)results);
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            using (rptAutoRenewPrintDigital report = new rptAutoRenewPrintDigital())
+                            {
+                                report.SetDataSource((IDataReader)reader);
+                                report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            }
 
                         }
-                        else if (result["report_name"].ToString() == "rptAutoRenewSun")
+                        else if (reader["report_name"].ToString() == "rptAutoRenewSun")
                         {
-                            rptAutoRenewSun report = new rptAutoRenewSun();
-                            report.SetDataSource((IDataReader)results);
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            using (rptAutoRenewSun report = new rptAutoRenewSun())
+                            {
+                                report.SetDataSource((IDataReader)reader);
+                                report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            }
                         }
 
                         //create record in AutoPrintPDF database
@@ -179,17 +166,21 @@ namespace AutoPrintPDF
                     else
                     {
                         //generate and save reports
-                        if (result["report_name"].ToString() == "rptOfficePayPrintDigital")
+                        if (reader["report_name"].ToString() == "rptOfficePayPrintDigital")
                         {
-                            rptOfficePayPrintDigital report = new rptOfficePayPrintDigital();
-                            report.SetDataSource((IDataReader)results);
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            using (rptOfficePayPrintDigital report = new rptOfficePayPrintDigital())
+                            {
+                                report.SetDataSource((IDataReader)reader);
+                                report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            }
                         }
-                        else if (result["report_name"].ToString() == "rptOfficePaySun")
+                        else if (reader["report_name"].ToString() == "rptOfficePaySun")
                         {
-                            rptOfficePaySun report = new rptOfficePaySun();
-                            report.SetDataSource((IDataReader)results);
-                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            using (rptOfficePaySun report = new rptOfficePaySun())
+                            {
+                                report.SetDataSource((IDataReader)reader);
+                                report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                            }
                         }
 
                         //create record in AutoPrintPDF database
@@ -208,10 +199,10 @@ namespace AutoPrintPDF
 
                     //after 9,900 files, create a new sub directory
                     if (totalCounter % 9900 == 0)
-                         subDirectoryCount++;
+                        subDirectoryCount++;
 
 
-                    //copy files to cmpdf directory
+                    //copy files to cmpdf directory 
                     File.Copy(outputDirectory + outputFileName, GetConfigurationKeyValue("CopyDirectory") + outputFileName);
 
                     WriteToJobLog(JobLogMessageType.INFO, $"File copied to {GetConfigurationKeyValue("CopyDirectory") + outputFileName}");
@@ -250,13 +241,13 @@ namespace AutoPrintPDF
                 return;
             }
 
-            foreach(Dictionary<string, object> load in loads)
+            foreach (Dictionary<string, object> load in loads)
             {
                 WriteToJobLog(JobLogMessageType.INFO, $"Found loads_id {load["loads_id"].ToString()}");
                 WriteToJobLog(JobLogMessageType.INFO, $"Retrieving invoices for {load["bill_date"].ToString()}");
 
                 SqlDataReader results = ExecuteSQLReturnDataReader(DatabaseConnectionStringNames.PBSInvoices, CommandType.StoredProcedure, "Proc_Select_Header_Body_By_Bill_Date_No_Additional_Copies",
-                                                                        new SqlParameter("@psdatBillDate", load["bill_date"].ToString()));   //todo: remove top 1, for testing only
+                                                                       new SqlParameter("@psdatBillDate", load["bill_date"].ToString()));   //todo: remove top 1, for testing only
 
 
 
@@ -272,10 +263,11 @@ namespace AutoPrintPDF
 
                     WriteToJobLog(JobLogMessageType.INFO, $"Sending invoices to {outputFile}");
 
-                    rptInvoices report = new rptInvoices();
-                    report.SetDataSource((IDataReader)results);
-                    report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
-
+                    using (rptInvoices report = new rptInvoices())
+                    {
+                        report.SetDataSource((IDataReader)results);
+                        report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
+                    }
 
                     DeleteTemp();
 
@@ -304,7 +296,7 @@ namespace AutoPrintPDF
 
             //todo: install font?
 
-            foreach(Dictionary<string, object> load in loads)
+            foreach (Dictionary<string, object> load in loads)
             {
                 WriteToJobLog(JobLogMessageType.INFO, $"Found loads_id {load["loads_id"].ToString()}");
                 WriteToJobLog(JobLogMessageType.INFO, $"Bill Date = {load["bill_date"].ToString()}");
@@ -331,13 +323,14 @@ namespace AutoPrintPDF
                         //create the directory if it doesn't already exist
                         if (!Directory.Exists(outputFile))
                             Directory.CreateDirectory(outputFile);
-                            
+
                         outputFile += carrier["carrier"] + "_" + Convert.ToDateTime(load["bill_date"].ToString()).ToString("yyyyMMdd") + "_" + load["bill_source"].ToString() + ".pdf";
 
-                        rptInvoices report = new rptInvoices();
-                        report.SetDataSource((IDataReader)results);
-                        report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
-
+                        using (rptInvoices report = new rptInvoices())
+                        {
+                            report.SetDataSource((IDataReader)results);
+                            report.ExportToDisk(ExportFormatType.PortableDocFormat, outputFile);
+                        }
 
                         //run update sproc
                         ExecuteNonQuery(DatabaseConnectionStringNames.PBSInvoices, "Proc_Update_Loads_Successful_AutoPrint_to_PDF_By_CarrierID_Flag",
@@ -351,6 +344,20 @@ namespace AutoPrintPDF
 
         }
 
+
+        private Dictionary<string, object> ConvertDataReaderToDictionary(SqlDataReader sqlDataReader)
+        {
+
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+            for (int i = 0; i < sqlDataReader.FieldCount; i++)
+            {
+                dictionary.Add(sqlDataReader.GetName(i), sqlDataReader.GetValue(i));
+            }
+            return dictionary;
+
+        }
+
         private void DeleteTemp()
         {
             //GDS - I'm not sure why this is needed here or why these temp files are getting created. From
@@ -358,7 +365,7 @@ namespace AutoPrintPDF
 
             List<string> tempFiles = Directory.GetFiles(Path.GetTempPath(), "ctm*.tmp").ToList();
 
-            foreach(string tempFile in tempFiles)
+            foreach (string tempFile in tempFiles)
             {
                 WriteToJobLog(JobLogMessageType.INFO, $"Delete temp file {tempFile}");
                 File.Delete(tempFile);
