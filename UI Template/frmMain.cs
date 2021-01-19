@@ -47,6 +47,12 @@ public FrmMain()
 
     // Get the current (logged-in) username.  It will be in the form DOMAIN\username
     UserInfo = new ActiveDirectory();
+    bool UserOkay = UserInfo.CheckUserCredentials(new List<string>{ "bsou_sbsreports", "bsadmin" });
+    if (!UserOkay)
+    {
+        BroadcastError("You do not have the appropriate credentials (BSOU_SBSReports) to run this app.", null);
+        System.Environment.Exit(1);
+    }
 
     // Add status bar (2 segment default, with version)
     StatusBar = new VersionStatusBar(this);
@@ -454,13 +460,3 @@ class CustomMenuStripRenderer : ToolStripProfessionalRenderer
 #endregion
 #endif
 
-#region UITemplate (Dummy)
-using System.Windows.Forms;
-
-namespace UI_Template
-{
-    public partial class frmMain : Form
-    {
-    }
-}
-#endregion

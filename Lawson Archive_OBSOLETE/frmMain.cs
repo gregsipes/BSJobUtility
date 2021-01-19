@@ -1,27 +1,29 @@
-//using System;
-//using System.Data;
-//using System.Data.SqlClient;
-//using System.Drawing;
-//using System.Windows.Forms;
-//using BSGlobals;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using BSGlobals;
 
-//namespace <Namespace>
-//{
-//    public partial class FrmMain : Form
-//    {
-
-// INSERT THIS INTO A NEW PROJECT ALONG WITH ANY OF THE USING CLAUSES, ABOVE
-
+namespace Lawson_Archive
+{
+    public partial class FrmMain : Form
+    {
         #region Declarations
-		// Constants
-		const string JobName = "<Jobname>";
-		
-		// Class declarations
-		
-		// Other global stuff
-		ActiveDirectory UserInfo;
-		VersionStatusBar StatusBar;
-		
+        // Constants
+        const string JobName = "<Jobname>";
+
+        // Class declarations
+
+        // Other global stuff
+        ActiveDirectory UserInfo;
+        VersionStatusBar StatusBar;
+
         #endregion
 
         #region Initialization
@@ -29,7 +31,7 @@
         {
             InitializeComponent();
 
-			// Job log start
+            // Job log start
             DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting", JobName);
 
             // Get configuration values.  
@@ -39,12 +41,12 @@
             // Create event handlers if any 
             //EXAMPLE: TxtAddressLine1.TextChanged += new System.EventHandler(this.VendorTxtBox_TextChanged);
 
-		    // Menu strip initialization (where needed)
+            // Menu strip initialization (where needed)
             MainMenuStrip.Renderer = new CustomMenuStripRenderer();
 
             // Get the current (logged-in) username.  It will be in the form DOMAIN\username
-			UserInfo = new ActiveDirectory();
-            bool UserOkay = UserInfo.CheckUserCredentials(new List<string> { "<bsou_credential1", "<bsou_credential2", "<and so on>"});
+            UserInfo = new ActiveDirectory();
+            bool UserOkay = UserInfo.CheckUserCredentials(new List<string> { "bsou_sbsreports", "bsadmin" });
             if (!UserOkay)
             {
                 BroadcastError("You do not have the appropriate credentials (BSOU_SBSReports) to run this app.", null);
@@ -53,7 +55,6 @@
 
             // Add status bar (2 segment default, with version)
             StatusBar = new VersionStatusBar(this);
-
         }
         #endregion
 
@@ -65,7 +66,7 @@
 
         #endregion
 
-        #region ----Safe Value Assignments
+        #region Safe Value Assignments
 
         /// <summary>
         /// A generic way to safely copy any string-able value from a dictionary into any control that has a .Text property.
@@ -166,7 +167,7 @@
             }
         }
 
-#endregion
+        #endregion
 
         #region Timer-related Functions
 
@@ -178,6 +179,15 @@
             SqlDataReader rdr = DataIO.ExecuteQuery(
                 Enums.DatabaseConnectionStringNames.Purchasing,
                 CommandType.StoredProcedure,
+                qryName);
+            return (rdr);
+        }
+
+        public static SqlDataReader SQLQuery(string qryName, CommandType command)
+        {
+            SqlDataReader rdr = DataIO.ExecuteQuery(
+                Enums.DatabaseConnectionStringNames.ISInventory,
+                command,
                 qryName);
             return (rdr);
         }
@@ -278,15 +288,6 @@
             }
         }
 
-        public static SqlDataReader SQLQuery(string qryName, CommandType command)
-        {
-            SqlDataReader rdr = DataIO.ExecuteQuery(
-                Enums.DatabaseConnectionStringNames.ISInventory,
-                command,
-                qryName);
-            return (rdr);
-        }
-
         private string SQLGetValueStringFromID(string fieldName, string tableName, string recordIDName, string iDString)
         {
             // Invoke a query of the form "SELECT <fielName> FROM <tableName> WHERE <recordIDname> = <idstring>".
@@ -328,86 +329,6 @@
             }
         }
 
-        /// <summary>
-        /// A utility to return any value from a SQL Query (as long as the underlying SQL type is knnown apriori).
-        /// USAGE:  object x = (T)GetSQLValue(SQLReader, FieldName)
-        /// NOTE:   Declarations that use this function MUST be declared nullable!  (i.e., int? var1, double? var2, etc.
-        /// </summary>
-        /// <param name="rdr"></param>
-        /// <param name="s"></param>
-        /// <returns>(T)Value</returns>
-        public object SQLGetValue(SqlDataReader rdr, string s)
-        {
-            // A utility to return any value from a SQL Query (as long as the underlying SQL type is knnown apriori).
-            // USAGE:
-            //   <type T> x = (T)GetSQLValue(SQLReader, FieldName)
-
-            // Because SQL can return a dbnull, there is no way to determine the actual value type.  
-            //   This requires that all declarations must be nullable.
-            if (rdr[s] != null)
-            {
-                string t = rdr[s].GetType().ToString().ToLower();
-                switch (t)
-                {
-                    case "system.string":
-                        try { return rdr[s].ToString(); } catch { return ""; }
-                    case "system.int32":
-                        try
-                        {
-                            string i = rdr[s].ToString();
-                            bool iokay = int.TryParse(i, out int ii);
-                            return (iokay ? ii : 0);
-                        }
-                        catch { return 0; }
-                    case "system.decimal":
-                        try
-                        {
-                            string d = rdr[s].ToString();
-                            bool dokay = Double.TryParse(d, out double dd);
-                            return (dokay ? dd : 0);
-                        }
-                        catch { return 0; }
-                    case "system.float":
-                        try
-                        {
-                            string f = rdr[s].ToString();
-                            bool fokay = float.TryParse(f, out float ff);
-                            return (fokay ? ff : 0);
-                        }
-                        catch { return 0; }
-                    case "system.bit":
-                        try
-                        {
-                            string b = rdr[s].ToString();
-                            bool iokay = int.TryParse(b, out int bb);
-                            return (iokay ? (bb == 0 ? false : true) : false);
-                        }
-                        catch { return false; }
-                    case "system.bool":
-                        try
-                        {
-                            string b = rdr[s].ToString();
-                            bool iokay = int.TryParse(b, out int bb);
-                            return (iokay ? (bb == 0 ? false : true) : false);
-                        }
-                        catch { return false; }
-                    case "system.dbnull":
-                        // Because SQL can return a dbnull, there is no way to determine the actual value type.  
-                        //   This requires that all declarations must be nullable.
-                        return null;
-                    default:
-                        // Check other SQL types like DATETIME and BIT!!!!
-                        string e = "Well, lookie here, seems like y'all forgot to handle SQL value type " + t + ". Best be goin' back to the programmer and have 'im do some fixin'";
-                        BroadcastError(e, null);
-                        return null;
-                }
-            }
-            else
-            {
-                return (null);
-            }
-        }
-
         private string SQLGetString(SqlDataReader rdr, string s)
         {
             try
@@ -436,9 +357,9 @@
             }
         }
 
-#endregion
+        #endregion
 
-#region General Helper Functions
+        #region General Helper Functions
 
         /// <summary>
         /// Send the specified message (can be of any JobLogMessageType) to the log and to a user prompt.
@@ -511,7 +432,7 @@
             }
         }
 
-#endregion
+        #endregion
 
         #region CustommenuStripRenderer
         /// <summary>
@@ -529,6 +450,6 @@
             }
         }
         #endregion
-//
-//    }
-//}
+
+    }
+}

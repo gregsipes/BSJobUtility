@@ -1,4 +1,4 @@
-﻿namespace UI_Template
+﻿namespace LawsonArchive
 {
     partial class FrmMain
     {
@@ -28,9 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // FrmMain
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Text = "Form1";
+            this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Name = "FrmMain";
+            this.Text = "Lawson Archive";
+            this.ResumeLayout(false);
+
         }
 
         #endregion

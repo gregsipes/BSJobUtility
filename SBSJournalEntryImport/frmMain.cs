@@ -62,9 +62,8 @@ namespace SBSJournalEntryImport
             // Get the current (logged-in) username.  It will be in the form DOMAIN\username.
             //   Terminate if the user is not credentialed to run this app.
             UserInfo = new ActiveDirectory();
-            BSOUClass bsouSBS = UserInfo.BSOUList.Find(x => x.Credential.ToLower() == "bsou_sbsreports");
-            BSOUClass bsouAdmin = UserInfo.BSOUList.Find(x => x.Credential.ToLower() == "bsadmin");
-            if ((bsouSBS is null) && (bsouAdmin is null))
+            bool UserOkay = UserInfo.CheckUserCredentials(new List<string>{ "bsou_sbsreports", "bsadmin" });
+            if (!UserOkay)
             {
                 BroadcastError("You do not have the appropriate credentials (BSOU_SBSReports) to run this app.", null);
                 System.Environment.Exit(1);
@@ -75,6 +74,7 @@ namespace SBSJournalEntryImport
             DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, StatusBar.GetVersion(), JobName);
 
         }
+
         #endregion
 
         #region SQL
@@ -99,7 +99,7 @@ namespace SBSJournalEntryImport
 
         #endregion
 
-        #region ----General Helper Functions
+        #region General Helper Functions
 
         /// <summary>
         /// Send the specified message (can be of any JobLogMessageType) to the log and to a user prompt.

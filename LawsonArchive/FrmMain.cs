@@ -1,27 +1,30 @@
-//using System;
-//using System.Data;
-//using System.Data.SqlClient;
-//using System.Drawing;
-//using System.Windows.Forms;
-//using BSGlobals;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using BSGlobals;
 
-//namespace <Namespace>
-//{
-//    public partial class FrmMain : Form
-//    {
-
-// INSERT THIS INTO A NEW PROJECT ALONG WITH ANY OF THE USING CLAUSES, ABOVE
+namespace LawsonArchive
+{
+    public partial class FrmMain : Form
+    {
 
         #region Declarations
-		// Constants
-		const string JobName = "<Jobname>";
-		
-		// Class declarations
-		
-		// Other global stuff
-		ActiveDirectory UserInfo;
-		VersionStatusBar StatusBar;
-		
+        // Constants
+        const string JobName = "LawsonArchive";
+
+        // Class declarations
+
+        // Other global stuff
+        ActiveDirectory UserInfo;
+        VersionStatusBar StatusBar;
+
         #endregion
 
         #region Initialization
@@ -29,7 +32,7 @@
         {
             InitializeComponent();
 
-			// Job log start
+            // Job log start
             DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting", JobName);
 
             // Get configuration values.  
@@ -39,15 +42,15 @@
             // Create event handlers if any 
             //EXAMPLE: TxtAddressLine1.TextChanged += new System.EventHandler(this.VendorTxtBox_TextChanged);
 
-		    // Menu strip initialization (where needed)
+            // Menu strip initialization (where needed)
             MainMenuStrip.Renderer = new CustomMenuStripRenderer();
 
             // Get the current (logged-in) username.  It will be in the form DOMAIN\username
-			UserInfo = new ActiveDirectory();
-            bool UserOkay = UserInfo.CheckUserCredentials(new List<string> { "<bsou_credential1", "<bsou_credential2", "<and so on>"});
+            UserInfo = new ActiveDirectory();
+            bool UserOkay = UserInfo.CheckUserCredentials(new List<string> { "BSOU_LawsonReports", "BSOU_LawsonUsers", "bsadmin" });
             if (!UserOkay)
             {
-                BroadcastError("You do not have the appropriate credentials (BSOU_SBSReports) to run this app.", null);
+                BroadcastError("You do not have the appropriate credentials (LawsonReports) to run this app.", null);
                 System.Environment.Exit(1);
             }
 
@@ -65,7 +68,7 @@
 
         #endregion
 
-        #region ----Safe Value Assignments
+        #region Safe Value Assignments
 
         /// <summary>
         /// A generic way to safely copy any string-able value from a dictionary into any control that has a .Text property.
@@ -166,7 +169,7 @@
             }
         }
 
-#endregion
+        #endregion
 
         #region Timer-related Functions
 
@@ -436,10 +439,6 @@
             }
         }
 
-#endregion
-
-#region General Helper Functions
-
         /// <summary>
         /// Send the specified message (can be of any JobLogMessageType) to the log and to a user prompt.
         /// </summary>
@@ -511,7 +510,7 @@
             }
         }
 
-#endregion
+        #endregion
 
         #region CustommenuStripRenderer
         /// <summary>
@@ -528,7 +527,7 @@
                 base.OnRenderItemText(e);
             }
         }
-        #endregion
-//
-//    }
-//}
+#endregion
+
+    }
+}
