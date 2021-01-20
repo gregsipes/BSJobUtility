@@ -15,7 +15,6 @@ namespace AutoPrintPDF
 {
     public class Job : JobBase
     {
-        // public string Version { get; set; }
 
         public override void SetupJob()
         {
@@ -29,12 +28,10 @@ namespace AutoPrintPDF
         {
             try
             {
-
                 AutoRenewOrOfficePay("AutoRenew");
                 AutoRenewOrOfficePay("OfficePay");
                 PBSInvoices();
                 PBSInvoicesByCarrierID();
-
             }
             catch (Exception ex)
             {
@@ -45,7 +42,7 @@ namespace AutoPrintPDF
 
         private void AutoRenewOrOfficePay(string version)
         {
-            WriteToJobLog(JobLogMessageType.INFO, $"Determining {version} notices to send to .pdf");
+           // WriteToJobLog(JobLogMessageType.INFO, $"Determining {version} notices to send to .pdf");
 
             List<Dictionary<string, object>> loads = new List<Dictionary<string, object>>();
 
@@ -55,15 +52,8 @@ namespace AutoPrintPDF
                 loads = ExecuteSQL(DatabaseConnectionStringNames.OfficePay, "Proc_Select_Loads_For_AutoPrint_To_PDF").ToList();
 
             if (loads == null || loads.Count() == 0)
-            {
-                WriteToJobLog(JobLogMessageType.INFO, $"No {version} notices to create .pdf's for exist in database");
                 return;
-            }
 
-            //todo: install tru type font?
-
-
-            WriteToJobLog(JobLogMessageType.INFO, "Creating .pdf's in work directory as {subscription_number}{MMddyyyy}INVOICE.pdf");
 
             foreach (Dictionary<string, object> load in loads)
             {
@@ -97,10 +87,9 @@ namespace AutoPrintPDF
 
 
                 if (reader == null || !reader.HasRows)
-                {
-                    WriteToJobLog(JobLogMessageType.INFO, $"No {version} notices exist for this loads_id");
                     return;
-                }
+
+                WriteToJobLog(JobLogMessageType.INFO, "Creating .pdf's in work directory as {subscription_number}{MMddyyyy}INVOICE.pdf");
 
                 Int32 subDirectoryCount = 1;
 
@@ -198,6 +187,7 @@ namespace AutoPrintPDF
                     }
 
                     //after 9,900 files, create a new sub directory
+                    //GDS - this will never be the case. Crystal Reports will error out long before 9,900 are generated
                     if (totalCounter % 9900 == 0)
                         subDirectoryCount++;
 
@@ -231,15 +221,12 @@ namespace AutoPrintPDF
 
         private void PBSInvoices()
         {
-            WriteToJobLog(JobLogMessageType.INFO, "Determining latest invoice date");
+           // WriteToJobLog(JobLogMessageType.INFO, "Determining latest invoice date");
 
             List<Dictionary<string, object>> loads = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Loads_Bill_Dates_Pages").ToList();
 
             if (loads == null || loads.Count() == 0)
-            {
-                WriteToJobLog(JobLogMessageType.INFO, "No invoice dates for which .pdf is to be created exist in database");
                 return;
-            }
 
             foreach (Dictionary<string, object> load in loads)
             {
@@ -247,7 +234,7 @@ namespace AutoPrintPDF
                 WriteToJobLog(JobLogMessageType.INFO, $"Retrieving invoices for {load["bill_date"].ToString()}");
 
                 SqlDataReader results = ExecuteSQLReturnDataReader(DatabaseConnectionStringNames.PBSInvoices, CommandType.StoredProcedure, "Proc_Select_Header_Body_By_Bill_Date_No_Additional_Copies",
-                                                                       new SqlParameter("@psdatBillDate", load["bill_date"].ToString()));   //todo: remove top 1, for testing only
+                                                                       new SqlParameter("@psdatBillDate", load["bill_date"].ToString()));  
 
 
 
@@ -284,17 +271,13 @@ namespace AutoPrintPDF
 
         private void PBSInvoicesByCarrierID()
         {
-            WriteToJobLog(JobLogMessageType.INFO, "Determining latest invoice date");
+           // WriteToJobLog(JobLogMessageType.INFO, "Determining latest invoice date");
 
             List<Dictionary<string, object>> loads = ExecuteSQL(DatabaseConnectionStringNames.PBSInvoices, "Proc_Select_Loads_Bill_Dates_Pages_For_AutoPrint_to_PDF_By_CarrierID").ToList();
 
             if (loads == null || loads.Count() == 0)
-            {
-                WriteToJobLog(JobLogMessageType.INFO, "No invoice dates for which .pdf is to be created exist in database");
                 return;
-            }
 
-            //todo: install font?
 
             foreach (Dictionary<string, object> load in loads)
             {
@@ -344,7 +327,9 @@ namespace AutoPrintPDF
 
         }
 
-
+        //This seems backwards from every other job, but the problem is that Crystal Reports seem to work best with data readers but the 
+        // rest of the code works best (and is at this point the standard) with lists and dictionaries. I also don't want to make an extra
+        // round trip to the database with results we already have stored in memory
         private Dictionary<string, object> ConvertDataReaderToDictionary(SqlDataReader sqlDataReader)
         {
 
