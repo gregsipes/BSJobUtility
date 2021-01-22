@@ -57,7 +57,7 @@ namespace AutoPrintPDF
 
             foreach (Dictionary<string, object> load in loads)
             {
-                WriteToJobLog(JobLogMessageType.INFO, $"Retrieving {version} notices for loads_id {load["loads_id"].ToString()}");
+                //WriteToJobLog(JobLogMessageType.INFO, $"Retrieving {version} notices for loads_id {load["loads_id"].ToString()}");
 
                  SqlDataReader reader = null;
 

@@ -87,7 +87,7 @@ namespace Feeds
                 outputDirectory += "\\" + DateTime.Now.ToString(feed["format_of_current_datetime_in_output_subdirectory"].ToString().Replace("m", "M").Replace("n", "m")) + "\\";
 
 
-            if (!Directory.Exists(outputDirectory))
+            if (outputDirectory != "" && !Directory.Exists(outputDirectory))
                 Directory.CreateDirectory(outputDirectory);
 
 
