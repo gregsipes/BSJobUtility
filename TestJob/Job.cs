@@ -1,4 +1,5 @@
 ﻿using BSJobBase;
+using Reporting;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -19,7 +20,13 @@ namespace TestJob
 
                WriteToJobLog(JobLogMessageType.INFO, "Test job is running");
 
-                throw new Exception("Testing...");
+                //    throw new Exception("Testing...");
+                using (rptAutoRenewSun report = new rptAutoRenewSun())
+                {
+                    //  report.SetDataSource((IDataReader)reader);
+                    //  report.ExportToDisk(ExportFormatType.PortableDocFormat, outputDirectory + outputFileName);
+                    report.SaveAs("C:\\temp\\testReport.rpt");
+                }
 
             }
             catch (Exception ex)
