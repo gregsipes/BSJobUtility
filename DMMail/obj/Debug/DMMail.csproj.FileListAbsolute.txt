@@ -30,3 +30,4 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Deb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CoreCompileInputs.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.pdb
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\WinSCPnet.dll

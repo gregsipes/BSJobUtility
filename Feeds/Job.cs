@@ -1,4 +1,5 @@
-﻿using BSJobBase;
+﻿using BSGlobals;
+using BSJobBase;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -97,7 +98,6 @@ namespace Feeds
 
 
             //Invoke stored procedure Proc_Insert_Builds and create a record identifying (logging) this build.
-           // var x = endDate.HasValue ? endDate.Value.ToString() : "";
             Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Insert_Builds",
                                              new SqlParameter("@pintFeedsID", feed["feeds_id"].ToString()),
                                              new SqlParameter("@pvchrUserSpecifiedStartingDate", startDate.HasValue ? startDate.Value.ToShortDateString() : ""),

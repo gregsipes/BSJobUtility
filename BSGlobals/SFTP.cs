@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WinSCP;
 
-namespace Feeds
+namespace BSGlobals
 {
-   public class SFTP
+    public class SFTP
     {
         private Session Session { get; set; }
 
@@ -26,16 +25,16 @@ namespace Feeds
             Password = password;
         }
 
-        public void OpenSession( string fingerprint, string keyFilePath, string keyPassPhrase)
+        public void OpenSession(string fingerprint, string keyFilePath, string keyPassPhrase)
         {
             SessionOptions sessionOptions = new SessionOptions()
-                    {
-                        Protocol = Protocol.Sftp,
-                        HostName = Host,
-                        UserName = UserName,
-                        Password = Password,
-                        SshHostKeyFingerprint = fingerprint
-                    };
+            {
+                Protocol = Protocol.Sftp,
+                HostName = Host,
+                UserName = UserName,
+                Password = Password,
+                SshHostKeyFingerprint = fingerprint
+            };
 
             Session = new Session();
 
@@ -44,13 +43,13 @@ namespace Feeds
                 sessionOptions.SshPrivateKeyPath = keyFilePath;
                 sessionOptions.PrivateKeyPassphrase = keyPassPhrase;
             }
-            
+
             Session.Open(sessionOptions);
         }
 
         public bool UploadFile(string sourceFilePath, string destinationFilePath, bool allowResumeSupport, bool allowPreserveTimeStamp)
         {
-            TransferOptions transferOptions = new TransferOptions() { TransferMode = TransferMode.Binary };
+            TransferOptions transferOptions = new TransferOptions() { TransferMode = TransferMode.Binary, PreserveTimestamp = true };
 
             if (!allowResumeSupport)
                 transferOptions.ResumeSupport = new TransferResumeSupport() { State = TransferResumeSupportState.Off };
@@ -74,7 +73,7 @@ namespace Feeds
 
         public bool CheckIfFileOrDirectoryExists(string path)
         {
-           return  Session.FileExists(path);
+            return Session.FileExists(path);
         }
 
 
@@ -82,6 +81,18 @@ namespace Feeds
         public void CloseSession()
         {
             Session.Close();
+        }
+
+        public List<string> GetFiles(string path, string inputMask)
+        {
+            //return only the file name
+           return Session.EnumerateRemoteFiles(path, inputMask, EnumerationOptions.AllDirectories).ToList().Select(r => r.FullName).ToList();
+
+        }
+
+        public void MoveFile(string path, string destination)
+        {
+            Session.MoveFile(path, destination);
         }
 
     }

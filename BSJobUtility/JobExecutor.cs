@@ -117,6 +117,8 @@ namespace BSJobUtility
                 _managedJob = new AutoPrintPDF.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
+            else if (_jobName == "ArchiveAutoRenewals")
+                _managedJob = new ArchiveAutoRenewals.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 
