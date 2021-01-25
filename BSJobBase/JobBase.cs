@@ -93,7 +93,9 @@ namespace BSJobBase
             // basic logging
             if (bool.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "LogEmptyRuns")) == true)
             {
+
                 WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting");
+
                 JobStartedLog = true;
             }
         }
@@ -117,6 +119,7 @@ namespace BSJobBase
             if (!JobStartedLog)
             {
                 JobStartedLog = true;
+
                 WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job starting");
             }
         }
@@ -135,7 +138,7 @@ namespace BSJobBase
         {
             CheckForJobStartedLog();
 
-            BSGlobals.DataIO.WriteToJobLog(type, message, JobName);           
+            BSGlobals.DataIO.WriteToJobLog(type, message, JobName);
         }
 
         protected void ExecuteNonQuery(BSGlobals.Enums.DatabaseConnectionStringNames connectionStringName, string commandText, params SqlParameter[] parameters)
@@ -146,7 +149,7 @@ namespace BSJobBase
         protected void ExecuteNonQuery(BSGlobals.Enums.DatabaseConnectionStringNames connectionStringName, CommandType commandType, string commandText, params SqlParameter[] parameters)
         {
             BSGlobals.DataIO.ExecuteNonQuery(connectionStringName, commandType, commandText, parameters);
-        }       
+        }
 
 
         #region Excel
@@ -334,7 +337,7 @@ namespace BSJobBase
         /// <returns></returns>
         public static string GetConnectionStringTo(BSGlobals.Enums.DatabaseConnectionStringNames name)
         {
-            return BSGlobals.Config.GetConnectionStringTo(name);            
+            return BSGlobals.Config.GetConnectionStringTo(name);
         }
 
 
@@ -350,7 +353,7 @@ namespace BSJobBase
 
         public static List<string> GetFiles(string sourceDirectory, Regex reg)
         {
-           return BSGlobals.FileIO.GetFiles(sourceDirectory, reg);
+            return BSGlobals.FileIO.GetFiles(sourceDirectory, reg);
         }
 
 
@@ -365,7 +368,7 @@ namespace BSJobBase
         /// <param name="bccs">Optional</param>
         protected void SendMail(string subject, string body, bool bodyIsHTML, string recipients = null, string ccs = null, string bccs = null, string attachment = null)
         {
-            BSGlobals.Mail.SendMail(subject, body, bodyIsHTML, recipients, ccs, bccs, attachment);            
+            BSGlobals.Mail.SendMail(subject, body, bodyIsHTML, recipients, ccs, bccs, attachment);
         }
 
         protected object FormatNumber(string inputString)

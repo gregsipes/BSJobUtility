@@ -54,10 +54,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ArchiveAutoRenewals\ArchiveAutoRenewals.csproj">
-      <Project>{4c929ed6-7b2d-42b8-bdf0-4ac9d563e3a9}</Project>
-      <Name>ArchiveAutoRenewals</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AutoPrintPDF\AutoPrintPDF.csproj">
       <Project>{b49ea1a9-a1e7-44a4-a7fe-69c470a2e0ca}</Project>
       <Name>AutoPrintPDF</Name>

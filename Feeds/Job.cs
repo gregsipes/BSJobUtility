@@ -25,7 +25,7 @@ namespace Feeds
 
         public override void SetupJob()
         {
-            JobName = "Feeds";
+            JobName = "Feeds - " + Version;
             JobDescription = "Either creates a data file, SFTP's existing files over to Wehaa, or runs a set of sprocs (aging summary) in the Brainworks database.";
             AppConfigSectionName = "Feeds";
 

@@ -23,8 +23,8 @@ namespace ArchiveAutoRenewals
         {
             try
             {
-                ArchiveSFTPFiles();
                 ArchiveCircFiles();
+                ArchiveSFTPFiles();
             }
             catch (Exception ex)
             {
@@ -38,7 +38,7 @@ namespace ArchiveAutoRenewals
             WriteToJobLog(JobLogMessageType.INFO, "Creating SFTP session");
 
             SFTP sFTP = new SFTP(GetConfigurationKeyValue("HostName"), GetConfigurationKeyValue("UserName"), GetConfigurationKeyValue("Password"));
-            sFTP.OpenSession(GetConfigurationKeyValue("HostKey"), "", "");
+            sFTP.OpenSession(GetConfigurationKeyValue("FingerPrint"), GetConfigurationKeyValue("KeyFilePath"), GetConfigurationKeyValue("KeyFilePassword"));
 
             WriteToJobLog(JobLogMessageType.INFO, $"Retrieving files from {GetConfigurationKeyValue("SFTPPath")}");
 
@@ -88,7 +88,6 @@ namespace ArchiveAutoRenewals
 
         private void ArchiveCircFiles()
         {
-            WriteToJobLog(JobLogMessageType.INFO, "Creating SFTP session");
 
             WriteToJobLog(JobLogMessageType.INFO, $"Retrieving files from {GetConfigurationKeyValue("CircPath")}");
 
