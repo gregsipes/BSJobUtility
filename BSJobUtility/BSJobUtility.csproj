@@ -94,6 +94,10 @@
       <Project>{960455ab-e26b-4a6f-b065-7a1e500757f9}</Project>
       <Name>DMMail</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ExecuteSQL\ExecuteSQL.csproj">
+      <Project>{a3f6e72b-b4d8-4bf8-8d23-3caf09cdd37a}</Project>
+      <Name>ExecuteSQL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Feeds\Feeds.csproj">
       <Project>{ebde7e14-5db4-49ea-ace0-b4b5d61fdcb8}</Project>
       <Name>Feeds</Name>

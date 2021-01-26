@@ -233,6 +233,39 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.PBSGeneral:
                     connectionString = GetConnectionString("pbsgeneral");
                     break;
+                case DatabaseConnectionStringNames.BSConsole:
+                    connectionString = GetConnectionString("bsconsole");
+                    break;
+                case DatabaseConnectionStringNames.Brainworks_Work:
+                    connectionString = GetConnectionString("brainworks_work");
+                    break;
+                case DatabaseConnectionStringNames.MailTops:
+                    connectionString = GetConnectionString("mailtops");
+                    break;
+                case DatabaseConnectionStringNames.Newshole:
+                    connectionString = GetConnectionString("newshole");
+                    break;
+                case DatabaseConnectionStringNames.OfficePay_Archived:
+                    connectionString = GetConnectionString("officepayarchived");
+                    break;
+                case DatabaseConnectionStringNames.Palletizers:
+                    connectionString = GetConnectionString("palletizers");
+                    break;
+                case DatabaseConnectionStringNames.PBSInvoiceExport:
+                    connectionString = GetConnectionString("pbsinvoiceexport");
+                    break;
+                case DatabaseConnectionStringNames.Postings:
+                    connectionString = GetConnectionString("postings");
+                    break;
+                case DatabaseConnectionStringNames.Preprints:
+                    connectionString = GetConnectionString("preprints");
+                    break;
+                case DatabaseConnectionStringNames.TouchControl:
+                    connectionString = GetConnectionString("touchcontrol");
+                    break;
+                case DatabaseConnectionStringNames.Trade:
+                    connectionString = GetConnectionString("trade");
+                    break;
                 default:
                     break;
             }

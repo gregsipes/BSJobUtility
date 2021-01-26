@@ -17,6 +17,7 @@ namespace BSGlobals
             Commissions,
             BuffNewsForBW,
             Brainworks,
+            Brainworks_Work,
             CommissionsRelated,
             BARC,
             Wrappers,
@@ -52,7 +53,17 @@ namespace BSGlobals
             SynergyReportMaintenance,
             SBSJournalEntryImport,
             AutoPrintPDF,
-            PBSGeneral
+            PBSGeneral,
+            BSConsole,
+            MailTops,
+            Newshole,
+            OfficePay_Archived,
+            Palletizers,
+            PBSInvoiceExport,
+            Postings,
+            Preprints,
+            TouchControl,
+            Trade
         }
 
         public enum JobLogMessageType
