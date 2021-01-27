@@ -110,7 +110,7 @@ namespace ExecuteSQL
                         break;
                     case "Preprints":
                         ExecuteNonQuery(DatabaseConnectionStringNames.Preprints, "Proc_Insert_Update_Brainworks_Related", 
-                                                            new SqlParameter("@pintBrainworksAccount", 0),
+                                                            new SqlParameter("@pintBrainworksAccount", "0"),
                                                             new SqlParameter("@pvchrBrainworksServiceInstance", GetConfigurationKeyValue("BrainworksServer")),
                                                             new SqlParameter("@pvchrBrainworksDatabase", GetConfigurationKeyValue("BrainworksDatabase")),
                                                             new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("BrainworksUserName")),
