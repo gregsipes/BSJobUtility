@@ -81,7 +81,8 @@ namespace ExecuteSQL
                         ExecuteNonQuery(DatabaseConnectionStringNames.CircDumpWorkLoad, "Proc_Delete_BN_Loads_DumpControl");
                         break;
                     case "CommissionsRelated_Responsible_Salespersons_BWDB_BW":
-                        ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "Proc_Insert_Update_Responsible_Salespersons");
+                        ExecuteNonQuery(DatabaseConnectionStringNames.CommissionsRelated, "Proc_Insert_Update_Responsible_Salespersons",
+                                                            new SqlParameter("@pvchrEndDate", ""));
                         break;
                     case "MailTops":
                         ExecuteNonQuery(DatabaseConnectionStringNames.MailTops, "Proc_Purge_Trucks");
