@@ -29,19 +29,19 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
             this.MnuMain = new System.Windows.Forms.MenuStrip();
             this.MnuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.MnuNewOrder = new System.Windows.Forms.ToolStripMenuItem();
@@ -481,8 +481,8 @@
             this.GrdOrderDetails.Margin = new System.Windows.Forms.Padding(2);
             this.GrdOrderDetails.MultiSelect = false;
             this.GrdOrderDetails.Name = "GrdOrderDetails";
-            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.GrdOrderDetails.RowsDefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.GrdOrderDetails.RowsDefaultCellStyle = dataGridViewCellStyle9;
             this.GrdOrderDetails.RowTemplate.Height = 40;
             this.GrdOrderDetails.Size = new System.Drawing.Size(1240, 397);
             this.GrdOrderDetails.TabIndex = 0;
@@ -493,25 +493,25 @@
             // 
             // Qty
             // 
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.Qty.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Qty.DefaultCellStyle = dataGridViewCellStyle1;
             this.Qty.HeaderText = "Qty";
             this.Qty.Name = "Qty";
             this.Qty.Width = 50;
             // 
             // Units
             // 
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle15.NullValue = null;
-            this.Units.DefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle2.NullValue = null;
+            this.Units.DefaultCellStyle = dataGridViewCellStyle2;
             this.Units.HeaderText = "Units";
             this.Units.Name = "Units";
             this.Units.Width = 50;
             // 
             // PartNumber
             // 
-            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.PartNumber.DefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.PartNumber.DefaultCellStyle = dataGridViewCellStyle3;
             this.PartNumber.HeaderText = "Item Part Number / Description";
             this.PartNumber.MinimumWidth = 300;
             this.PartNumber.Name = "PartNumber";
@@ -519,20 +519,20 @@
             // 
             // ItemUnitPrice
             // 
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle17.Format = "C2";
-            dataGridViewCellStyle17.NullValue = null;
-            this.ItemUnitPrice.DefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle4.Format = "C2";
+            dataGridViewCellStyle4.NullValue = null;
+            this.ItemUnitPrice.DefaultCellStyle = dataGridViewCellStyle4;
             this.ItemUnitPrice.HeaderText = "Unit Price";
             this.ItemUnitPrice.Name = "ItemUnitPrice";
             this.ItemUnitPrice.Width = 80;
             // 
             // ItemTotalPrice
             // 
-            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle18.Format = "C2";
-            dataGridViewCellStyle18.NullValue = null;
-            this.ItemTotalPrice.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle5.Format = "C2";
+            dataGridViewCellStyle5.NullValue = null;
+            this.ItemTotalPrice.DefaultCellStyle = dataGridViewCellStyle5;
             this.ItemTotalPrice.HeaderText = "Total Price";
             this.ItemTotalPrice.Name = "ItemTotalPrice";
             this.ItemTotalPrice.ReadOnly = true;
@@ -546,8 +546,8 @@
             // 
             // ChargeTo
             // 
-            dataGridViewCellStyle19.NullValue = "<not set>";
-            this.ChargeTo.DefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewCellStyle6.NullValue = "<not set>";
+            this.ChargeTo.DefaultCellStyle = dataGridViewCellStyle6;
             this.ChargeTo.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
             this.ChargeTo.HeaderText = "Charge To";
             this.ChargeTo.MaxDropDownItems = 50;
@@ -556,8 +556,8 @@
             // 
             // Classification
             // 
-            dataGridViewCellStyle20.NullValue = "<not set>";
-            this.Classification.DefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCellStyle7.NullValue = "<not set>";
+            this.Classification.DefaultCellStyle = dataGridViewCellStyle7;
             this.Classification.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
             this.Classification.HeaderText = "Classification";
             this.Classification.MaxDropDownItems = 50;
@@ -566,8 +566,8 @@
             // 
             // Purpose
             // 
-            dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.Purpose.DefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.Purpose.DefaultCellStyle = dataGridViewCellStyle8;
             this.Purpose.HeaderText = "Purpose";
             this.Purpose.MinimumWidth = 250;
             this.Purpose.Name = "Purpose";
@@ -1043,6 +1043,7 @@
             this.CmdPrintArchive.TabIndex = 46;
             this.CmdPrintArchive.Text = "Print Archive";
             this.CmdPrintArchive.UseVisualStyleBackColor = true;
+            this.CmdPrintArchive.Click += new System.EventHandler(this.CmdPrintArchive_Click);
             // 
             // CmdPreviewArchive
             // 
@@ -1157,8 +1158,8 @@
             // 
             this.PO.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.PO.DataPropertyName = "OrdID";
-            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.PO.DefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.PO.DefaultCellStyle = dataGridViewCellStyle10;
             this.PO.HeaderText = "PO#";
             this.PO.Name = "PO";
             this.PO.ReadOnly = true;
@@ -1178,8 +1179,8 @@
             // 
             this.Date.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.Date.DataPropertyName = "OrdDate";
-            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.Date.DefaultCellStyle = dataGridViewCellStyle24;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Date.DefaultCellStyle = dataGridViewCellStyle11;
             this.Date.HeaderText = "Date";
             this.Date.Name = "Date";
             this.Date.ReadOnly = true;
@@ -1217,8 +1218,8 @@
             // 
             this.UnitPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.UnitPrice.DataPropertyName = "UnitPrice";
-            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UnitPrice.DefaultCellStyle = dataGridViewCellStyle25;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UnitPrice.DefaultCellStyle = dataGridViewCellStyle12;
             this.UnitPrice.HeaderText = "Unit Price";
             this.UnitPrice.Name = "UnitPrice";
             this.UnitPrice.ReadOnly = true;
@@ -1228,8 +1229,8 @@
             // 
             this.TotalPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.TotalPrice.DataPropertyName = "TotalPrice";
-            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.TotalPrice.DefaultCellStyle = dataGridViewCellStyle26;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.TotalPrice.DefaultCellStyle = dataGridViewCellStyle13;
             this.TotalPrice.HeaderText = "Total Price";
             this.TotalPrice.Name = "TotalPrice";
             this.TotalPrice.ReadOnly = true;

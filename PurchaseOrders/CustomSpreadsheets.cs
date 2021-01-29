@@ -10,7 +10,7 @@ namespace PurchaseOrders
         // ALL spreadsheet constructors are put here so that we don't clutter the main code with too much stuff.
 
         #region Purchase Order Spreadsheet
-        private Spreadsheet CreatePurchaseOrderSpreadsheet(OrderClass currentOrder)
+        private Spreadsheet CreatePurchaseOrderSpreadsheet(OrderClass currentOrder, VendorClass currentVendor)
         {
             Spreadsheet xlPO = new Spreadsheet();
 
@@ -127,7 +127,7 @@ namespace PurchaseOrders
                 // Format the DataGrid rows.  Display a minimum of 8 rows whether or not they are all populated.
 
                 int ROWGRIDSTART = ROWDGHEADNG + 1;
-                int NumRows = ((GrdOrderDetails.RowCount - 1 <= 8) ? 8 : GrdOrderDetails.RowCount - 1);
+                int NumRows = ((currentOrder.NumLineItems <= 8) ? 8 : currentOrder.NumLineItems);
 
                 // Center some cells
                 int lastrow = ROWGRIDSTART + 2 * (NumRows - 1) + 1;
@@ -398,33 +398,32 @@ namespace PurchaseOrders
                 OrderClass o = currentOrder;
                 xlPO.SetCellValue(POCELL.Y, POCELL.X, "D" + o.PONumber.Value.ToString("D5"));
 
-                VendorClass v = CurrentVendors.VendorList[CurrentVendors.SelectedListIndex];
                 // Populate the Vendor info
-                xlPO.SetCellValue(VENDORBOXUL.Y + 1, VENDORBOXUL.X + 1, v.VendorName);
-                xlPO.SetCellValue(VENDORBOXUL.Y + 2, VENDORBOXUL.X + 1, v.AddrLine1);
+                xlPO.SetCellValue(VENDORBOXUL.Y + 1, VENDORBOXUL.X + 1, currentVendor.VendorName);
+                xlPO.SetCellValue(VENDORBOXUL.Y + 2, VENDORBOXUL.X + 1, currentVendor.AddrLine1);
                 int nextrow = 3;
-                if (v.AddrLine2 != null)
+                if (currentVendor.AddrLine2 != null)
                 {
-                    if (v.AddrLine2.Length > 0)
+                    if (currentVendor.AddrLine2.Length > 0)
                     {
-                        xlPO.SetCellValue(VENDORBOXUL.Y + 3, VENDORBOXUL.X + 1, v.AddrLine2);
+                        xlPO.SetCellValue(VENDORBOXUL.Y + 3, VENDORBOXUL.X + 1, currentVendor.AddrLine2);
                         nextrow = 4;
                     }
                 }
-                xlPO.SetCellValue(VENDORBOXUL.Y + nextrow, VENDORBOXUL.X + 1, v.City + ", " + v.State + "  " + v.Zip);
-                if (v.Contact != null)
+                xlPO.SetCellValue(VENDORBOXUL.Y + nextrow, VENDORBOXUL.X + 1, currentVendor.City + ", " + currentVendor.State + "  " + currentVendor.Zip);
+                if (currentVendor.Contact != null)
                 {
-                    if (v.Contact.Length > 0)
+                    if (currentVendor.Contact.Length > 0)
                     {
-                        xlPO.SetCellValue(VENDORBOXUL.Y + nextrow + 2, VENDORBOXUL.X + 1, "Attn: " + v.Contact);
-                        xlPO.SetCellValue(VENDORBOXUL.Y + nextrow + 3, VENDORBOXUL.X + 1, v.Phone);
+                        xlPO.SetCellValue(VENDORBOXUL.Y + nextrow + 2, VENDORBOXUL.X + 1, "Attn: " + currentVendor.Contact);
+                        xlPO.SetCellValue(VENDORBOXUL.Y + nextrow + 3, VENDORBOXUL.X + 1, currentVendor.Phone);
                     }
                 }
-                if (v.AcctNum != null)
+                if (currentVendor.AcctNum != null)
                 {
-                    if (v.AcctNum.Length > 0)
+                    if (currentVendor.AcctNum.Length > 0)
                     {
-                        xlPO.SetCellValue(VENDORBOXUL.Y + 8, VENDORBOXUL.X + 2, "News Acct # " + v.AcctNum);
+                        xlPO.SetCellValue(VENDORBOXUL.Y + 8, VENDORBOXUL.X + 2, "News Acct # " + currentVendor.AcctNum);
                     }
                 }
 
@@ -447,6 +446,7 @@ namespace PurchaseOrders
                     xlPO.SetCellValue(row2start, COLCHPUSTRT, d.Purpose);
                 }
 
+                // TBD TBD TBD  1/29/21- Need to either eliminate these or put in a conditional to differentiate between New and Archived orders
                 //Populate Order Total
                 xlPO.SetCellValue(ROWGRIDTOTALS, COLTOTLPRIC, TxtPOTotal.Text);
 
@@ -471,6 +471,31 @@ namespace PurchaseOrders
                         xlPO.SetCellValue(ROW1SIGS + 1, COLORDERDATE, TxtDate.Text);
                     }
                 }
+
+                //Populate Order Total
+                xlPO.SetCellValue(ROWGRIDTOTALS, COLTOTLPRIC, currentOrder.OrderTotal.ToString("C2"));
+
+                // Display username in the Ordered By box. 
+                xlPO.SetCellValue(ROW1SIGS, COLORDBYSTRT, currentOrder.Owner);
+
+                xlPO.SetCellValue(ROW2SIGS, COLDELTOSTRT, currentOrder.DeliverTo);
+                xlPO.SetCellValue(ROW1SIGS, COLEXTENSTRT, currentOrder.DeliverToPhone);
+                xlPO.SetCellValue(ROW2SIGS, COLDEPTMSTRT, currentOrder.Department);
+                xlPO.SetCellValue(ROW1SIGS, COLTERMSSTRT, currentOrder.Terms);
+                xlPO.SetCellValue(ROW2SIGS, COLREFNUSTRT, "'" + currentOrder.OrderReference); // Force this to be text
+                xlPO.SetCellValue(ROW3SIGS, COLCOMMNSTRT, currentOrder.Comments);
+                if (currentOrder.OrderDate.ToString().Length > 0)
+                {
+                    bool dateokay = DateTime.TryParse(currentOrder.OrderDate.ToString(), out DateTime dt);
+                    if (dateokay)
+                    {
+                        xlPO.SetCellValue(ROW1SIGS + 1, COLORDERDATE, dt.ToShortDateString());
+                    }
+                }
+
+
+
+
                 DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, "Created PO Spreadshet #" + o.PONumber.Value.ToString("D5"), JobName);
 
             }

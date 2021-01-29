@@ -281,7 +281,7 @@
         public static SqlDataReader SQLQuery(string qryName, CommandType command)
         {
             SqlDataReader rdr = DataIO.ExecuteQuery(
-                Enums.DatabaseConnectionStringNames.ISInventory,
+                Enums.DatabaseConnectionStringNames.<JOBNAME GOES HERE>,
                 command,
                 qryName);
             return (rdr);

@@ -106,7 +106,8 @@ namespace PurchaseOrders
         {
             private List<LineItemsClass> LineItems { get; set; }
             public int? PONumber { get; private set; }
-            public DateTime? OrderDate { get; private set; }
+            public DateTime? OrderDate { get; set; } // Date is not private - we need to set it from SQL when accessing archived data
+            public string Owner { get; private set; }
             public string DeliverTo { get; private set; }
             public string DeliverToPhone { get; private set; }
             public string Department { get; private set; }
@@ -134,10 +135,11 @@ namespace PurchaseOrders
             /// <param name="terms"></param>
             /// <param name="orderReference"></param>
             /// <param name="comments"></param>
-            public void UpdateOrderRecord(string orderDate, string deliverTo, string deliverToPhone, string department, string terms, string orderReference, string comments)
+            public void UpdateOrderRecord(string orderDate, string deliverTo, string deliverToPhone, string department, string terms, string orderReference, string comments, string owner)
             {
                 bool dateokay = DateTime.TryParse(orderDate, out DateTime dt);
                 OrderDate = (dateokay ? dt : DateTime.Now);
+                Owner = owner;
                 DeliverTo = deliverTo;
                 DeliverToPhone = deliverToPhone;
                 Department = department;
@@ -175,6 +177,7 @@ namespace PurchaseOrders
                 Terms = (string)GetSQLValue(rdrOrder, "Terms");
                 OrderReference = (string)GetSQLValue(rdrOrder, "RefNum");
                 Comments = (string)GetSQLValue(rdrOrder, "Comments");
+                Owner = (string)GetSQLValue(rdrOrder, "Owner");
             }
 
             /// <summary>

@@ -50,7 +50,8 @@ namespace BSGlobals
             Feeds,
             ISInventory,
             SynergyReportMaintenance,
-            SBSJournalEntryImport
+            SBSJournalEntryImport,
+            LawsonArchive
         }
 
         public enum JobLogMessageType

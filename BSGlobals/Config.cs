@@ -227,6 +227,9 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.SBSJournalEntryImport:
                     connectionString = GetConnectionString("sbsjournalentryimport");
                     break;
+                case DatabaseConnectionStringNames.LawsonArchive:
+                    connectionString = GetConnectionString("prod8");
+                    break;
                 default:
                     break;
             }
