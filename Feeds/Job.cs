@@ -181,8 +181,8 @@ namespace Feeds
                     new SqlParameter("@pintBuildsID", buildId));
 
                 //throw an exception if the feed's flag is set to true
-                if (Convert.ToBoolean(feed["error_if_no_data_selected_flag"].ToString()))
-                    throw new Exception($"No data selected for feed");
+                //if (Convert.ToBoolean(feed["error_if_no_data_selected_flag"].ToString()))
+                //    throw new Exception($"No data selected for feed");
 
                 return;
             }
