@@ -48,7 +48,7 @@ namespace Feeds
         private void CreateBuild()
         {
 
-            string securityPassPhrase = DeterminePassPhrase();
+            string securityPassPhrase = DeterminePassPhrase(DatabaseConnectionStringNames.Feeds);
 
             WriteToJobLog(JobLogMessageType.INFO, $"Running as user {System.Security.Principal.WindowsIdentity.GetCurrent().Name}");
 
@@ -395,38 +395,38 @@ namespace Feeds
 
         }
 
-        private string DeterminePassPhrase()
-        {
-            Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_BS_Verify").FirstOrDefault();
+        //private string DeterminePassPhrase()
+        //{
+        //    Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_BS_Verify").FirstOrDefault();
 
-            //to build the passphrase, get the user sid, replace hyphen and leading S, then reverse
+        //    //to build the passphrase, get the user sid, replace hyphen and leading S, then reverse
 
-            //To maintain backwards comptability, this SID has been changed to static
-            //value as opposed to collecting the SID from the logged in user.
-            // string userSID = WindowsIdentity.GetCurrent().User.ToString();
-            string userSID = GetConfigurationKeyValue("UserSID");
+        //    //To maintain backwards comptability, this SID has been changed to static
+        //    //value as opposed to collecting the SID from the logged in user.
+        //    // string userSID = WindowsIdentity.GetCurrent().User.ToString();
+        //    string userSID = GetConfigurationKeyValue("UserSID");
 
-            char[] passPhraseArray = userSID.Replace("-", "").Replace("S", "").ToCharArray();
-            Array.Reverse(passPhraseArray);
-            string passPhrase = new string(passPhraseArray);
+        //    char[] passPhraseArray = userSID.Replace("-", "").Replace("S", "").ToCharArray();
+        //    Array.Reverse(passPhraseArray);
+        //    string passPhrase = new string(passPhraseArray);
 
-            result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_BS_Verify_Verify_Value",
-                                            new SqlParameter("@pvchrPassPhrase", passPhrase)).FirstOrDefault();
+        //    result = ExecuteSQL(DatabaseConnectionStringNames.Feeds, "Proc_Select_BS_Verify_Verify_Value",
+        //                                    new SqlParameter("@pvchrPassPhrase", passPhrase)).FirstOrDefault();
 
-            //only if the two returned values match (one is reversed), return the correct passphrase
-            string verifyString = result["verify_value"].ToString();
-            char[] verifyArray = verifyString.ToCharArray();
-            Array.Reverse(verifyArray);
+        //    //only if the two returned values match (one is reversed), return the correct passphrase
+        //    string verifyString = result["verify_value"].ToString();
+        //    char[] verifyArray = verifyString.ToCharArray();
+        //    Array.Reverse(verifyArray);
 
-            if (new string(verifyArray) != result["misc_user"].ToString())
-            {
-                WriteToJobLog(JobLogMessageType.WARNING, "Invalid passphrase");
-                return "";
-            }
+        //    if (new string(verifyArray) != result["misc_user"].ToString())
+        //    {
+        //        WriteToJobLog(JobLogMessageType.WARNING, "Invalid passphrase");
+        //        return "";
+        //    }
 
 
-            return passPhrase;
-        }
+        //    return passPhrase;
+        //}
 
         private bool PostProcess(Int64 buildId, Int32 groupNumber, Dictionary<string, object> feed, List<string> filesToPostProcess, string outputFileName)
         {

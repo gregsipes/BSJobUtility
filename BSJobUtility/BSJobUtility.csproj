@@ -182,6 +182,10 @@
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SBSReportsLoad\SBSReportsLoad.csproj">
+      <Project>{0c122252-5007-4f08-b047-96e653a7dc28}</Project>
+      <Name>SBSReportsLoad</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SubBalanceLoad\SubBalanceLoad.csproj">
       <Project>{8e87415b-a7ea-4165-9aee-8fb6d88496ae}</Project>
       <Name>SubBalanceLoad</Name>

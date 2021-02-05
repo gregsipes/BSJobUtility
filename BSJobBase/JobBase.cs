@@ -11,6 +11,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static BSGlobals.Enums;
 
 namespace BSJobBase
 {
@@ -384,6 +385,40 @@ namespace BSJobBase
         protected object FormatString(string inputString)
         {
             return BSGlobals.Types.FormatString(inputString);
+        }
+
+
+        protected string DeterminePassPhrase(DatabaseConnectionStringNames connectionStringName)
+        {
+            Dictionary<string, object> result = ExecuteSQL(connectionStringName, "Proc_Select_BS_Verify").FirstOrDefault();
+
+            //to build the passphrase, get the user sid, replace hyphen and leading S, then reverse
+
+            //To maintain backwards comptability, this SID has been changed to static
+            //value as opposed to collecting the SID from the logged in user.
+            // string userSID = WindowsIdentity.GetCurrent().User.ToString();
+            string userSID = GetConfigurationKeyValue("UserSID");
+
+            char[] passPhraseArray = userSID.Replace("-", "").Replace("S", "").ToCharArray();
+            Array.Reverse(passPhraseArray);
+            string passPhrase = new string(passPhraseArray);
+
+            result = ExecuteSQL(connectionStringName, "Proc_Select_BS_Verify_Verify_Value",
+                                            new SqlParameter("@pvchrPassPhrase", passPhrase)).FirstOrDefault();
+
+            //only if the two returned values match (one is reversed), return the correct passphrase
+            string verifyString = result["verify_value"].ToString();
+            char[] verifyArray = verifyString.ToCharArray();
+            Array.Reverse(verifyArray);
+
+            if (new string(verifyArray) != result["misc_user"].ToString())
+            {
+                WriteToJobLog(JobLogMessageType.WARNING, "Invalid passphrase");
+                return "";
+            }
+
+
+            return passPhrase;
         }
 
         #endregion

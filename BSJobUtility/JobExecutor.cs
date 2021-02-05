@@ -117,6 +117,8 @@ namespace BSJobUtility
                 _managedJob = new AutoPrintPDF.Job();
             else if (_jobName == "ExecuteSQL")
                 _managedJob = new ExecuteSQL.Job() { Version = _version };
+            else if (_jobName == "SBSReportsLoad")
+                _managedJob = new SBSReportsLoad.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
             else
