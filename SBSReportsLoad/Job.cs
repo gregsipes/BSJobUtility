@@ -16,7 +16,7 @@ namespace SBSReportsLoad
         public override void SetupJob()
         {
             JobName = "SBSReportsLoad";
-            JobDescription = "TODO";
+            JobDescription = "Parses XML files into database tables";
             AppConfigSectionName = "SBSReportsLoad";
 
         }
@@ -25,11 +25,6 @@ namespace SBSReportsLoad
         {
             try
             {
-                //string securityPassPhrase = DeterminePassPhrase(DatabaseConnectionStringNames.SBSReports);
-
-                ////throw an exception if the passphrase comes back empty or null. This is used later to decrypt 
-                //if (String.IsNullOrEmpty(securityPassPhrase))
-                //    throw new Exception($"Invalid passphrase for user {System.Security.Principal.WindowsIdentity.GetCurrent().Name}");
 
                 //create a load record and return the unique id
                 Dictionary<string, object> result = ExecuteSQL(DatabaseConnectionStringNames.SBSReports, "Proc_Insert_Loads").FirstOrDefault();
@@ -55,8 +50,7 @@ namespace SBSReportsLoad
                     {
                         XDocument xml = XDocument.Load(xmlFile);
 
-                        List<XElement> nodes = new List<XElement>(); // xml.Root.Elements("tt" + table["table_name"].ToString() + "Row").ToList();
-
+                        List<XElement> nodes = new List<XElement>(); 
 
                         //this case statement replaces the replaces the where_conditions table. We ran into issues converting the sql strings into the Linq To XML queries,
                         //so for the sake of time, we moved the where clauses here
@@ -154,15 +148,15 @@ namespace SBSReportsLoad
                                                 new SqlParameter("@PlanEePaidAmt", node.Element("PlanEePaidAmt").Value),
                                                 new SqlParameter("@PlanAddBackAmt", node.Element("PlanAddBackAmt").Value),
                                                 new SqlParameter("@PlanEarnAmt", node.Element("PlanEarnAmt").Value),
-                                                new SqlParameter("@xLifeOthX", node.Element("xLifeOthX").Value),
+                                                new SqlParameter("@xLifeOthX", node.Element("XLifeOthX").Value),
                                                 new SqlParameter("@CoverageAmt", node.Element("CoverageAmt").Value),
                                                 new SqlParameter("@OtherValue", node.Element("OtherValue").Value),
-                                                new SqlParameter("@xMedDentX", node.Element("xMedDentX").Value),
-                                                new SqlParameter("@xDefContrbtnX", node.Element("xDefContrbtnX").Value),
+                                                new SqlParameter("@xMedDentX", node.Element("XMedDentX").Value),
+                                                new SqlParameter("@xDefContrbtnX", node.Element("XDefContrbtnX").Value),
                                                 new SqlParameter("@EePercent", node.Element("EePercent").Value),
                                                 new SqlParameter("@EePlanAmt", node.Element("EePlanAmt").Value),
                                                 new SqlParameter("@EePpAmt", node.Element("EePpAmt").Value),
-                                                new SqlParameter("@xBuySellVacX", node.Element("xBuySellVacX").Value),
+                                                new SqlParameter("@xBuySellVacX", node.Element("XBuySellVacX").Value),
                                                 new SqlParameter("@HrsBought", node.Element("HrsBought").Value),
                                                 new SqlParameter("@HrsSold", node.Element("HrsSold").Value),
                                                 new SqlParameter("@CostPerHr", node.Element("CostPerHr").Value),
@@ -171,8 +165,8 @@ namespace SBSReportsLoad
                                                 new SqlParameter("@PaymentMethod", node.Element("PaymentMethod").Value),
                                                 new SqlParameter("@PaymentMethodDesc", node.Element("PaymentMethodDesc").Value),
                                                 new SqlParameter("@ManAccrGend", node.Element("ManAccrGend").Value),
-                                                new SqlParameter("@xSavingsBondsX", node.Element("xSavingsBondsX").Value),
-                                                new SqlParameter("@xReimbursementX", node.Element("xReimbursementX").Value),
+                                                new SqlParameter("@xSavingsBondsX", node.Element("XSavingsBondsX").Value),
+                                                new SqlParameter("@xReimbursementX", node.Element("XReimbursementX").Value),
                                                 new SqlParameter("@DateAdded", node.Element("DateAdded").Value),
                                                 new SqlParameter("@AddedBy", node.Element("AddedBy").Value),
                                                 new SqlParameter("@DateChanged", node.Element("DateChanged").Value),
@@ -290,14 +284,14 @@ namespace SBSReportsLoad
                                                     new SqlParameter("@ApAcct", node.Element("ApAcct").Value),
                                                     new SqlParameter("@FacilityNo", node.Element("FacilityNo").Value),
                                                     new SqlParameter("@VatRegistrNo", node.Element("VatRegistrNo").Value),
-                                                    new SqlParameter("@UsOrFc", node.Element("").Value),
-                                                    new SqlParameter("@BillWashAcct", node.Element("").Value),
+                                                    new SqlParameter("@UsOrFc", node.Element("UsOrFc").Value),
+                                                    new SqlParameter("@BillWashAcct", node.Element("BillWashAcct").Value),
                                                     new SqlParameter("@Address1", node.Element("").Value),
-                                                    new SqlParameter("@Address2", node.Element("").Value),
-                                                    new SqlParameter("@City", node.Element("").Value),
-                                                    new SqlParameter("@State", node.Element("").Value),
-                                                    new SqlParameter("@ZipCode", node.Element("").Value),
-                                                    new SqlParameter("@Country", node.Element("").Value),
+                                                    new SqlParameter("@Address2", node.Element("Address2").Value),
+                                                    new SqlParameter("@City", node.Element("City").Value),
+                                                    new SqlParameter("@State", node.Element("State").Value),
+                                                    new SqlParameter("@ZipCode", node.Element("ZipCode").Value),
+                                                    new SqlParameter("@Country", node.Element("Country").Value),
                                                     new SqlParameter("@Entity", node.Element("Entity").Value),
                                                     new SqlParameter("@BankId", node.Element("BankId").Value),
                                                     new SqlParameter("@BankAcctNo", node.Element("BankAcctNo").Value),
@@ -1280,8 +1274,8 @@ namespace SBSReportsLoad
                     ExecuteNonQuery(DatabaseConnectionStringNames.SBSReports, "Proc_Delete_Loads",
                                                     new SqlParameter("@pvchrTableName", table["table_name"].ToString()));
 
-
-                   //todo:  RetrievePostLoads();
+                    //this only runs for the Employee table
+                    RetrievePostLoad(table["table_name"].ToString(), loadsId);
 
                 }
 
@@ -1300,6 +1294,24 @@ namespace SBSReportsLoad
                 LogException(ex);
                 throw;
             }
+        }
+
+
+        private void RetrievePostLoad(string tableName, Int64 loadsId)
+        {
+            WriteToJobLog(JobLogMessageType.INFO, "Checking for post load routines");
+
+            if (tableName == "Employee")
+            {
+                ExecuteNonQuery(DatabaseConnectionStringNames.Trade, "Proc_Insert_Update_Users",
+                                            new SqlParameter("@pvchrSBSReportsServerInstance", GetConfigurationKeyValue("RemoteServerName")),
+                                            new SqlParameter("@pvchrSBSReportsDatabase", GetConfigurationKeyValue("RemoteDatabaseName")),
+                                            new SqlParameter("@pvchrUserName", GetConfigurationKeyValue("RemoteUserName")),
+                                            new SqlParameter("@pvchrPassword", GetConfigurationKeyValue("RemotePassword")),
+                                            new SqlParameter("@pintEmployeeLoadsID", loadsId));
+            }
+            else
+                WriteToJobLog(JobLogMessageType.INFO, "No post load routines");
         }
     }
 }
