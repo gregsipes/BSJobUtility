@@ -50,7 +50,7 @@ namespace SBSReportsLoad
                     {
                         XDocument xml = XDocument.Load(xmlFile);
 
-                        List<XElement> nodes = new List<XElement>(); 
+                        List<XElement> nodes = new List<XElement>();
 
                         //this case statement replaces the replaces the where_conditions table. We ran into issues converting the sql strings into the Linq To XML queries,
                         //so for the sake of time, we moved the where clauses here
@@ -63,12 +63,16 @@ namespace SBSReportsLoad
                                 nodes = xml.Root.Elements("tt" + table["table_name"].ToString() + "Row").Where(n => n.Elements("CompanyId") != null && n.Elements("CompanyId").ToString().Contains("BNEWS")).ToList();
                                 break;
                             case "tcard2":
-                                xml.Root.Elements("tt" + table["table_name"].ToString() + "Row").Where(n => Convert.ToDateTime(n.Elements("TrxDate").ToString()) >= DateTime.Now.AddYears(-3)).ToList();
+                                nodes = xml.Root.Elements("tt" + table["table_name"].ToString() + "Row").Where(n => Convert.ToDateTime(n.Element("TrxDate").Value) >= DateTime.Now.AddYears(-3)).ToList();
                                 break;
                             default:
                                 nodes = xml.Root.Elements("tt" + table["table_name"].ToString() + "Row").ToList();
                                 break;
                         }
+
+                        //test code
+                        int count = 0;
+                        XElement testNode = null;
 
                         foreach (XElement node in nodes)
                         {
@@ -266,6 +270,7 @@ namespace SBSReportsLoad
                                                 new SqlParameter("@UserDate1", node.Element("UserDate1").Value));
                                     break;
                                 case "busunit":
+
                                     ExecuteNonQuery(DatabaseConnectionStringNames.SBSReports, "Proc_Insert_BusUnit",
                                                     new SqlParameter("@loads_id", loadsId),
                                                     new SqlParameter("@BusUnit", node.Element("BusUnit").Value),
@@ -286,7 +291,7 @@ namespace SBSReportsLoad
                                                     new SqlParameter("@VatRegistrNo", node.Element("VatRegistrNo").Value),
                                                     new SqlParameter("@UsOrFc", node.Element("UsOrFc").Value),
                                                     new SqlParameter("@BillWashAcct", node.Element("BillWashAcct").Value),
-                                                    new SqlParameter("@Address1", node.Element("").Value),
+                                                    new SqlParameter("@Address1", node.Element("Address1").Value),
                                                     new SqlParameter("@Address2", node.Element("Address2").Value),
                                                     new SqlParameter("@City", node.Element("City").Value),
                                                     new SqlParameter("@State", node.Element("State").Value),
@@ -334,8 +339,8 @@ namespace SBSReportsLoad
                                                     new SqlParameter("@UserDate1", node.Element("UserDate1").Value),
                                                     new SqlParameter("@BusunitToChangeTo", node.Element("BusunitToChangeTo").Value),
                                                     new SqlParameter("@ListOfXferBusunits", node.Element("ListOfXferBusunits").Value),
-                                                    new SqlParameter("@RQApprReqSameAsBusUnit", node.Element("RQApprReqSameAsBusUnit").Value),
-                                                    new SqlParameter("@APApprReqSameAsBusUnit", node.Element("APApprReqSameAsBusUnit").Value));
+                                                    new SqlParameter("@RQApprReqSameAsBusUnit", node.Element("RqApprReqSameAsBusUnit").Value),
+                                                    new SqlParameter("@APApprReqSameAsBusUnit", node.Element("ApApprReqSameAsBusUnit").Value));
                                     break;
                                 case "empauto":
                                     ExecuteNonQuery(DatabaseConnectionStringNames.SBSReports, "Proc_Insert_Empauto",
@@ -384,7 +389,7 @@ namespace SBSReportsLoad
                                                 new SqlParameter("@UserAlpha2", node.Element("UserAlpha2").Value),
                                                 new SqlParameter("@MiscDate1", node.Element("MiscDate1").Value),
                                                 new SqlParameter("@UserDate1", node.Element("UserDate1").Value),
-                                                new SqlParameter("@ExcludedCheckTypes", node.Element("").Value));
+                                                new SqlParameter("@ExcludedCheckTypes", node.Element("ExcludedCheckTypes").Value));
                                     break;
                                 case "empded2":
                                     ExecuteNonQuery(DatabaseConnectionStringNames.SBSReports, "Proc_Insert_Empded2",
@@ -518,7 +523,7 @@ namespace SBSReportsLoad
                                                 new SqlParameter("@SortField3", node.Element("SortField3").Value),
                                                 new SqlParameter("@SortField4", node.Element("SortField4").Value),
                                                 new SqlParameter("@SortField5", node.Element("SortField5").Value),
-                                                new SqlParameter("@GroupUsedForTA", node.Element("GroupUsedForTA").Value));
+                                                new SqlParameter("@GroupUsedForTA", node.Element("GroupUSedForTA").Value));
                                     break;
                                 case "empgrp2":
                                     ExecuteNonQuery(DatabaseConnectionStringNames.SBSReports, "Proc_Insert_Empgrp2",
@@ -807,56 +812,58 @@ namespace SBSReportsLoad
                                     break;
                                 case "mainacct":
                                     ExecuteNonQuery(DatabaseConnectionStringNames.SBSReports, "Proc_Insert_Mainacct",
-                                        new SqlParameter("@loads_id", loadsId),
-                                        new SqlParameter("@CompanyId", node.Element("CompanyId").Value),
-                                        new SqlParameter("@MainAcct", node.Element("MainAcct").Value),
-                                        new SqlParameter("@MajorAcct", node.Element("MajorAcct").Value),
-                                        new SqlParameter("@MinorAcct", node.Element("MinorAcct").Value),
-                                        new SqlParameter("@Description", node.Element("Description").Value),
-                                        new SqlParameter("@ShortDesc", node.Element("ShortDesc").Value),
-                                        new SqlParameter("@Alpha", node.Element("Alpha").Value),
-                                        new SqlParameter("@LevOfDet", node.Element("LevOfDet").Value),
-                                        new SqlParameter("@LevOfDetDesc", node.Element("LevOfDetDesc").Value),
-                                        new SqlParameter("@AllocID", node.Element("AllocID").Value),
-                                        new SqlParameter("@AcctCat", node.Element("AcctCat").Value),
-                                        new SqlParameter("@AcctCatDesc", node.Element("AcctCatDesc").Value),
-                                        new SqlParameter("@Function", node.Element("Function").Value),
-                                        new SqlParameter("@AcctClass", node.Element("AcctClass").Value),
-                                        new SqlParameter("@ProjectExc", node.Element("ProjectExc").Value),
-                                        new SqlParameter("@ProjectExcDesc", node.Element("ProjectExcDesc").Value),
-                                        new SqlParameter("@DateAdded", node.Element("DateAdded").Value),
-                                        new SqlParameter("@AddedBy", node.Element("AddedBy").Value),
-                                        new SqlParameter("@DateChanged", node.Element("DateChanged").Value),
-                                        new SqlParameter("@ChangedBy", node.Element("ChangedBy").Value),
-                                        new SqlParameter("@XmitStatus", node.Element("XmitStatus").Value),
-                                        new SqlParameter("@OkToDelete", node.Element("OkToDelete").Value),
-                                        new SqlParameter("@AccessGroups", node.Element("AccessGroups").Value),
-                                        new SqlParameter("@RefGroup", node.Element("").Value),
-                                        new SqlParameter("@MiscInt1", node.Element("MiscInt1").Value),
-                                        new SqlParameter("@MiscInt2", node.Element("MiscInt2").Value),
-                                        new SqlParameter("@UserInt1", node.Element("UserInt1").Value),
-                                        new SqlParameter("@MiscDec1", node.Element("MiscDec1").Value),
-                                        new SqlParameter("@UserDec1", node.Element("UserDec1").Value),
-                                        new SqlParameter("@MiscLog1", node.Element("MiscLog1").Value),
-                                        new SqlParameter("@UserLog1", node.Element("UserLog1").Value),
-                                        new SqlParameter("@MiscAlpha1", node.Element("MiscAlpha1").Value),
-                                        new SqlParameter("@MiscAlpha2", node.Element("MiscAlpha2").Value),
-                                        new SqlParameter("@MiscAlpha3", node.Element("MiscAlpha3").Value),
-                                        new SqlParameter("@MiscAlpha4", node.Element("MiscAlpha4").Value),
-                                        new SqlParameter("@UserAlpha1", node.Element("UserAlpha1").Value),
-                                        new SqlParameter("@UserAlpha2", node.Element("UserAlpha2").Value),
-                                        new SqlParameter("@MiscDate1", node.Element("MiscDate1").Value),
-                                        new SqlParameter("@UserDate1", node.Element("UserDate1").Value),
-                                        new SqlParameter("@ExcludedJournalCodes", node.Element("ExcludedJournalCodes").Value),
-                                        new SqlParameter("@AccountType", node.Element("AccountType").Value),
-                                        new SqlParameter("@SearchField", node.Element("SearchField").Value),
-                                        new SqlParameter("@SectionId", node.Element("SectionId").Value),
-                                        new SqlParameter("@RequiredProjectType", node.Element("RequiredProjectType").Value),
-                                        new SqlParameter("@MainacctKey", node.Element("MainacctKey").Value),
-                                        new SqlParameter("@UpdateSeqNo", node.Element("UpdateSeqNo").Value),
-                                        new SqlParameter("@ColsolMainAcct", node.Element("ColsolMainAcct").Value),
-                                        new SqlParameter("@RequiredJobType", node.Element("RequiredJobType").Value),
-                                        new SqlParameter("@DateTimeChanged", node.Element("DateTimeChanged").Value));
+                                                                            new SqlParameter("@loads_id", loadsId),
+                                                                            new SqlParameter("@CompanyId", node.Element("CompanyId").Value),
+                                                                            new SqlParameter("@MainAcct", node.Element("MainAcct").Value),
+                                                                            new SqlParameter("@MajorAcct", node.Element("MajorAcct").Value),
+                                                                            new SqlParameter("@MinorAcct", node.Element("MinorAcct").Value),
+                                                                            new SqlParameter("@Description", node.Element("Description").Value),
+                                                                            new SqlParameter("@ShortDesc", node.Element("ShortDesc").Value),
+                                                                            new SqlParameter("@Alpha", node.Element("Alpha").Value),
+                                                                            new SqlParameter("@LevOfDet", node.Element("LevOfDet").Value),
+                                                                            new SqlParameter("@LevOfDetDesc", node.Element("LevOfDetDesc").Value),
+                                                                            new SqlParameter("@AllocID", node.Element("AllocId").Value),
+                                                                            new SqlParameter("@AcctCat", node.Element("AcctCat").Value),
+                                                                            new SqlParameter("@AcctCatDesc", node.Element("AcctCatDesc").Value),
+                                                                            new SqlParameter("@Function", node.Element("Function").Value),
+                                                                            new SqlParameter("@AcctClass", node.Element("AcctClass").Value),
+                                                                            new SqlParameter("@ProjectExc", node.Element("ProjectExc").Value),
+                                                                            new SqlParameter("@ProjectExcDesc", node.Element("ProjectExcDesc").Value),
+                                                                            new SqlParameter("@DateAdded", node.Element("DateAdded").Value),
+                                                                            new SqlParameter("@AddedBy", node.Element("AddedBy").Value),
+                                                                            new SqlParameter("@DateChanged", node.Element("DateChanged").Value),
+                                                                            new SqlParameter("@ChangedBy", node.Element("ChangedBy").Value),
+                                                                            new SqlParameter("@XmitStatus", node.Element("XmitStatus").Value),
+                                                                            new SqlParameter("@OkToDelete", node.Element("OkToDelete").Value),
+                                                                            new SqlParameter("@AccessGroups", node.Element("AccessGroups").Value),
+                                                                            new SqlParameter("@RefGroup", node.Element("RefGroup").Value),
+                                                                            new SqlParameter("@MiscInt1", node.Element("MiscInt1").Value),
+                                                                            new SqlParameter("@MiscInt2", node.Element("MiscInt2").Value),
+                                                                            new SqlParameter("@UserInt1", node.Element("UserInt1").Value),
+                                                                            new SqlParameter("@MiscDec1", node.Element("MiscDec1").Value),
+                                                                            new SqlParameter("@UserDec1", node.Element("UserDec1").Value),
+                                                                            new SqlParameter("@MiscLog1", node.Element("MiscLog1").Value),
+                                                                            new SqlParameter("@UserLog1", node.Element("UserLog1").Value),
+                                                                            new SqlParameter("@MiscAlpha1", node.Element("MiscAlpha1").Value),
+                                                                            new SqlParameter("@MiscAlpha2", node.Element("MiscAlpha2").Value),
+                                                                            new SqlParameter("@MiscAlpha3", node.Element("MiscAlpha3").Value),
+                                                                            new SqlParameter("@MiscAlpha4", node.Element("MiscAlpha4").Value),
+                                                                            new SqlParameter("@UserAlpha1", node.Element("UserAlpha1").Value),
+                                                                            new SqlParameter("@UserAlpha2", node.Element("UserAlpha2").Value),
+                                                                            new SqlParameter("@MiscDate1", node.Element("MiscDate1").Value),
+                                                                            new SqlParameter("@UserDate1", node.Element("UserDate1").Value),
+                                                                            new SqlParameter("@ExcludedJournalCodes", node.Element("ExcludedJournalCodes").Value),
+                                                                            new SqlParameter("@AccountType", node.Element("AccountType").Value),
+                                                                            new SqlParameter("@SearchField", node.Element("SearchField").Value),
+                                                                            new SqlParameter("@SectionId", node.Element("SectionId").Value),
+                                                                            new SqlParameter("@RequiredProjectType", node.Element("RequiredProjectType").Value),
+                                                                            new SqlParameter("@MainacctKey", node.Element("MainacctKey").Value),
+                                                                            new SqlParameter("@UpdateSeqNo", node.Element("UpdateSeqNo").Value),
+                                                                            new SqlParameter("@ColsolMainAcct", node.Element("ConsolMainAcct").Value),
+                                                                            new SqlParameter("@RequiredJobType", node.Element("RequiredJobType").Value),
+                                                                            new SqlParameter("@DateTimeChanged", ""));
+
+
                                     break;
                                 case "pperiod":
                                     ExecuteNonQuery(DatabaseConnectionStringNames.SBSReports, "Proc_Insert_Pperiod",
@@ -931,7 +938,7 @@ namespace SBSReportsLoad
                                         new SqlParameter("@SortField3", node.Element("SortField3").Value),
                                         new SqlParameter("@SortField4", node.Element("SortField4").Value),
                                         new SqlParameter("@SortField5", node.Element("SortField5").Value),
-                                        new SqlParameter("@TimeAttendStatus", node.Element("").Value));
+                                        new SqlParameter("@TimeAttendStatus", node.Element("TimeAttendStatus").Value));
                                     break;
                                 case "pyjobcd":
                                     ExecuteNonQuery(DatabaseConnectionStringNames.SBSReports, "Proc_Insert_Pyjobcd",
@@ -1222,7 +1229,7 @@ namespace SBSReportsLoad
                                             new SqlParameter("@VendorBankTransit", node.Element("VendorBankTransit").Value),
                                             new SqlParameter("@VendorBankAcctNo", node.Element("VendorBankAcctNo").Value),
                                             new SqlParameter("@UseTaxState", node.Element("PrenoteStatus").Value),
-                                            new SqlParameter("@PrenoteStatus", node.Element("").Value),
+                                            new SqlParameter("@PrenoteStatus", node.Element("PrenoteStatus").Value),
                                             new SqlParameter("@BankAcctType", node.Element("BankAcctType").Value),
                                             new SqlParameter("@DefaultBoxNo", node.Element("DefaultBoxNo").Value),
                                             new SqlParameter("@PrenoteDate", node.Element("PrenoteDate").Value),
