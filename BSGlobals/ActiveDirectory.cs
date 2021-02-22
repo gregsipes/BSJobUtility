@@ -40,7 +40,7 @@ namespace BSGlobals
             {
                 // User only needs a single credential from the passed-in list to match their AD BSOU_ credentials list.  
                 //   Return true if any match is found, false if no matches are found.
-                BSOUClass bsou = BSOUList.Find(x => x.Credential.ToLower() == credential);
+                BSOUClass bsou = BSOUList.Find(x => x.Credential.ToLower() == credential.ToLower());
                 if (!(bsou is null)) return (true);
             }
             return (false);
