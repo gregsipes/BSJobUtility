@@ -18,6 +18,8 @@ namespace TestJob
             try
             {
 
+                throw new Exception("testing");
+
                WriteToJobLog(JobLogMessageType.INFO, "Test job is running");
 
                 //    throw new Exception("Testing...");
