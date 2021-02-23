@@ -52,6 +52,8 @@ namespace BSGlobals
             ISInventory,
             SynergyReportMaintenance,
             SBSJournalEntryImport,
+            LawsonArchive
+            SBSJournalEntryImport,
             AutoPrintPDF,
             PBSGeneral,
             BSConsole,

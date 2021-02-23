@@ -22,6 +22,7 @@ namespace BSGlobals
         public StatusStrip Strip;
         public int NumSegments { get; }
         public int VersionSegmentWidth = 80;
+        public string Version = "";
 
         private bool PaintEnabled;
 
@@ -116,7 +117,8 @@ namespace BSGlobals
             try
             {
                 // Allow manual insertion of verion
-                Strip.Items[NumSegments - 1].Text = "V" + ParentForm.ProductVersion;
+                Version = "V" + ParentForm.ProductVersion;
+                Strip.Items[NumSegments - 1].Text = Version;
                 return (true);
             }
             catch (Exception ex)
@@ -133,7 +135,8 @@ namespace BSGlobals
                 // Allow manual insertion of version into any segment
                 if (segmentNum < NumSegments)
                 {
-                    Strip.Items[segmentNum].Text = version;
+                    Version = version;
+                    Strip.Items[segmentNum].Text = Version;
                     return (true);
                 }
                 return (false);
@@ -143,6 +146,11 @@ namespace BSGlobals
                 MessageBox.Show("ERROR - Unable to add version to status bar:  " + ex.ToString());
                 return (false);
             }
+        }
+
+        public string GetVersion()
+        {
+            return (Version);
         }
 
         public bool AddText(int segmentNum, string s)

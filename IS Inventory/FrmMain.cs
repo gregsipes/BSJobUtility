@@ -386,7 +386,7 @@ namespace IS_Inventory
             // Useful (saves typing) when we want to send the same error message to both the job log and to a user prompt.  Useless otherwise.
             string ExceptionStr = (ex != null ? ex.ToString() : "");
             DataIO.WriteToJobLog(errorType, msg + "\r\n\r\n" + ExceptionStr, JobName);
-            MessageBox.Show(msg + ExceptionStr);
+            MessageBox.Show(msg + "\r\n\r\n" + ExceptionStr);
         }
 
         private void BroadcastError(string msg, Exception ex)
@@ -415,12 +415,14 @@ namespace IS_Inventory
         {
             try
             {
-                foreach (TextBox t in p.Controls)
+                for (int i = 0; i < p.Controls.Count; i++)
                 {
-                    t.Text = "";
-                    t.ForeColor = Color.Black;
+                    if (p.Controls[i] is TextBox t)
+                    {
+                        t.Text = "";
+                        t.ForeColor = Color.Black;
+                    }
                 }
-
             }
             catch { }
         }
@@ -440,20 +442,28 @@ namespace IS_Inventory
             {
                 ((TextBox)sender).ForeColor = Color.Red;
             }
-            if (sender.GetType() == typeof(ComboBox))
-            {
-                ((TextBox)sender).ForeColor = Color.Red;
+
+            if ((sender.GetType() == typeof(ComboBox)) || (sender.GetType() == typeof(ComboBoxUnlocked)))            {
+                ((ComboBox)sender).ForeColor = Color.Red;
             }
             if (sender.GetType() == typeof(DateTimePicker))
             {
+                // DateTimePicker control's forecolor or backcolor attributes do not work.  Use a label instead
                 ((DateTimePicker)sender).ForeColor = Color.Red;
             }
 
             if (!(status == null))
             {
-                button.Enabled = true;
+                SetButtonState(button, true, Color.White, Color.Red);
                 status.IsSaved = false;
             }
+        }
+
+        private void SetButtonState(Button button, Boolean enabled, Color forecolor, Color backcolor)
+        {
+            button.Enabled = enabled;
+            button.BackColor = backcolor;
+            button.ForeColor = forecolor;
         }
 
         /// <summary>
@@ -762,8 +772,9 @@ namespace IS_Inventory
                         if (!ServersInitialized)
                         {
                             ServersInitialized = true;
-                            ServerRecord = new ServerEditClass();  // TBD confirm that this is needed
+                            ServerRecord = new ServerEditClass();  
                             PopulateServersGrid();
+                            ServerRecord.Status.IsSaved = true;
                         }
                         break;
                     case 3:  // Documentation
@@ -772,7 +783,7 @@ namespace IS_Inventory
                             DocumentationInitialized = true;
                             DocumentationRecord = new DocumentationClass();
                             PopulateDocumentationGrid();
-                            CmdDocumentationSearch.Enabled = false;
+                            SetButtonState(CmdDocumentationSearch, false, Color.Black, Color.White);
                         }
                         break;
                     case 4: // HW Template Edit
@@ -1232,7 +1243,7 @@ namespace IS_Inventory
         {
             PnlCategoryEditNewSave.Visible = false;
             PnlCategoryEditItem.Visible = false;
-            CmdCategoryEditSaveItem.Enabled = false;
+            SetButtonState(CmdCategoryEditSaveItem, false, Color.Black, Color.White);
         }
 #endregion
 
@@ -1402,7 +1413,7 @@ namespace IS_Inventory
 
                 DisplayCategoryEdit(CategoryEdit, (int)GrdSelectedList.Rows[row].Cells[0].Value);
                 PnlCategoryEditItem.Visible = true;
-                CmdCategoryEditSaveItem.Enabled = false;
+                SetButtonState(CmdCategoryEditSaveItem, false, Color.Black, Color.White);
             }
             catch (Exception ex)
             {
@@ -1470,7 +1481,7 @@ namespace IS_Inventory
                 ClearCategoryEditTemplate();
                 SelectCategoryListToPopulate();
                 PnlCategoryEditItem.Visible = false;
-                CmdCategoryEditSaveItem.Enabled = false;
+                SetButtonState(CmdCategoryEditSaveItem, false, Color.Black, Color.White);
                 categoryEdit.IsSaved = true;
                 categoryEdit.IsNew = false;
             }
@@ -1483,14 +1494,14 @@ namespace IS_Inventory
         private void TxtItemName_TextChanged(object sender, EventArgs e)
         {
             // This text box is limited to 100 characters - same length as maximum allowed in the category list tables
-            CmdCategoryEditSaveItem.Enabled = true;
+            SetButtonState(CmdCategoryEditSaveItem, true, Color.White, Color.Red);
             CategoryEdit.IsSaved = false;  // TBD NEED TO CHANGE THIS TO A STATUS OBJECT!!!!!
             // TBD We want to use MarkAsDirty here!!!!!
         }
 
         private void RadCategoryActive_CheckedChanged(object sender, EventArgs e)
         {
-            CmdCategoryEditSaveItem.Enabled = true;
+            SetButtonState(CmdCategoryEditSaveItem, true, Color.White, Color.Red);
             CategoryEdit.IsSaved = false;
         }
 
@@ -1512,7 +1523,7 @@ namespace IS_Inventory
             // By default the SAVE button and the IP address text box are not enabled.
             //   (Existing IP addresses are not editable, and SAVE is enabled only after an edit)
 
-            CmdSaveIPAddress.Enabled = false;
+            SetButtonState(CmdSaveIPAddress, false, Color.Black, Color.White);
             TxtIPAddress.Enabled = false;
             PnlIPEditItem.Visible = false;
             IPAddressGridSortOrder = ListSortDirection.Ascending;
@@ -1558,7 +1569,7 @@ namespace IS_Inventory
             try
             {
                 PopulateGrid(GrdIPAddresses, "Proc_Select_IP_Addresses", CommandType.StoredProcedure, RadIPAddressesFilterActive);
-                CmdSaveIPAddress.Enabled = false;
+                SetButtonState(CmdSaveIPAddress, false, Color.Black, Color.White);
 
                 // For this grid we need to specify column attributes
                 GrdIPAddresses.Columns[0].Visible = false;   // Hide the IP Address ID
@@ -1591,7 +1602,7 @@ namespace IS_Inventory
                 SafeRadioBox(RadIPActive, RadIPInactive, ipr, "active_flag");
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdSaveIPAddress.Enabled = false;
+                SetButtonState(CmdSaveIPAddress, false, Color.Black, Color.White);
                 iPAddressRecord.Status.IsSaved = true;
 
                 // Existing IP addresses are NOT editable, so disable the IPAddress text box
@@ -1930,7 +1941,7 @@ namespace IS_Inventory
         {
             PnlPCUser.Visible = false;   // Render this after a NEW or an existing selection is made
             PnlPCHardware.Visible = false; // Render this only after a HW template has been selected
-            CmdSavePC.Enabled = false;
+            SetButtonState(CmdSavePC, false, Color.Black, Color.White);
 
             // Populate Department, PC Type and PC Template comboboxes
             PopulateComboBox(CmbPCTemplate, "TemplatesHardware", "template_name", "hardware_templates_id");
@@ -1956,6 +1967,7 @@ namespace IS_Inventory
                     ["system_id"] = "",
                     ["active_flag"] = true
                 };
+                Status = new DictionaryStatusClass();
                 Status.FieldList.Add(fields);
             }
         }
@@ -2011,7 +2023,7 @@ namespace IS_Inventory
                 SafeRadioBox(RadPCActive, RadPCInactive, pcm, "active_flag");
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdSavePC.Enabled = false;
+                SetButtonState(CmdSavePC, false, Color.Black, Color.White);
                 pCMac.Status.IsSaved = true; // Indicates that no edits to this record have occurred (yet)
             }
             catch (Exception ex)
@@ -2025,7 +2037,7 @@ namespace IS_Inventory
             try
             {
                 PopulateGrid(GrdPCsAndMacs, "Proc_Select_PCsAndMACs", CommandType.StoredProcedure, RadPCsAndMacsFilterActive);
-                CmdSavePC.Enabled = false;
+                SetButtonState(CmdSavePC, false, Color.Black, Color.White);
                 // For this grid we need to specify column attributes
                 GrdPCsAndMacs.Columns[0].Visible = false;   // Hide the IP Address ID
                 GrdPCsAndMacs.Sort(GrdPCsAndMacs.Columns[PCsAndMacsGridSortColumn], PCsAndMacsGridSortOrder);
@@ -2049,6 +2061,7 @@ namespace IS_Inventory
             ClearCombo(CmbPCTemplate);
 
             RadPCActive.Checked = true;
+            SetButtonState(CmdSavePC, false, Color.Black, Color.White);
         }
 
 #endregion
@@ -2131,7 +2144,7 @@ namespace IS_Inventory
                     PCParams[31] = new SqlParameter("@pvchrmouse", TxtPCMouse.Text);
                     PCParams[32] = new SqlParameter("@pvchrcomments", TxtPCcomments.Text);
                     PCParams[33] = new SqlParameter("@pvbitactive_flag", RadPCActive.Checked ? 1 : 0);
-                    PCParams[34] = new SqlParameter("@pvdatmodifiedfate", DateTime.Now);
+                    PCParams[34] = new SqlParameter("@pvdatmodifieddate", DateTime.Now);
                     PCParams[35] = new SqlParameter("@pvchrmodifiedby", UserInfo.Username);
 
                     SQLQuery("Proc_Update_PCsAndMACs", PCParams);
@@ -2140,7 +2153,9 @@ namespace IS_Inventory
                     ClearPCsAndMACsEditPanel();
                     PopulatePCsAndMacsGrid();
 
-                    CmdSavePC.Enabled = false;
+                    SetButtonState(CmdSavePC, false, Color.Black, Color.White);
+                    CmbPCTemplate.ForeColor = Color.Black;
+                    CmbPCType.ForeColor = Color.Black;
                     PCsAndMacsRecord.Status.IsSaved = true;
                     PCsAndMacsRecord.Status.IsNew = false;
 
@@ -2227,6 +2242,8 @@ namespace IS_Inventory
                         SafeText(TxtPCComments2, hwr, "comments");  // Note LOWERCASE!  Dictionaries are case-sensitive.
                     }
                 }
+                SetButtonState(CmdSavePC, true, Color.White, Color.Red);
+                CmbPCTemplate.ForeColor = Color.Red;
             }
             catch (Exception ex)
             {
@@ -2271,6 +2288,7 @@ namespace IS_Inventory
                 PnlPCHardware.Visible = true;
                 DisplayPCsAndMACsRecord(PCsAndMacsRecord, (int)GrdPCsAndMacs.Rows[row].Cells["pcmac_id"].Value);
                 PCsAndMacsRecord.Status.IsNew = false;
+                CmbPCTemplate.ForeColor = Color.Black;
             }
             catch (Exception ex)
             {
@@ -2284,9 +2302,10 @@ namespace IS_Inventory
             //   See the PROPERTIES View for each of the test and radio boxes
             // On any change, enable the Save button
             if (!(PCsAndMacsRecord == null))
-            {
-                CmdSavePC.Enabled = true;
-                PCsAndMacsRecord.Status.IsSaved = false;
+            {                
+                //SetButtonState(CmdSavePC, false, Color.Black, Color.White);
+                //PCsAndMacsRecord.Status.IsSaved = false;
+                MarkAsDirty(sender, PCsAndMacsRecord.Status, CmdSavePC);
             }
         }
 
@@ -2334,12 +2353,12 @@ namespace IS_Inventory
 
         private void RadPCActive_CheckedChanged(object sender, EventArgs e)
         {
-            CmdSavePC.Enabled = true;
+            SetButtonState(CmdSavePC, true, Color.White, Color.Red);
         }
 
         private void RadPCInactive_CheckedChanged(object sender, EventArgs e)
         {
-            CmdSavePC.Enabled = true;
+            SetButtonState(CmdSavePC, true, Color.White, Color.Red);
         }
 
         private void RadPcsAndMacsActiveStatus_Changed(object sender, EventArgs e)
@@ -2374,6 +2393,13 @@ namespace IS_Inventory
 #region ----Servers Initialization
         private void PopulateServersGrid()
         {
+            // Render all panels invisible
+
+            PnlServer.Visible = false;
+            PnlServerContact.Visible = false;
+            PnlServerNetwork.Visible = false;
+            PnlServerOwner.Visible = false;
+            PnlServerRAID.Visible = false;
 
             // Populate all list boxes on the Servers tab
 
@@ -2385,17 +2411,12 @@ namespace IS_Inventory
             PopulateComboBox(CmbServerContainerType, "lstContainerTypes", "container_type", "container_types_id");
             PopulateComboBox(CmbServerOwner, "lstOwners", "owner_name", "owners_id");
 
-            CmdSaveServer.Enabled = false;
+            SetButtonState(CmdSaveServer, false, Color.Black, Color.White);
             // (For the related grids we need to specify some column attributes, but only AFTER the main grid's server selection is made 
             //   (or a NEW server is created)
 
             GrdServers.Columns[0].Visible = false;   // Hide the Server ID
             GrdServers.Sort(GrdServers.Columns[ServersGridSortColumn], ServersGridSortOrder);
-            PnlServer.Visible = false;
-            PnlServerContact.Visible = false;
-            PnlServerNetwork.Visible = false;
-            PnlServerOwner.Visible = false;
-            PnlServerRAID.Visible = false;
         }
 
 #endregion
@@ -2418,7 +2439,12 @@ namespace IS_Inventory
                 // On instantiation, create all necessary dictionary keys in the first record (should be the ONLY record ever created on this list) 
                 Dictionary<string, object> fields = new Dictionary<string, object>
                 {
+                    ["servers_id"] = 0,
                     ["server_name"] = "",
+                    ["manufacturers_id"] = 0,
+                    ["model_id"] = 0,
+                    ["processor_id"] = 0,
+                    ["ram_id"] = 0,
                     ["cpu_quantity"] = 0,
                     ["hard_drive_quantity"] = 0,
                     ["rack_number"] = 0,
@@ -2602,7 +2628,7 @@ namespace IS_Inventory
                 PopulateServerSubGrid(GrdServerOwner, SelectStr, CmdServerSaveOwner, null);
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdSaveServer.Enabled = false;
+                SetButtonState(CmdSaveServer, false, Color.Black, Color.White);
                 serverRecord.Status.IsSaved = true; // Indicates that no edits to this record have occurred (yet)
             }
             catch (Exception ex)
@@ -2636,7 +2662,7 @@ namespace IS_Inventory
                 PopulateServerSubGrid(GrdServerOwner, GridStr, CmdServerSaveOwner, RadServersOwnersFilterActive);
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdServerSaveOwner.Enabled = false;
+                SetButtonState(CmdServerSaveOwner, false, Color.Black, Color.White);
                 status.IsSaved = true; // Indicates that no edits to this record have occurred (yet)
 
                 // Disable the Owner selection as well, since this can ONLY activate/deactivate the owner, not change the name
@@ -2667,7 +2693,7 @@ namespace IS_Inventory
                 PopulateServerSubGrid(GrdServerRaid, "SELECT * FROM Servers_RAID WHERE servers_id = " + status.FieldList[0]["servers_id"].ToString(), CmdServerSaveRAID, RadServersRaidFilterActive);
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdServerSaveRAID.Enabled = false;
+                SetButtonState(CmdServerSaveRAID, false, Color.Black, Color.White);
                 status.IsSaved = true; // Indicates that no edits to this record have occurred (yet)
             }
             catch (Exception ex)
@@ -2695,7 +2721,7 @@ namespace IS_Inventory
                 PopulateServerSubGrid(GrdServerNetwork, "SELECT * FROM Servers_Networks WHERE servers_id = " + status.FieldList[0]["servers_id"].ToString(), CmdServerSaveNetwork, RadServersNetworkFilterActive);
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdServerSaveNetwork.Enabled = false;
+                SetButtonState(CmdServerSaveNetwork, false, Color.Black, Color.White);
                 status.IsSaved = true; // Indicates that no edits to this record have occurred (yet)
             }
             catch (Exception ex)
@@ -2724,7 +2750,7 @@ namespace IS_Inventory
                 PopulateServerSubGrid(GrdServerNetwork, "SELECT * FROM Servers_Contacts WHERE servers_id = " + status.FieldList[0]["servers_id"].ToString(), CmdServerSaveContact, RadServersContactsFilterActive);
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdServerSaveContact.Enabled = false;
+                SetButtonState(CmdServerSaveContact, false, Color.Black, Color.White);
                 status.IsSaved = true; // Indicates that no edits to this record have occurred (yet)
             }
             catch (Exception ex)
@@ -2742,7 +2768,7 @@ namespace IS_Inventory
             try
             {
                 PopulateGrid(subGrid, SelectStr, CommandType.Text, activeRadioButton);
-                saveButton.Enabled = false;
+                SetButtonState(saveButton, false, Color.Black, Color.White);
                 // For this grid we need to specify column attributes
                 subGrid.Columns[0].Visible = false;  // Hide table record id
                 subGrid.Columns[1].Visible = false;  // Hide servers_id
@@ -2760,9 +2786,9 @@ namespace IS_Inventory
             //   (Start with a clean slate)
 
             ClearPanelTextBoxes(PnlServer);
-
             ClearCombo(CmbServerManufacturer);
             ClearCombo(CmbServerModel);
+
             DTServerBuildDate.Value = DateTime.Today;  // TBD Change forecolor to black?????
             RadServerActive.Checked = true;
 
@@ -2779,8 +2805,10 @@ namespace IS_Inventory
             DTServerWarrantyStart.Value = DateTime.Today;
             DTServerWarrantyEnd.Value = DateTime.Today;
 
-            // TBD these are all on separate tabs and need to be checked if they get cleared
-#if false
+            LblBuildDate.ForeColor = Color.Black; // Sustitutes for the fact that the forecolor on the DateTimePicker control can't be changed from basic black.
+
+            // Clear everthing on the subtabs
+
             TxtServerCPUQty.Text = "";
             TxtServerProcessorDescription.Text = "";
             TxtServerDriveQty.Text = "";
@@ -2798,7 +2826,6 @@ namespace IS_Inventory
             TxtServerGeneralDirectoryLocations.Text = "";
             TxtServerGeneralRemarks.Text = "";
             TxtServerGeneralRestrictions.Text = "";
-#endif
         }
 
         private void ClearServerOwnersEditPanel()
@@ -2838,10 +2865,19 @@ namespace IS_Inventory
             {
                 // Qualification tests:  
                 //   ServerName may not be null and must be unique
-                if (TxtServerName.Text.Length <= 0)
+                //   Manufacturers ID, Model ID, Processor ID and RAM ID must all be nonzero
+
+                string strMissing = "";
+                strMissing += (TxtServerName.Text.Length <= 0 ? "SERVER NAME   " : "");
+                strMissing += ((int)serverRecord.Status.FieldList[0]["manufacturers_id"] == 0 ? "MANUFACTURER   " : "");
+                strMissing += ((int)serverRecord.Status.FieldList[0]["model_id"] == 0 ? "MODEL   " : "");
+                strMissing += ((int)serverRecord.Status.FieldList[0]["processor_id"] == 0 ? "PROCESSOR   " : "");
+                strMissing += ((int)serverRecord.Status.FieldList[0]["ram_id"] == 0 ? "RAM   " : "");
+
+                if (strMissing.Length > 0)
                 {
-                    MessageBox.Show("Server name MUST be specified prior to saving this record.", "MISSING SERVER NAME", MessageBoxButtons.OK);
-                    return;
+                    MessageBox.Show("The following items must ALL be specified prior to saving this record (Server Name, Manufacturer, Model, Processor and RAM).", "MISSING " + strMissing, MessageBoxButtons.OK);
+                    return;  // One or more items is missing.
                 }
 
                 // Is this a new record (i.e., is the IsNew property enabled?) If so, then perform a record insert prior to the update.
@@ -2922,7 +2958,7 @@ namespace IS_Inventory
                 ClearServerEditPanel();
                 PopulateServersGrid();
 
-                CmdSaveServer.Enabled = false;
+                SetButtonState(CmdSaveServer, false, Color.Black, Color.White);
                 serverRecord.Status.IsSaved = true;
                 serverRecord.Status.IsNew = false;
 
@@ -2990,7 +3026,7 @@ namespace IS_Inventory
                 PopulateServerSubGrid(GrdServerRaid, "SELECT * FROM Servers_RAID WHERE servers_id = " + serverRecord.Status.FieldList[0]["servers_id"].ToString(), CmdServerSaveRAID, RadServersRaidFilterActive);
                 GrdServerRaid.Sort(GrdServerRaid.Columns[ServersRAIDGridSortColumn], ServersRAIDGridSortOrder);
 
-                CmdServerSaveRAID.Enabled = false;
+                SetButtonState(CmdServerSaveRAID, false, Color.Black, Color.White);
                 StatusRecord.IsSaved = true;
                 StatusRecord.IsNew = false;
 
@@ -3058,7 +3094,7 @@ namespace IS_Inventory
                 PopulateServerSubGrid(GrdServerNetwork, "SELECT * FROM Servers_Networks WHERE servers_id = " + serverRecord.Status.FieldList[0]["servers_id"].ToString(), CmdServerSaveNetwork, RadServersNetworkFilterActive);
                 GrdServerNetwork.Sort(GrdServerNetwork.Columns[ServersNetworkGridSortColumn], ServersNetworkGridSortOrder);
 
-                CmdServerSaveNetwork.Enabled = false;
+                SetButtonState(CmdServerSaveNetwork, false, Color.Black, Color.White);
                 StatusRecord.IsSaved = true;
                 StatusRecord.IsNew = false;
 
@@ -3126,7 +3162,7 @@ namespace IS_Inventory
                 PopulateServerSubGrid(GrdServerContact, "SELECT * FROM Servers_Contacts WHERE servers_id = " + serverRecord.Status.FieldList[0]["servers_id"].ToString(), CmdServerSaveContact, RadServersContactsFilterActive);
                 GrdServerContact.Sort(GrdServerContact.Columns[ServersContactGridSortColumn], ServersContactGridSortOrder);
 
-                CmdServerSaveContact.Enabled = false;
+                SetButtonState(CmdServerSaveContact, false, Color.Black, Color.White);
                 StatusRecord.IsSaved = true;
                 StatusRecord.IsNew = false;
 
@@ -3188,7 +3224,7 @@ namespace IS_Inventory
                 GrdServerOwner.Columns[2].Visible = false; // Hide the Owner ID
                 GrdServerOwner.Sort(GrdServerOwner.Columns[ServersOwnerGridSortColumn], ServersOwnerGridSortOrder);
 
-                CmdServerSaveOwner.Enabled = false;
+                SetButtonState(CmdServerSaveOwner, false, Color.Black, Color.White);
                 StatusRecord.IsSaved = true;
                 StatusRecord.IsNew = false;
 
@@ -3213,7 +3249,7 @@ namespace IS_Inventory
                 // If the combobox entry was accepted (added to the table or already a member of the table) then update its dictionary entry in the server record
                 if (recordadded)
                 {
-                    button.Enabled = true;
+                    SetButtonState(button, true, Color.White, Color.Red);
                     string keyname = "";
                     switch (cmb.Name)
                     {
@@ -3227,7 +3263,7 @@ namespace IS_Inventory
                         case "CmbServerOwner": keyname = "owners_id"; break;
                         default:
                             BroadcastWarning("ERROR - Missing Server Combobox entry " + cmb.Name + " in the Server's combobox EntryComplete event", null);
-                            button.Enabled = false;
+                            SetButtonState(button, false, Color.Black, Color.White);
                             break;
                     }
                     fieldList[0][keyname] = cmb.SelectedValue;
@@ -3253,7 +3289,7 @@ namespace IS_Inventory
             {
                 if (ServerRecord != null)
                 {
-                    if (!ServerRecord.Status.IsSaved)
+                    if ((!ServerRecord.Status.IsSaved) && (CmdSaveServer.Enabled))
                     {
                         DialogResult dlgResult = MessageBox.Show("The current record in the edit window has NOT been saved; do you want to save it first?", "SAVE SERVER RECORD?", MessageBoxButtons.YesNoCancel);
                         switch (dlgResult)
@@ -3273,6 +3309,7 @@ namespace IS_Inventory
 
                 // On New, render the Server panels
                 PnlServer.Visible = true;
+                SetButtonState(CmdSaveServer, false, Color.Black, Color.White);
             }
             catch (Exception ex)
             {
@@ -3310,7 +3347,7 @@ namespace IS_Inventory
 
                 // On New, render the Server panels
                 PnlServerNetwork.Visible = true;
-                CmdServerSaveNetwork.Enabled = false;
+                SetButtonState(CmdServerSaveNetwork, false, Color.Black, Color.White);
             }
             catch (Exception ex)
             {
@@ -3348,7 +3385,7 @@ namespace IS_Inventory
 
                 // On New, render the Server panels
                 PnlServerContact.Visible = true;
-                CmdServerSaveContact.Enabled = false;
+                SetButtonState(CmdServerSaveContact, false, Color.Black, Color.White);
             }
             catch (Exception ex)
             {
@@ -3387,7 +3424,7 @@ namespace IS_Inventory
 
                 // On New, render the Server panels
                 PnlServerOwner.Visible = true;
-                CmdServerSaveOwner.Enabled = false;
+                SetButtonState(CmdServerSaveOwner, false, Color.Black, Color.White);
                 CmbServerOwner.Enabled = true;
             }
             catch (Exception ex)
@@ -3426,7 +3463,7 @@ namespace IS_Inventory
 
                 // On New, render the Server panels
                 PnlServerRAID.Visible = true;
-                CmdServerSaveRAID.Enabled = false;
+                SetButtonState(CmdServerSaveRAID, false, Color.Black, Color.White);
             }
             catch (Exception ex)
             {
@@ -3483,7 +3520,7 @@ namespace IS_Inventory
 
                 if (ServerRecord != null)
                 {
-                    if (!ServerRecord.Status.IsSaved)
+                    if ((!ServerRecord.Status.IsSaved) && (CmdSaveServer.Enabled))
                     {
                         DialogResult dlgResult = MessageBox.Show("The current record in the edit window has NOT been saved; do you want to save it first?", "SAVE SERVER RECORD?", MessageBoxButtons.YesNoCancel);
                         switch (dlgResult)
@@ -3500,6 +3537,12 @@ namespace IS_Inventory
                 PnlServer.Visible = true;
                 DisplayServerRecord(ServerRecord, (int)GrdServers.Rows[row].Cells["servers_id"].Value);
                 ServerRecord.Status.IsNew = false;
+                CmbServerManufacturer.ForeColor = Color.Black;
+                CmbServerModel.ForeColor = Color.Black;
+                CmbServerProcessor.ForeColor = Color.Black;
+                CmbServerRAM.ForeColor = Color.Black;
+
+                LblBuildDate.ForeColor = Color.Black;
             }
             catch (Exception ex)
             {
@@ -3708,13 +3751,35 @@ namespace IS_Inventory
         /// <param name="e"></param>
         private void Event_ServerEntryComplete(object sender, EventArgs e)
         {
-            // Generic _SelectedIndexChanged event for
+            // This is the generic _SelectedIndexChanged event for
             //    CmbServerManufacturerer
             //    CmbServerModel
             //    CmbServerProcessor
             //    CmbServerRAM
 
             ConfirmServerComboboxEntry((ComboBox)sender, CmdSaveServer, ServerRecord.Status.FieldList);
+            MarkAsDirty(sender, ServerRecord.Status, CmdSaveServer);
+
+            // Save the record ID of whatever combobox selection event just fired.
+            ComboBox c = (ComboBox)sender;
+            switch (c.Name.ToLower())
+            {
+                case "cmbservermanufacturer":
+                    ServerRecord.Status.FieldList[0]["manufacturers_id"] = c.SelectedValue;
+                    break;
+                case "cmbservermodel":
+                    ServerRecord.Status.FieldList[0]["model_id"] = c.SelectedValue;
+                    break;
+                case "cmbserverprocessor":
+                    ServerRecord.Status.FieldList[0]["processor_id"] = c.SelectedValue;
+                    break;
+                case "cmbserverram":
+                    ServerRecord.Status.FieldList[0]["ram_id"] = c.SelectedValue;
+                    break;
+                default:
+                    MessageBox.Show("ERROR - Undefined CombBox '" + c.Name + " during server Save operation");
+                    break;
+            }
         }
 
         private void Event_ServerRaidEntryComplete(object sender, EventArgs e)
@@ -3724,6 +3789,7 @@ namespace IS_Inventory
             //    CmbServerContainerType
 
             ConfirmServerComboboxEntry((ComboBox)sender, CmdServerSaveRAID, ServerRecord.RAID.Status.FieldList);
+            MarkAsDirty(sender, ServerRecord.RAID.Status, CmdServerSaveRAID);
         }
 
         private void Event_ServerContactEntryComplete(object sender, EventArgs e)
@@ -3732,6 +3798,7 @@ namespace IS_Inventory
             //    CmbServerContactType
 
             ConfirmServerComboboxEntry((ComboBox)sender, CmdServerSaveContact, ServerRecord.Contacts.Status.FieldList);
+            MarkAsDirty(sender, ServerRecord.Contacts.Status, CmdServerSaveContact);
         }
 
         private void Event_ServerOwnerEntryComplete(object sender, EventArgs e)
@@ -3740,6 +3807,7 @@ namespace IS_Inventory
             //    CmbServerOwner
 
             ConfirmServerComboboxEntry((ComboBox)sender, CmdServerSaveOwner, ServerRecord.Owners.Status.FieldList);
+            MarkAsDirty(sender, ServerRecord.Owners.Status, CmdServerSaveOwner);
         }
 
         //Server Data Changed Events
@@ -3755,7 +3823,8 @@ namespace IS_Inventory
 
         private void Servers_DateValueChanged(object sender, EventArgs e)
         {
-            MarkAsDirty(sender, ServerRecord.Status, CmdSaveServer);
+            MarkAsDirty(sender, ServerRecord.Status, CmdSaveServer); // Does not work for datetimepicker controls (Windows limitation)
+            LblBuildDate.ForeColor = Color.Red;
         }
 
         //RAID Data Changed Events
@@ -3808,6 +3877,7 @@ namespace IS_Inventory
         private void RadServersActiveStatus_Changed(object sender, EventArgs e)
         {
             PopulateGrid(GrdServers, "Proc_Select_Servers", CommandType.StoredProcedure, RadServerActive);
+            //MarkAsDirty(sender, ServerRecord.Status, CmdSaveServer);
         }
 
         private void RadServersRaidActiveStatus_Changed(object sender, EventArgs e)
@@ -3819,6 +3889,7 @@ namespace IS_Inventory
                 {
                     PopulateServerSubGrid(GrdServerRaid, "SELECT * FROM Servers_RAID WHERE servers_id = " + recordid.ToString(), CmdServerSaveRAID, RadServersRaidFilterActive);
                 }
+                //MarkAsDirty(sender, ServerRecord.RAID.Status, CmdServerSaveRAID);
             }
             catch (Exception ex)
             {
@@ -3835,6 +3906,7 @@ namespace IS_Inventory
                 {
                     PopulateServerSubGrid(GrdServerNetwork, "SELECT * FROM Servers_Networks WHERE servers_id = " + recordid, CmdServerSaveNetwork, RadServersNetworkFilterActive);
                 }
+                //MarkAsDirty(sender, ServerRecord.Networks.Status, CmdServerSaveNetwork);
             }
             catch (Exception ex)
             {
@@ -3851,6 +3923,7 @@ namespace IS_Inventory
                 {
                     PopulateServerSubGrid(GrdServerContact, "SELECT * FROM Servers_Contacts WHERE servers_id = " + recordid, CmdServerSaveContact, RadServersContactsFilterActive);
                 }
+                //MarkAsDirty(sender, ServerRecord.Contacts.Status, CmdServerSaveContact);
             }
             catch (Exception ex)
             {
@@ -3879,6 +3952,7 @@ namespace IS_Inventory
                         SelectStr += " AND S.active_flag = 0";
                     }
                     PopulateServerSubGrid(GrdServerOwner, SelectStr, CmdServerSaveOwner, null);
+                    //MarkAsDirty(sender, ServerRecord.Owners.Status, CmdServerSaveOwner);
                 }
             }
             catch (Exception ex)
@@ -3920,7 +3994,7 @@ namespace IS_Inventory
                 PnlDocumentation.Visible = false;
                 PnlDocumentationVersion.Visible = false;
                 GrdDocumentationVersion.Enabled = false;
-                CmdDocumentSave.Enabled = false;
+                SetButtonState(CmdDocumentSave, false, Color.Black, Color.White);
             }
             catch (Exception ex)
             {
@@ -3948,7 +4022,7 @@ namespace IS_Inventory
 
                 // Hide the version edit panel
                 PnlDocumentationVersion.Visible = false;
-                CmdDocumentVersionSave.Enabled = false;
+                SetButtonState(CmdDocumentVersionSave, false, Color.Black, Color.White);
             }
             catch (Exception ex)
             {
@@ -4027,7 +4101,7 @@ namespace IS_Inventory
                 SafeRadioBox(RadDocumentationVersionActive, RadDocumentationVersionInactive, ver, "active_flag");
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdDocumentVersionSave.Enabled = false;
+                SetButtonState(CmdDocumentVersionSave, false, Color.Black, Color.White);
                 documentationRecord.Versions.Status.IsSaved = true; // Indicates that no edits to this record have occurred (yet)
             }
             catch (Exception ex)
@@ -4062,7 +4136,7 @@ namespace IS_Inventory
                 PopulateDocumentationVersionsGrid(documentationRecord);
 
                 // Disable the SAVE button until the user makes an edit.
-                CmdDocumentSave.Enabled = false;
+                SetButtonState(CmdDocumentSave, false, Color.Black, Color.White);
                 documentationRecord.Status.IsSaved = true; // Indicates that no edits to this record have occurred (yet)
 
                 // If the URL is non-blank then enable the document view button
@@ -4179,7 +4253,7 @@ namespace IS_Inventory
                 ClearDocumentEditPanel();
                 PopulateDocumentationGrid();
 
-                CmdDocumentSave.Enabled = false;
+                SetButtonState(CmdDocumentSave, false, Color.Black, Color.White);
                 documentationRecord.Status.IsSaved = true;
                 documentationRecord.Status.IsNew = false;
 
@@ -4239,7 +4313,7 @@ namespace IS_Inventory
                 ClearDocumentVersionEditPanel();
                 PopulateDocumentationVersionsGrid(documentationRecord);
 
-                CmdDocumentVersionSave.Enabled = false;
+                SetButtonState(CmdDocumentVersionSave, false, Color.Black, Color.White);
                 documentationRecord.Versions.Status.IsSaved = true;
                 documentationRecord.Versions.Status.IsNew = false;
 
@@ -4402,8 +4476,8 @@ namespace IS_Inventory
 
                 // Disable save button and version grid 
                 GrdDocumentationVersion.Enabled = false;
-                CmdDocumentSave.Enabled = false;
-                CmdDocumentVersionSave.Enabled = false;
+                SetButtonState(CmdDocumentSave, false, Color.Black, Color.White);
+                SetButtonState(CmdDocumentVersionSave, false, Color.Black, Color.White);
 
                 // Then Wait for user entry on the edit panel(s).  
             }
@@ -4443,7 +4517,7 @@ namespace IS_Inventory
                 // Render the edit panel
                 PnlDocumentationVersion.Visible = true;
                 TxtDocumentationVersionDescription.Text = "<not specified>";
-                CmdDocumentVersionSave.Enabled = false;
+                SetButtonState(CmdDocumentVersionSave, false, Color.Black, Color.White);
 
                 // Then Wait for user entry on the edit panel(s).  
             }

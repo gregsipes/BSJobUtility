@@ -28,6 +28,24 @@ namespace BSGlobals
             UsernameFound = GetADUser(CurrentUser.Name);
         }
 
+        /// <summary>
+        /// Check if this user has the appropriate AD credentials to use this account
+        /// </summary>
+        /// <param name="requiredCredentials"></param>
+        /// <returns></returns>
+        public bool CheckUserCredentials(List<string> requiredCredentials)
+        {
+
+            foreach (string credential in requiredCredentials)
+            {
+                // User only needs a single credential from the passed-in list to match their AD BSOU_ credentials list.  
+                //   Return true if any match is found, false if no matches are found.
+                BSOUClass bsou = BSOUList.Find(x => x.Credential.ToLower() == credential.ToLower());
+                if (!(bsou is null)) return (true);
+            }
+            return (false);
+        }
+
         public bool GetADUser(string loginUsername)
         {
             // Obtain the specified Active Directory user.  The user attributes we'll be interested include
@@ -40,7 +58,7 @@ namespace BSGlobals
                 using (var context = new PrincipalContext(ContextType.Domain, "buffnews.com")) // Note that we're hard-coding "Buffnews.com" here
                 {
                     Username = StripOffUsername(loginUsername);
-                    using (var searcher = new PrincipalSearcher(new UserPrincipal(context) { SamAccountName = Username } ))
+                    using (var searcher = new PrincipalSearcher(new UserPrincipal(context) { SamAccountName = Username }))
                     {
                         // Return the first AD entry found for this user.  There should only be a single entry per username!!!!
                         PrincipalSearchResult<Principal> principal = searcher.FindAll();
@@ -65,7 +83,7 @@ namespace BSGlobals
         {
             // Usernames consist of DOMAIN\Username.  Split at the slash and return only the user's name
             string[] name = username.Split('\\');
-            return(name.Last());
+            return (name.Last());
         }
 
         public void GetAllADUsers()

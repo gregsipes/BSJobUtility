@@ -50,8 +50,9 @@
             // 
             this.TxtImportFile.Location = new System.Drawing.Point(133, 103);
             this.TxtImportFile.Name = "TxtImportFile";
-            this.TxtImportFile.Size = new System.Drawing.Size(362, 20);
+            this.TxtImportFile.Size = new System.Drawing.Size(549, 20);
             this.TxtImportFile.TabIndex = 1;
+            this.TxtImportFile.Click += new System.EventHandler(this.TxtImportFile_Click);
             // 
             // CmdBrowse
             // 
@@ -65,7 +66,7 @@
             // 
             // CmdExit
             // 
-            this.CmdExit.Location = new System.Drawing.Point(405, 158);
+            this.CmdExit.Location = new System.Drawing.Point(48, 166);
             this.CmdExit.Name = "CmdExit";
             this.CmdExit.Size = new System.Drawing.Size(79, 28);
             this.CmdExit.TabIndex = 3;
@@ -77,7 +78,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(64, 42);
+            this.label2.Location = new System.Drawing.Point(162, 42);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(388, 20);
             this.label2.TabIndex = 4;
@@ -87,11 +88,11 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(173, 16);
+            this.label3.Location = new System.Drawing.Point(239, 16);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(135, 20);
+            this.label3.Size = new System.Drawing.Size(232, 20);
             this.label3.TabIndex = 5;
-            this.label3.Text = "SBS Data Import ";
+            this.label3.Text = "SBS Journal Entry Data Import ";
             // 
             // CmdImport
             // 
@@ -108,7 +109,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(535, 242);
+            this.ClientSize = new System.Drawing.Size(694, 242);
             this.Controls.Add(this.CmdImport);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -119,6 +120,7 @@
             this.Name = "FrmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Journal Entry Spreadsheet Import";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -95,31 +95,45 @@ namespace PurchaseOrders
         #region Populate Combo Boxes
         private void PopulateChargeToComboBox(int rowNum)
         {
-            using (SqlDataReader rdr = SQLQuery("Proc_Select_Departments"))
+            try
             {
-                if (rdr.HasRows)
+                using (SqlDataReader rdr = SQLQuery("Proc_Select_Departments"))
                 {
-                    DataGridViewComboBoxCell dgvCell = (DataGridViewComboBoxCell)GrdOrderDetails.Rows[rowNum].Cells["ChargeTo"];
-                    DataTable dt = new DataTable();
-                    dt.Load(rdr);
-                    dgvCell.DataSource = dt;
-                    dgvCell.DisplayMember = "Dept";
+                    if (rdr.HasRows)
+                    {
+                        DataGridViewComboBoxCell dgvCell = (DataGridViewComboBoxCell)GrdOrderDetails.Rows[rowNum].Cells["ChargeTo"];
+                        DataTable dt = new DataTable();
+                        dt.Load(rdr);
+                        dgvCell.DataSource = dt;
+                        dgvCell.DisplayMember = "Dept";
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                BroadcastError("Error trying to populate the 'Charge to' combo box", ex);
             }
         }
 
         private void PopulateClassificationComboBox(int rowNum)
         {
-            using (SqlDataReader rdr = SQLQuery("Proc_Select_Classifications"))
+            try
             {
-                if (rdr.HasRows)
+                using (SqlDataReader rdr = SQLQuery("Proc_Select_Classifications"))
                 {
-                    DataGridViewComboBoxCell dgvCell = (DataGridViewComboBoxCell)GrdOrderDetails.Rows[rowNum].Cells["Classification"];
-                    DataTable dt = new DataTable();
-                    dt.Load(rdr);
-                    dgvCell.DataSource = dt;
-                    dgvCell.DisplayMember = "Class";
+                    if (rdr.HasRows)
+                    {
+                        DataGridViewComboBoxCell dgvCell = (DataGridViewComboBoxCell)GrdOrderDetails.Rows[rowNum].Cells["Classification"];
+                        DataTable dt = new DataTable();
+                        dt.Load(rdr);
+                        dgvCell.DataSource = dt;
+                        dgvCell.DisplayMember = "Class";
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                BroadcastError("Error trying to populate 'Classification' combo box", ex);
             }
         }
 
@@ -127,19 +141,26 @@ namespace PurchaseOrders
         {
             // Populate the existing order grid from SQL
 
-            //GrdExistingOrders.DataSource = ""; // TBD This wipes out our named columns
-            SqlParameter[] VendorParams = new SqlParameter[2];
-            VendorParams[0] = new SqlParameter("@pvchrVendorName", vendorFilter);
-            VendorParams[1] = new SqlParameter("@pvintLookbackInYears", LookbackInYears);
-            using (SqlDataReader rdr = SQLQuery("Proc_Select_All_Orders_By_Vendorname", VendorParams))
+            try
             {
-                //if (rdr.HasRows)
+                //GrdExistingOrders.DataSource = ""; // TBD This wipes out our named columns
+                SqlParameter[] VendorParams = new SqlParameter[2];
+                VendorParams[0] = new SqlParameter("@pvchrVendorName", vendorFilter);
+                VendorParams[1] = new SqlParameter("@pvintLookbackInYears", LookbackInYears);
+                using (SqlDataReader rdr = SQLQuery("Proc_Select_All_Orders_By_Vendorname", VendorParams))
                 {
-                    GrdExistingOrders.Visible = true;
-                    DataTable dt = new DataTable();
-                    dt.Load(rdr);
-                    GrdExistingOrders.DataSource = dt;
+                    //if (rdr.HasRows)
+                    {
+                        GrdExistingOrders.Visible = true;
+                        DataTable dt = new DataTable();
+                        dt.Load(rdr);
+                        GrdExistingOrders.DataSource = dt;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                BroadcastError("Error trying to populate to existing orders grid", ex);
             }
         }
 
@@ -147,22 +168,29 @@ namespace PurchaseOrders
         {
             // Populate the existing order grid from SQL
 
-            SqlParameter[] VendorParams = new SqlParameter[1];
-            VendorParams[0] = new SqlParameter("@pvchrVendorName", vendorFilter);
-            using (SqlDataReader rdrVendor = SQLQuery("Proc_Select_Vendor", VendorParams))
-            //            using (SqlDataReader rdr = DataIO.ExecuteQuery(
-            //                Enums.DatabaseConnectionStringNames.Purchasing,
-            //                CommandType.Text,
-            //                "SELECT Vendor FROM tblVendors WHERE (Vendor <> '' AND Vendor is not NULL) ORDER BY Vendor"))
+            try
             {
-                if (rdrVendor.HasRows)
+                SqlParameter[] VendorParams = new SqlParameter[1];
+                VendorParams[0] = new SqlParameter("@pvchrVendorName", vendorFilter);
+                using (SqlDataReader rdrVendor = SQLQuery("Proc_Select_Vendor", VendorParams))
+                //            using (SqlDataReader rdr = DataIO.ExecuteQuery(
+                //                Enums.DatabaseConnectionStringNames.Purchasing,
+                //                CommandType.Text,
+                //                "SELECT Vendor FROM tblVendors WHERE (Vendor <> '' AND Vendor is not NULL) ORDER BY Vendor"))
                 {
-                    DataTable dt = new DataTable();
-                    dt.Load(rdrVendor);
-                    combo.DataSource = dt;
-                    combo.DisplayMember = "Vendor";
+                    if (rdrVendor.HasRows)
+                    {
+                        DataTable dt = new DataTable();
+                        dt.Load(rdrVendor);
+                        combo.DataSource = dt;
+                        combo.DisplayMember = "Vendor";
+                    }
+                    combo.SelectedIndex = -1;
                 }
-                combo.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                BroadcastError("Error trying to populate the vendor combo box", ex);
             }
         }
         #endregion
@@ -200,8 +228,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
-                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, "Unable to create new purchase order:  " + ex.ToString(), JobName);
-                MessageBox.Show("ERROR - " + "Unable to create new purchase order:  " + ex.ToString());
+                BroadcastError("Unable to create new purchase order:  ", ex);
                 return (null);
             }
             return (order);
@@ -215,57 +242,65 @@ namespace PurchaseOrders
             //   If we don't complete the PO order we can delete it at the end.
 
             order = CreateNewPORecord();
+            CurrentOrder = order;
 
             // Get all vendor info associated with this item
 
-            SqlParameter[] OrderParams = new SqlParameter[2];
-            OrderParams[0] = new SqlParameter("@pvintOrderID", SelectedOrderItem.SelectedOrderID);
-            OrderParams[1] = new SqlParameter("@pvintLookbackInYears", LookbackInYears);
-            using (SqlDataReader rdrOrder = SQLQuery("Proc_Select_All_Orders", OrderParams))
+            try
             {
-                rdrOrder.Read(); // Read just the first record
+                SqlParameter[] OrderParams = new SqlParameter[2];
+                OrderParams[0] = new SqlParameter("@pvintOrderID", SelectedOrderItem.SelectedOrderID);
+                OrderParams[1] = new SqlParameter("@pvintLookbackInYears", LookbackInYears);
+                using (SqlDataReader rdrOrder = SQLQuery("Proc_Select_All_Orders", OrderParams))
                 {
-                    // Put order into order object and display
+                    rdrOrder.Read(); // Read just the first record
+                    {
+                        // Put order into order object and display
 
-                    order.LoadOrderFromSQL(rdrOrder);
-                    DisplayOrder(order);
+                        order.LoadOrderFromSQL(rdrOrder);
+                        DisplayOrder(order);
 
-                    // Put vendor into vendor object and display
+                        // Put vendor into vendor object and display
 
-                    CurrentVendors = new VendorListClass();
-                    VendorClass v = new VendorClass(rdrOrder, UserInfo.Username);
-                    CurrentVendors.VendorList.Add(v);
-                    CurrentVendors.VendorInfoChanged = false;
+                        CurrentVendors = new VendorListClass();
+                        VendorClass v = new VendorClass(rdrOrder, UserInfo.Username);
+                        CurrentVendors.VendorList.Add(v);
+                        CurrentVendors.VendorInfoChanged = false;
 
-                    string vendorname = CurrentVendors.GetCurrentVendorName();
-                    SelectVendor(vendorname);
+                        string vendorname = CurrentVendors.GetCurrentVendorName();
+                        SelectVendor(vendorname);
 
+                    }
                 }
-            }
 
-            // Put order details into order object
-            int ItemRecordID = (SelectedOrderItem.SingleItemOnly) ? SelectedOrderItem.SelectItemRecordID : 0;
-            SqlParameter[] ItemParams = new SqlParameter[2];
-            ItemParams[0] = new SqlParameter("@pvintOrderID", SelectedOrderItem.SelectedOrderID);
-            ItemParams[1] = new SqlParameter("@pvintItemRecordID", ItemRecordID);
-            using (SqlDataReader rdrItem = SQLQuery("Proc_Select_Order_Item", ItemParams))
+                // Put order details into order object
+                int ItemRecordID = (SelectedOrderItem.SingleItemOnly) ? SelectedOrderItem.SelectItemRecordID : 0;
+                SqlParameter[] ItemParams = new SqlParameter[2];
+                ItemParams[0] = new SqlParameter("@pvintOrderID", SelectedOrderItem.SelectedOrderID);
+                ItemParams[1] = new SqlParameter("@pvintItemRecordID", ItemRecordID);
+                using (SqlDataReader rdrItem = SQLQuery("Proc_Select_Order_Item", ItemParams))
+                {
+                    int row = 0;
+                    GrdOrderDetails.Rows.Clear();
+
+                    while (rdrItem.Read())
+                    {
+                        GrdOrderDetails.Rows.Add();
+                        PopulateChargeToComboBox(row);
+                        PopulateClassificationComboBox(row);
+                        DisplayLineItems(GrdOrderDetails.Rows[row], rdrItem);
+                        order.LoadLineItemsFromSQL(rdrItem, true);
+                        if (selectedOrderItem.SingleItemOnly) break; // If only a single entry was copied, exit the loop after a single iteration
+                        row++;
+                    }
+                }
+
+                TxtPOTotal.Text = order.ComputeOrderTotal().ToString("C2");
+            }
+            catch (Exception ex)
             {
-                int row = 0;
-                GrdOrderDetails.Rows.Clear();
-
-                while (rdrItem.Read())
-                {
-                    GrdOrderDetails.Rows.Add();
-                    PopulateChargeToComboBox(row);
-                    PopulateClassificationComboBox(row);
-                    DisplayLineItems(GrdOrderDetails.Rows[row], rdrItem);
-                    order.LoadLineItemsFromSQL(rdrItem, true);
-                    if (selectedOrderItem.SingleItemOnly) break; // If only a single entry was copied, exit the loop after a single iteration
-                    row++;
-                }
+                BroadcastError("Error trying to (auto) create a new PO record", ex);
             }
-
-            TxtPOTotal.Text = order.ComputeOrderTotal().ToString("C2");
         }
 
         private void SavePORecord(OrderClass currentOrder)
@@ -274,37 +309,50 @@ namespace PurchaseOrders
             OrderClass o = currentOrder;
             VendorClass v = CurrentVendors.VendorList[CurrentVendors.SelectedListIndex];
 
-            if (o.PONumber > 0)
+            try
             {
-                SqlParameter[] OrderParams = new SqlParameter[19];
-                OrderParams[0] = new SqlParameter("@pvintOrdID", o.PONumber);
-                OrderParams[1] = new SqlParameter("@pvchrVendor", v.VendorName);
-                OrderParams[2] = new SqlParameter("@pvchrAdd1", v.AddrLine1);
-                OrderParams[3] = new SqlParameter("@pvchrAdd2", v.AddrLine2);
-                OrderParams[4] = new SqlParameter("@pvchrCity", v.City);
-                OrderParams[5] = new SqlParameter("@pvchrState", v.State);
-                OrderParams[6] = new SqlParameter("@pvchrZip", v.Zip);
-                OrderParams[7] = new SqlParameter("@pvchrContact", v.Contact);
-                OrderParams[8] = new SqlParameter("@pvchrPhone", v.Phone);
-                OrderParams[9] = new SqlParameter("@pvchrFax", v.Fax);
-                OrderParams[10] = new SqlParameter("@pvchrAcctNum", v.AcctNum);
-                OrderParams[11] = new SqlParameter("@pvchrRefNum", o.OrderReference);
-                OrderParams[12] = new SqlParameter("@pvchrDept", o.Department);
-                OrderParams[13] = new SqlParameter("@pvchrExt", o.DeliverToPhone);
-                OrderParams[14] = new SqlParameter("@pvdatOrdDate", o.OrderDate);
-                OrderParams[15] = new SqlParameter("@pvchrDelTo", o.DeliverTo);
-                OrderParams[16] = new SqlParameter("@pvchrTerms", o.Terms);
-                OrderParams[17] = new SqlParameter("@pvchrComments", o.Comments);
-                OrderParams[18] = new SqlParameter("@pvchrOwner", UserInfo.Username);
-                SQLProcCall("Proc_Update_Order", OrderParams);
+                if (o.PONumber > 0)
+                {
+                    SqlParameter[] OrderParams = new SqlParameter[19];
+                    OrderParams[0] = new SqlParameter("@pvintOrdID", o.PONumber);
+                    OrderParams[1] = new SqlParameter("@pvchrVendor", v.VendorName);
+                    OrderParams[2] = new SqlParameter("@pvchrAdd1", v.AddrLine1);
+                    OrderParams[3] = new SqlParameter("@pvchrAdd2", v.AddrLine2);
+                    OrderParams[4] = new SqlParameter("@pvchrCity", v.City);
+                    OrderParams[5] = new SqlParameter("@pvchrState", v.State);
+                    OrderParams[6] = new SqlParameter("@pvchrZip", v.Zip);
+                    OrderParams[7] = new SqlParameter("@pvchrContact", v.Contact);
+                    OrderParams[8] = new SqlParameter("@pvchrPhone", v.Phone);
+                    OrderParams[9] = new SqlParameter("@pvchrFax", v.Fax);
+                    OrderParams[10] = new SqlParameter("@pvchrAcctNum", v.AcctNum);
+                    OrderParams[11] = new SqlParameter("@pvchrRefNum", o.OrderReference);
+                    OrderParams[12] = new SqlParameter("@pvchrDept", o.Department);
+                    OrderParams[13] = new SqlParameter("@pvchrExt", o.DeliverToPhone);
+                    OrderParams[14] = new SqlParameter("@pvdatOrdDate", o.OrderDate);
+                    OrderParams[15] = new SqlParameter("@pvchrDelTo", o.DeliverTo);
+                    OrderParams[16] = new SqlParameter("@pvchrTerms", o.Terms);
+                    OrderParams[17] = new SqlParameter("@pvchrComments", o.Comments);
+                    OrderParams[18] = new SqlParameter("@pvchrOwner", UserInfo.Username);
+                    SQLProcCall("Proc_Update_Order", OrderParams);
 
-                SaveLineItems(currentOrder);
-                currentOrder.OrderIsSaved = true;
-                currentOrder.SaveCount++;
+                    // Save PO Details
+
+                    SaveLineItems(currentOrder);
+                    currentOrder.OrderIsSaved = true;
+                    currentOrder.SaveCount++;
+
+                    // Repopoulate the archive
+
+                    PopulateExistingOrderGrid("");
+                }
+                else
+                {
+                    MessageBox.Show("Error: PO Number was zero on Save", "PO # NOT SET", MessageBoxButtons.OK);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Error: PO Number was zero on Save", "PO # NOT SET", MessageBoxButtons.OK);
+                BroadcastError("Unable to save the purchase order:  ", ex);
             }
         }
 
@@ -312,37 +360,46 @@ namespace PurchaseOrders
         {
             //  Delete any previous order items associated with this order ID
 
-            SqlParameter[] DeleteParams = new SqlParameter[1];
-            DeleteParams[0] = new SqlParameter("@pvintOrdID", CurrentOrder.PONumber);
-            SQLProcCall("Proc_Delete_Order_Items", DeleteParams);
-
-            // For each order item on the order item list, create (or update) the corresponding SQL record
-            for (int i = 0; i < currentOrder.NumLineItems; i++)
+            try
             {
-                LineItemsClass o = currentOrder.GetLineItems(i);
-                SqlParameter[] OrderParams = new SqlParameter[11];
-                OrderParams[0] = new SqlParameter("@pvintOrdID", currentOrder.PONumber);
-                OrderParams[1] = new SqlParameter("@pvintRecID", o.OrderItemID);
-                OrderParams[2] = new SqlParameter("@pvintQty", o.Quantity);
-                OrderParams[3] = new SqlParameter("@pvchrUnits", o.Units);
-                OrderParams[4] = new SqlParameter("@pvchrDescription", o.Description);
-                OrderParams[5] = new SqlParameter("@pvcurUnitPrice", o.UnitPrice);
-                OrderParams[6] = new SqlParameter("@pvchrChargeTo", o.ChargeTo);
-                OrderParams[7] = new SqlParameter("@pvchrPurpose", o.Purpose);
-                OrderParams[8] = new SqlParameter("@pvchrClass", o.Classification);
-                OrderParams[9] = new SqlParameter("@pvchrTaxable", (o.IsTaxable ? "1" : "0"));
-                OrderParams[10] = new SqlParameter("@pvchrOwner", UserInfo.Username);
-                SqlDataReader rdrItem = SQLQuery("Proc_Update_Order_Item", OrderParams);
-                try
+                SqlParameter[] DeleteParams = new SqlParameter[1];
+                DeleteParams[0] = new SqlParameter("@pvintOrdID", CurrentOrder.PONumber);
+                SQLProcCall("Proc_Delete_Order_Items", DeleteParams);
+
+                // For each order item on the order item list, create (or update) the corresponding SQL record
+                for (int i = 0; i < currentOrder.NumLineItems; i++)
                 {
-                    rdrItem.Read();
-                    o.OrderItemID = (int)GetSQLValue(rdrItem, "RecID");
+                    LineItemsClass o = currentOrder.GetLineItems(i);
+                    SqlParameter[] OrderParams = new SqlParameter[11];
+                    OrderParams[0] = new SqlParameter("@pvintOrdID", currentOrder.PONumber);
+                    OrderParams[1] = new SqlParameter("@pvintRecID", o.OrderItemID);
+                    OrderParams[2] = new SqlParameter("@pvintQty", o.Quantity);
+                    OrderParams[3] = new SqlParameter("@pvchrUnits", o.Units);
+                    OrderParams[4] = new SqlParameter("@pvchrDescription", o.Description);
+                    OrderParams[5] = new SqlParameter("@pvcurUnitPrice", o.UnitPrice);
+                    OrderParams[6] = new SqlParameter("@pvchrChargeTo", o.ChargeTo);
+                    OrderParams[7] = new SqlParameter("@pvchrPurpose", o.Purpose);
+                    OrderParams[8] = new SqlParameter("@pvchrClass", o.Classification);
+                    OrderParams[9] = new SqlParameter("@pvchrTaxable", (o.IsTaxable ? "1" : "0"));
+                    OrderParams[10] = new SqlParameter("@pvchrOwner", UserInfo.Username);
+                    SqlDataReader rdrItem = SQLQuery("Proc_Update_Order_Item", OrderParams);
+                    try
+                    {
+                        rdrItem.Read();
+                        // TBD 12/29/20 PEB - The next line crashed after having saved the spreadsheet, gone back,
+                        //  used PREV button to change to a previous CDW account, then NEXT to get back, then getting a SAVE prompt
+                        //  after clicking EXIT and trying to save.  UPDATE:  Can't convert decimal value using (int) typecast.  Need to use ToInt32 function instead.
+                        o.OrderItemID = Convert.ToInt32(GetSQLValue(rdrItem, "RecID"));
+                    }
+                    catch (Exception ex)
+                    {
+                        BroadcastError("Unable to obtain the record ID for the updated order:  ", ex);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, "Unable to obtain the record ID for the updated order:  " + ex.ToString(), JobName);
-                    MessageBox.Show("ERROR - " + "Unable to obtain the record ID for the updated order:  " + ex.ToString());
-                }
+            }
+            catch (Exception ex)
+            {
+                BroadcastError("Error trying to save purchase order details: ", ex);
             }
         }
 
@@ -361,8 +418,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
-                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, "Unable to create new vendor record:  " + ex.ToString(), JobName);
-                MessageBox.Show("ERROR - " + "Unable to create new vendor record:  " + ex.ToString());
+                BroadcastError("Unable to create new vendor record:  ", ex);
                 return (null);
             }
         }
@@ -370,67 +426,117 @@ namespace PurchaseOrders
         private int SelectVendor(string vendorname)
         {
             int VendorID = 0;
-            SqlParameter[] VendorParams = new SqlParameter[1];
-            VendorParams[0] = new SqlParameter("@pvchrVendorName", vendorname);
-            using (SqlDataReader rdrVendor = SQLQuery("Proc_Select_Vendor", VendorParams))
+            try
             {
-                if (rdrVendor.HasRows)
+                SqlParameter[] VendorParams = new SqlParameter[1];
+                VendorParams[0] = new SqlParameter("@pvchrVendorName", vendorname);
+                using (SqlDataReader rdrVendor = SQLQuery("Proc_Select_Vendor", VendorParams))
                 {
-                    CurrentVendors.VendorList.Clear();
-                    while (rdrVendor.Read())
+                    if (rdrVendor.HasRows)
                     {
-                        VendorClass v = new VendorClass(rdrVendor, UserInfo.Username);
-                        CurrentVendors.VendorList.Add(v);
-                    }
+                        CurrentVendors.VendorList.Clear();
+                        while (rdrVendor.Read())
+                        {
+                            VendorClass v = new VendorClass(rdrVendor, UserInfo.Username);
+                            CurrentVendors.VendorList.Add(v);
+                        }
 
-                    // display the first item of the list here.
-                    CurrentVendors.SelectedListIndex = 0;
-                    DisplayVendor(CurrentVendors);
-                    VendorID = CurrentVendors.VendorList[CurrentVendors.SelectedListIndex].VendorID;
+                        // display the first item of the list here.
+                        CurrentVendors.SelectedListIndex = 0;
+                        DisplayVendor(CurrentVendors);
+                        VendorID = CurrentVendors.VendorList[CurrentVendors.SelectedListIndex].VendorID;
 
-                    // If more than one item in the list, enable the NEXT button
-                    CmdPrev.Enabled = false;
-                    CmdPrev.BackColor = Color.Transparent;
-                    if (CurrentVendors.VendorList.Count > 1)
-                    {
-                        CmdNext.Enabled = true;
-                        CmdNext.BackColor = Color.Yellow;
-                    }
-                    else
-                    {
-                        CmdNext.Enabled = false;
-                        CmdNext.BackColor = Color.Transparent;
+                        // If more than one item in the list, enable the NEXT button
+                        CmdPrev.Enabled = false;
+                        CmdPrev.BackColor = Color.Transparent;
+                        if (CurrentVendors.VendorList.Count > 1)
+                        {
+                            CmdNext.Enabled = true;
+                            CmdNext.BackColor = Color.Yellow;
+                        }
+                        else
+                        {
+                            CmdNext.Enabled = false;
+                            CmdNext.BackColor = Color.Transparent;
+                        }
                     }
                 }
+                return (VendorID);
             }
-            return (VendorID);
+            catch (Exception ex)
+            {
+                BroadcastError("", ex);
+                return (-1);
+            }
         }
 
-        private void SaveVendorRecord(VendorListClass currentVendors)
+        private void UpdateVendor(VendorClass vendor)
+        {
+            try
+            {
+                if (vendor.VendorID > 0)
+                {
+                    vendor.VendorName = CmbVendorName.Text;
+                    vendor.AddrLine1 = TxtAddressLine1.Text;
+                    vendor.AddrLine2 = TxtAddressLine2.Text;
+                    vendor.City = TxtCity.Text;
+                    vendor.State = TxtState.Text;
+                    vendor.Zip = TxtZipCode.Text;
+                    vendor.Contact = TxtContact.Text;
+                    vendor.Phone = TxtTelephone.Text;
+                    vendor.Fax = TxtFax.Text;
+                    vendor.AcctNum = TxtNewsAccount.Text;
+                    vendor.Username = UserInfo.Username;
+
+                    CurrentVendors.VendorInfoChanged = true;
+                }
+                else
+                {
+                    MessageBox.Show("Error: Vendor ID was zero on Update", "VendorID NOT SET", MessageBoxButtons.OK);
+                }
+            }
+            catch (Exception ex)
+            {
+                BroadcastError("ERROR trying update vendor record:  ", ex);
+            }
+        }    
+
+    private void SaveVendorRecord(VendorListClass currentVendors)
         {
             VendorClass v = currentVendors.VendorList[currentVendors.SelectedListIndex];
+            try
+            {
+                if (v.VendorID > 0)
+                {
+                    UpdateVendor(v);
+                    SqlParameter[] VendorParams = new SqlParameter[12];
+                    VendorParams[0] = new SqlParameter("@pvintVenID", v.VendorID);
+                    VendorParams[1] = new SqlParameter("@pvchrVendor", v.VendorName);
+                    VendorParams[2] = new SqlParameter("@pvchrAdd1", v.AddrLine1);
+                    VendorParams[3] = new SqlParameter("@pvchrAdd2", v.AddrLine2);
+                    VendorParams[4] = new SqlParameter("@pvchrCity", v.City);
+                    VendorParams[5] = new SqlParameter("@pvchrState", v.State);
+                    VendorParams[6] = new SqlParameter("@pvchrZip", v.Zip);
+                    VendorParams[7] = new SqlParameter("@pvchrContact", v.Contact);
+                    VendorParams[8] = new SqlParameter("@pvchrPhone", v.Phone);
+                    VendorParams[9] = new SqlParameter("@pvchrFax", v.Fax);
+                    VendorParams[10] = new SqlParameter("@pvchrAcctNum", v.AcctNum);
+                    VendorParams[11] = new SqlParameter("@pvchrOwner", v.Username);
+                    SQLProcCall("Proc_Update_Vendor", VendorParams);
 
-            if (v.VendorID > 0)
-            {
-                SqlParameter[] VendorParams = new SqlParameter[12];
-                VendorParams[0] = new SqlParameter("@pvintVenID", v.VendorID);
-                VendorParams[1] = new SqlParameter("@pvchrVendor", v.VendorName);
-                VendorParams[2] = new SqlParameter("@pvchrAdd1", v.AddrLine1);
-                VendorParams[3] = new SqlParameter("@pvchrAdd2", v.AddrLine2);
-                VendorParams[4] = new SqlParameter("@pvchrCity", v.City);
-                VendorParams[5] = new SqlParameter("@pvchrState", v.State);
-                VendorParams[6] = new SqlParameter("@pvchrZip", v.Zip);
-                VendorParams[7] = new SqlParameter("@pvchrContact", v.Contact);
-                VendorParams[8] = new SqlParameter("@pvchrPhone", v.Phone);
-                VendorParams[9] = new SqlParameter("@pvchrFax", v.Fax);
-                VendorParams[10] = new SqlParameter("@pvchrAcctNum", v.AcctNum);
-                VendorParams[11] = new SqlParameter("@pvchrOwner", v.Username);
-                SQLProcCall("Proc_Update_Vendor", VendorParams);
+                    CurrentVendors.VendorInfoChanged = false;
+                    RenderVendorSaveButton(CurrentVendors);
+                }
+                else
+                {
+                    MessageBox.Show("Error: Vendor ID was zero on Save", "VendorID NOT SET", MessageBoxButtons.OK);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Error: Vendor ID was zero on Save", "VendorID NOT SET", MessageBoxButtons.OK);
+                BroadcastError("ERROR trying save vendor record:  ", ex);
             }
+
         }
         #endregion
 
@@ -452,8 +558,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
-                MessageBox.Show("ERROR - Unable to display current order:  " + ex.ToString());
-                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to display current order:  " + ex.ToString(), JobName);
+                BroadcastError("ERROR - Unable to display current order:  ", ex);
             }
         }
 
@@ -478,8 +583,7 @@ namespace PurchaseOrders
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("ERROR - Unable to populate grid Quantity value from SQL:  " + ex.ToString());
-                    DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate grid Quantity value from SQL:  " + ex.ToString(), JobName);
+                    BroadcastWarning("ERROR - Unable to populate grid Quantity value from SQL:  ", ex);
                 }
 
                 string t = "";
@@ -489,8 +593,7 @@ namespace PurchaseOrders
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("ERROR - Unable to populate grid Unit Price value from SQL:  " + ex.ToString());
-                    DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to populate grid Unit Price value from SQL:  " + ex.ToString(), JobName);
+                    BroadcastWarning("ERROR - Unable to populate grid Unit Price value from SQL:  ", ex);
                 }
                 bool qtyokay = double.TryParse(s, out double qty);
                 bool priceokay = double.TryParse(t, out double price);
@@ -505,8 +608,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
-                MessageBox.Show("ERROR trying display current line items:  " + ex.ToString());
-                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to correctly display current line items:  " + ex.ToString(), JobName);
+                BroadcastWarning("ERROR trying display current line items:  ", ex);
             }
         }
 
@@ -541,8 +643,7 @@ namespace PurchaseOrders
             }
             catch (Exception ex)
             {
-                MessageBox.Show("ERROR trying display current vendor:  " + ex.ToString());
-                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.WARNING, "Unable to correctly display current vendor:  " + ex.ToString(), JobName);
+                BroadcastWarning("ERROR trying display current vendor:  ", ex);
             }
         }
 
@@ -551,13 +652,20 @@ namespace PurchaseOrders
             // This is invoked when a new order is generated (clears any previous orders)
 
             OrderClass o = new OrderClass();
-            DisplayOrder(o);
+            try
+            {
+                DisplayOrder(o);
 
-            VendorListClass v = new VendorListClass();
-            v.VendorList.Add(new VendorClass());
-            DisplayVendor(v);
-            CurrentVendors.VendorIsSupplied = false;
-            GrdOrderDetails.Rows.Clear();
+                VendorListClass v = new VendorListClass();
+                v.VendorList.Add(new VendorClass());
+                DisplayVendor(v);
+                CurrentVendors.VendorIsSupplied = false;
+                GrdOrderDetails.Rows.Clear();
+            }
+            catch (Exception ex)
+            {
+                BroadcastError("Error trying to clear the purchase order UI panel: ", ex);
+            }
         }
         #endregion
 
@@ -889,5 +997,39 @@ namespace PurchaseOrders
 
         #endregion
 
+        #region Broadcasts
+        /// <summary>
+        /// Send the specified message (can be of any JobLogMessageType) to the log and to a user prompt.
+        /// </summary>
+        /// <param name="errorType"></param>
+        /// <param name="msg"></param>
+        /// <param name="ex"></param>
+        private void BroadcastMessage(Enums.JobLogMessageType errorType, string msg, Exception ex)
+        {
+            // Useful (saves typing) when we want to send the same error message to both the job log and to a user prompt.  Useless otherwise.
+            string ExceptionStr = (ex != null ? ex.ToString() : "");
+            DataIO.WriteToJobLog(errorType, msg + "\r\n\r\n" + ExceptionStr, JobName);
+            MessageBox.Show(msg + ExceptionStr);
+        }
+
+        private void BroadcastError(string msg, Exception ex)
+        {
+            // Useful (saves typing) when we want to send the same error message to both the job log and to a user prompt.  Useless otherwise.
+            BroadcastMessage(Enums.JobLogMessageType.ERROR, msg, ex);
+        }
+
+        private void BroadcastWarning(string msg, Exception ex)
+        {
+            // Useful (saves typing) when we want to send the same error message to both the job log and to a user prompt.  Useless otherwise.
+            BroadcastMessage(Enums.JobLogMessageType.WARNING, msg, ex);
+        }
+
+        private void BroadcastInfo(string msg, Exception ex)
+        {
+            // Useful (saves typing) when we want to send the same error message to both the job log and to a user prompt.  Useless otherwise.
+            BroadcastMessage(Enums.JobLogMessageType.INFO, msg, ex);
+        }
+
+        #endregion
     }
 }

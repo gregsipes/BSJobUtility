@@ -31,6 +31,7 @@ namespace BSGlobals
     //    Margins (Narrow, Normal)
     //    Max Rows
     //    Max Columns
+    //    RowIsBlank
 
     // NOTES
     //    OLE process threads are notoriously difficult to consistently kill (they hang out in Task Manager as orphaned processes, taking up space).
@@ -194,6 +195,13 @@ namespace BSGlobals
         private Excel.Range SetRange(int startRow, int startCol, int endRow, int endCol)
         {
             Excel.Range range = ExcelWorksheet.Range[ExcelWorksheet.Cells[startRow, startCol], ExcelWorksheet.Cells[endRow, endCol]];
+            range.Select();
+            return (range);
+        }
+
+        private Excel.Range SetRange(Excel.Worksheet sheet, int startRow, int startCol, int endRow, int endCol)
+        {
+            Excel.Range range = sheet.Range[sheet.Cells[startRow, startCol], sheet.Cells[endRow, endCol]];
             range.Select();
             return (range);
         }
@@ -386,6 +394,68 @@ namespace BSGlobals
                 // TBD
             }
         }
+
+        /// <summary>
+        /// Returns true if the entire row is blank
+        /// </summary>
+        /// <returns></returns>
+        public bool RowIsBlank(int rowNum)
+        {
+            int lastcol = GetNumColumns();
+            Excel.Range range = SetRange(rowNum, 1, rowNum, lastcol);
+            double numnonblankcols = ExcelApp.WorksheetFunction.CountA(range);
+            return (numnonblankcols == 0);
+        }
+
+        /// <summary>
+        /// Copies (any part of) a worksheet to a new worksheet and returns the new sheet #
+        /// </summary>
+        /// <param name="firstrow"></param>
+        /// <param name="firstcol"></param>
+        /// <param name="lastrow"></param>
+        /// <param name="lastcol"></param>
+        /// <returns></returns>
+        public int CopyToNewWorksheet(int firstrow, int firstcol, int lastrow, int lastcol)
+        {
+            try
+            {
+                Excel.Range from = SetRange(firstrow, firstcol, lastrow, lastcol);
+                Excel.Sheets xlSheets = ExcelWorkbook.Sheets;
+                //xlSheets.Add(After: xlSheets[xlSheets.Count]);
+                Excel.Worksheet newsheet = xlSheets[xlSheets.Count];
+                Excel.Range to = SetRange(newsheet, firstrow, firstcol, lastrow, lastcol);
+                ExcelWorksheet.Copy(newsheet);
+                ExcelWorksheet.Move(Type.Missing, xlSheets[xlSheets.Count]);
+                return (ExcelWorkbook.Sheets.Count);
+            }
+            catch (Exception ex)
+            {
+                LastException = ex.ToString();
+                return (-1);
+            }
+        }
+
+        /// <summary>
+        /// Delete all rows from first to last, inclusive
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="lastActualRow"></param>
+        public bool DeleteRows(int first, int last)
+        {
+            try
+            {
+                Excel.Range range = SetRange(first, 1, last, 1);
+                range.EntireRow.Delete(Type.Missing);
+                return (true);
+            }
+            catch (Exception ex)
+            {
+                LastException = ex.ToString();
+                return (false);
+            }
+        }
+
+
         #endregion    
 
         #region FontClass
@@ -649,6 +719,7 @@ namespace BSGlobals
             }
 
         }
+
         #endregion
 
         #region FormatClass
@@ -1621,8 +1692,9 @@ namespace BSGlobals
 
                     return (true);
                 }
-                catch 
+                catch (Exception ex)
                 {
+                    SP.LastException = ex.ToString();
                     return (false);
                 }
             }
