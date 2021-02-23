@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static BSGlobals.Enums;
@@ -21,17 +22,21 @@ namespace BSGlobals
         {
             Console.WriteLine($"{DateTime.Now.ToString()} {type.ToString("g"),-7}  Message: {message}");
 
-
-            using (SqlCommand command = new SqlCommand())
+           using (SqlCommand command = new SqlCommand())
             {
                 try
                 {
                     command.Connection = new SqlConnection(Config.GetConnectionStringTo(DatabaseConnectionStringNames.BSJobUtility));
                     command.CommandType = CommandType.StoredProcedure;
                     command.CommandText = "dbo.InsertJobLog";
-                    command.Parameters.Add(new SqlParameter("@JobName", jobName));
+
+                    if (Convert.ToBoolean(Config.GetConfigurationKeyValue("BSJobUtilitySection", "IsTestVersion")))
+                        command.Parameters.Add(new SqlParameter("@JobName", jobName + " - TEST"));
+                    else
+                        command.Parameters.Add(new SqlParameter("@JobName", jobName));
                     command.Parameters.Add(new SqlParameter("@MessageType", type.ToString("d")));
                     command.Parameters.Add(new SqlParameter("@Message", message));
+                    command.Parameters.Add(new SqlParameter("@Version", Assembly.GetEntryAssembly().GetName().Version.ToString()));
 
                     command.Connection.Open();
                     command.ExecuteNonQuery();

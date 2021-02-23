@@ -129,7 +129,10 @@ namespace BSJobBase
         {
             CheckForJobStartedLog();
 
-            BSGlobals.Mail.SendMail($"Error in Job: {JobName}", ex.ToString(), false);
+            if (Convert.ToBoolean(GetConfigurationKeyValue("BSJobUtilitySection", "IsTestVersion")) == true)
+                BSGlobals.Mail.SendMail($"Error in TEST Job: {JobName}", ex.ToString(), false);
+            else
+                BSGlobals.Mail.SendMail($"Error in Job: {JobName}", ex.ToString(), false);
             BSGlobals.DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, ex.ToString(), JobName);
         }
 
