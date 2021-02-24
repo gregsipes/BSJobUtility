@@ -76,7 +76,7 @@ namespace SaxoXMLLoad
 
         private void CopyAndProcessFile(FileInfo fileInfo)
         {
-            string backupFileName = GetConfigurationKeyValue("BackupDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xml";
+            string backupFileName = GetConfigurationKeyValue("OutputDirectory") + fileInfo.Name + "_" + DateTime.Now.ToString("yyyyMMddhhmmsstt") + ".xml";
             Int32 loadsId = 0;
 
 
