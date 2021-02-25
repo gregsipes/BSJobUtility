@@ -18,7 +18,7 @@ namespace SaxoXMLLoad
         public override void SetupJob()
         {
             JobName = "Saxo XML Load";
-            JobDescription = "TODO";
+            JobDescription = "Parses XML file into database, then syncs with Brainworks";
             AppConfigSectionName = "SaxoXMLLoad";
         }
 
