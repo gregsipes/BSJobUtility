@@ -101,7 +101,7 @@ namespace BSJobBase
             }
         }
 
-        public virtual void PostExecuteJob()
+        public virtual void PostExecuteJob(bool wasSuccessful)
         {
             if (bool.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "LogEmptyRuns")) == true || JobStartedLog == true)
             {
@@ -109,6 +109,10 @@ namespace BSJobBase
                 System.Threading.Thread.Sleep(5000);
                 WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed");
             }
+
+            //send success email if the job has one defined
+            if (wasSuccessful && JobStartedLog == true && GetConfigurationKeyValue("SuccessEmail") != null)
+                SendMail($"{JobName} completed successfully", $"{JobName} ran successfully on {DateTime.Now.ToString()}", false, GetConfigurationKeyValue("SuccessEmail"));
         }
 
         #endregion

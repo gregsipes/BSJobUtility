@@ -13,6 +13,7 @@ namespace BSJobUtility
         private readonly string _group;
         private readonly string _version;
         private JobBase _managedJob;
+        private bool _wasSuccessful;
 
         public JobExecutor(string jobName, string group, string version, string[] args)
         {
@@ -31,9 +32,13 @@ namespace BSJobUtility
                 // execute job
                 ExecuteJob();
 
+                _wasSuccessful = true;
+
             }
             catch(Exception ex)
             {
+                _wasSuccessful = false;
+
                 throw new Exception ("JobExecutor exception:  " + ex.ToString()); // 10/01/20 PEB Added Ex to eliminate compiler warning.
             }
             finally
@@ -143,7 +148,7 @@ namespace BSJobUtility
 
         private void PostExecution()
         {
-            _managedJob.PostExecuteJob();
+            _managedJob.PostExecuteJob(_wasSuccessful);
         }
 
         public void Dispose()

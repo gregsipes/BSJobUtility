@@ -20,7 +20,7 @@ namespace TestJob
             try
             {
 
-                WriteToJobLog(JobLogMessageType.INFO, "Test job is running");
+              //  WriteToJobLog(JobLogMessageType.INFO, "Test job is running");
 
                 //    throw new Exception("Testing...");
                 //using (rptAutoRenewSun report = new rptAutoRenewSun())
