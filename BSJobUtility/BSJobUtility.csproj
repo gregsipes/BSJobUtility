@@ -202,6 +202,10 @@
       <Project>{428258fe-950a-4ffd-883c-7faea65e05b3}</Project>
       <Name>TestJob</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ToSecurity\ToSecurity.csproj">
+      <Project>{0779e912-8594-425d-81be-041a0fc8b296}</Project>
+      <Name>ToSecurity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TradeAutoEmail\TradeAutoEmail.csproj">
       <Project>{2833225f-e708-41d2-8a45-9e2fc910b7a2}</Project>
       <Name>TradeAutoEmail</Name>
