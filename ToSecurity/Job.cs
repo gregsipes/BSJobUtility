@@ -86,6 +86,7 @@ namespace ToSecurity
 
                     //save the new version
                     workbook.SaveAs(Filename: GetConfigurationKeyValue("OutputFileName"));
+                    WriteToJobLog(BSGlobals.Enums.JobLogMessageType.INFO, $"New file created at {GetConfigurationKeyValue("OutputFileName")}");
                     workbook.Close(SaveChanges: false);
 
                     excel.Application.Quit();
