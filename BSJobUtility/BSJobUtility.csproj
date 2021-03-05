@@ -182,6 +182,10 @@
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RefreshUsers\RefreshUsers.csproj">
+      <Project>{c46c94d5-15d1-46b8-876e-b4e4ab5f12ce}</Project>
+      <Name>RefreshUsers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SaxoXMLLoad\SaxoXMLLoad.csproj">
       <Project>{f77ff4dc-8fbf-450b-a34e-4d18f19948e2}</Project>
       <Name>SaxoXMLLoad</Name>

@@ -63,7 +63,9 @@ namespace BSGlobals
             Postings,
             Preprints,
             TouchControl,
-            Trade
+            Trade,
+            Passwords,
+            ServReq
         }
 
         public enum JobLogMessageType
