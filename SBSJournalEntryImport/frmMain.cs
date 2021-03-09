@@ -66,6 +66,7 @@ namespace SBSJournalEntryImport
             if (!UserOkay)
             {
                 BroadcastError("You do not have the appropriate credentials (BSOU_SBSReports) to run this app.", null);
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed", JobName);
                 System.Environment.Exit(1);
             }
 
@@ -312,6 +313,7 @@ namespace SBSJournalEntryImport
 
         private void CmdExit_Click(object sender, EventArgs e)
         {
+            this.Close();
             Application.Exit();
         }
 

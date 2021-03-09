@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static BSGlobals.Enums;
@@ -32,6 +33,7 @@ namespace BSGlobals
                     command.Parameters.Add(new SqlParameter("@JobName", jobName));
                     command.Parameters.Add(new SqlParameter("@MessageType", type.ToString("d")));
                     command.Parameters.Add(new SqlParameter("@Message", message));
+                    command.Parameters.Add(new SqlParameter("@Version", Assembly.GetEntryAssembly().GetName().Version.ToString()));
 
                     command.Connection.Open();
                     command.ExecuteNonQuery();

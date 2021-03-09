@@ -959,6 +959,7 @@ namespace PurchaseOrders
         {
             try
             {
+                this.Close();
                 Application.Exit();
             }
             catch (Exception ex)
@@ -1011,7 +1012,6 @@ namespace PurchaseOrders
                         }
                     }
 
-                    DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed", JobName);
                 }
 
                 if (POSpreadsheet != null)
@@ -1022,6 +1022,9 @@ namespace PurchaseOrders
                 {
                     ERSpreadsheet.Terminate();
                 }
+
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed", JobName);
+
             }
             catch (Exception ex)
             {

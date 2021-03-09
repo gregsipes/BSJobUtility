@@ -57,6 +57,7 @@ namespace LawsonArchive
             if (!UserOkay)
             {
                 BroadcastError("You do not have the appropriate credentials (LawsonReports) to run this app.", null);
+                DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed", JobName);
                 System.Environment.Exit(1);
             }
 
@@ -1004,6 +1005,7 @@ namespace LawsonArchive
 
         private void MnuExit_Click(object sender, EventArgs e)
         {
+            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed", JobName);
             Application.Exit();
         }
 

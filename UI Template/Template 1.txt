@@ -529,6 +529,24 @@
             }
         }
         #endregion
-//
+
+		#region Events
+        private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+			try
+			{
+
+			// Add any logic needed to cleanly close this application ...
+
+            DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed", JobName);
+            }
+            catch (Exception ex)
+            {
+                BroadcastError("Error while trying to close this app!!! ", ex);
+            }
+        }
+
+		#endregion
+//		
 //    }
 //}
