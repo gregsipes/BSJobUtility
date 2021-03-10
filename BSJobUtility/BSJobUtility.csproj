@@ -182,6 +182,14 @@
       <Project>{1d5268df-d016-4eac-bb9e-073275c349d3}</Project>
       <Name>QualificationReportLoad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RefreshUsers\RefreshUsers.csproj">
+      <Project>{c46c94d5-15d1-46b8-876e-b4e4ab5f12ce}</Project>
+      <Name>RefreshUsers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SaxoXMLLoad\SaxoXMLLoad.csproj">
+      <Project>{f77ff4dc-8fbf-450b-a34e-4d18f19948e2}</Project>
+      <Name>SaxoXMLLoad</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SBSReportsLoad\SBSReportsLoad.csproj">
       <Project>{0c122252-5007-4f08-b047-96e653a7dc28}</Project>
       <Name>SBSReportsLoad</Name>
@@ -197,6 +205,14 @@
     <ProjectReference Include="..\TestJob\TestJob.csproj">
       <Project>{428258fe-950a-4ffd-883c-7faea65e05b3}</Project>
       <Name>TestJob</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ToSecurity\ToSecurity.csproj">
+      <Project>{0779e912-8594-425d-81be-041a0fc8b296}</Project>
+      <Name>ToSecurity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TradeAutoEmail\TradeAutoEmail.csproj">
+      <Project>{2833225f-e708-41d2-8a45-9e2fc910b7a2}</Project>
+      <Name>TradeAutoEmail</Name>
     </ProjectReference>
     <ProjectReference Include="..\TradeWorkload\TradeWorkload.csproj">
       <Project>{7846f18e-0d22-4b7b-919c-e7c579091c8a}</Project>

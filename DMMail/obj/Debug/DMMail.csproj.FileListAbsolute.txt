@@ -9,17 +9,6 @@ C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CoreCompile
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CopyComplete
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.dll
 C:\projects\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.pdb
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\DMMail.dll
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\DMMail.pdb
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSGlobals.dll
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.dll
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSGlobals.pdb
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.pdb
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.dll.config
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CoreCompileInputs.cache
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CopyComplete
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.dll
-C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\DMMail.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\DMMail.pdb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\BSGlobals.dll
@@ -30,5 +19,15 @@ C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Deb
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CoreCompileInputs.cache
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.dll
 C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\obj\Debug\DMMail.pdb
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\DMMail.dll
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\DMMail.pdb
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSGlobals.dll
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.dll
 C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\WinSCPnet.dll
-C:\Projects\BSConsole\BS Console Source Code\C-Sharp\BSJobUtility\DMMail\bin\Debug\WinSCPnet.dll
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSGlobals.pdb
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.pdb
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\bin\Debug\BSJobBase.dll.config
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CoreCompileInputs.cache
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.csproj.CopyComplete
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.dll
+C:\projects\Buffalo News\Applications\BSJobUtility\DMMail\obj\Debug\DMMail.pdb

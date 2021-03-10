@@ -13,6 +13,7 @@ namespace BSJobUtility
         private readonly string _group;
         private readonly string _version;
         private JobBase _managedJob;
+        private bool _wasSuccessful;
 
         public JobExecutor(string jobName, string group, string version, string[] args)
         {
@@ -31,9 +32,13 @@ namespace BSJobUtility
                 // execute job
                 ExecuteJob();
 
+                _wasSuccessful = true;
+
             }
             catch(Exception ex)
             {
+                _wasSuccessful = false;
+
                 throw new Exception ("JobExecutor exception:  " + ex.ToString()); // 10/01/20 PEB Added Ex to eliminate compiler warning.
             }
             finally
@@ -119,8 +124,16 @@ namespace BSJobUtility
                 _managedJob = new ExecuteSQL.Job() { Version = _version };
             else if (_jobName == "SBSReportsLoad")
                 _managedJob = new SBSReportsLoad.Job();
+            else if (_jobName == "SaxoXMLLoad")
+                _managedJob = new SaxoXMLLoad.Job();
+            else if (_jobName == "TradeAutoEmail")
+                _managedJob = new TradeAutoEmail.Job();
             else if (_jobName == "TestJob")
                 _managedJob = new TestJob.Job();
+            else if (_jobName == "ToSecurity")
+                _managedJob = new ToSecurity.Job();
+            else if (_jobName == "RefreshUsers")
+                _managedJob = new RefreshUsers.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 
@@ -139,7 +152,7 @@ namespace BSJobUtility
 
         private void PostExecution()
         {
-            _managedJob.PostExecuteJob();
+            _managedJob.PostExecuteJob(_wasSuccessful);
         }
 
         public void Dispose()

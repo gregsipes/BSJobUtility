@@ -48,7 +48,7 @@ namespace Feeds
         private void CreateBuild()
         {
 
-            string securityPassPhrase = DeterminePassPhrase(DatabaseConnectionStringNames.Feeds);
+            string securityPassPhrase = DeterminePassPhrase(DatabaseConnectionStringNames.Feeds, "UserSID");
 
             WriteToJobLog(JobLogMessageType.INFO, $"Running as user {System.Security.Principal.WindowsIdentity.GetCurrent().Name}");
 

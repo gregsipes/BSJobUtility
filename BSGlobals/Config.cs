@@ -266,6 +266,12 @@ namespace BSGlobals
                 case DatabaseConnectionStringNames.Trade:
                     connectionString = GetConnectionString("trade");
                     break;
+                case DatabaseConnectionStringNames.Passwords:
+                    connectionString = GetConnectionString("passwords");
+                    break;
+                case DatabaseConnectionStringNames.ServReq:
+                    connectionString = GetConnectionString("servreq");
+                    break;
                 default:
                     break;
             }

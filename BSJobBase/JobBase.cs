@@ -4,10 +4,12 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -101,7 +103,7 @@ namespace BSJobBase
             }
         }
 
-        public virtual void PostExecuteJob()
+        public virtual void PostExecuteJob(bool wasSuccessful)
         {
             if (bool.Parse(GetConfigurationKeyValue("BSJobUtilitySection", "LogEmptyRuns")) == true || JobStartedLog == true)
             {
@@ -109,6 +111,10 @@ namespace BSJobBase
                 System.Threading.Thread.Sleep(5000);
                 WriteToJobLog(BSGlobals.Enums.JobLogMessageType.STARTSTOP, "Job completed");
             }
+
+            //send success email if the job has one defined
+            if (wasSuccessful && JobStartedLog == true && GetConfigurationKeyValue("SuccessEmail") != null)
+                SendMail($"{JobName} completed successfully", $"{JobName} ran successfully on {DateTime.Now.ToString()}", false, GetConfigurationKeyValue("SuccessEmail"));
         }
 
         #endregion
@@ -130,12 +136,10 @@ namespace BSJobBase
             CheckForJobStartedLog();
 
             if (Convert.ToBoolean(GetConfigurationKeyValue("BSJobUtilitySection", "IsTestVersion")) == true)
-                 BSGlobals.Mail.SendMail($"Error in TEST Job: {JobName}", ex.ToString(), false);
-             else
+                BSGlobals.Mail.SendMail($"Error in TEST Job: {JobName}", ex.ToString(), false);
+            else
                 BSGlobals.Mail.SendMail($"Error in Job: {JobName}", ex.ToString(), false);
-            
             BSGlobals.DataIO.WriteToJobLog(BSGlobals.Enums.JobLogMessageType.ERROR, ex.ToString(), JobName);
-            
         }
 
 
@@ -393,16 +397,22 @@ namespace BSJobBase
         }
 
 
-        protected string DeterminePassPhrase(DatabaseConnectionStringNames connectionStringName)
+        protected string DeterminePassPhrase(DatabaseConnectionStringNames connectionStringName, string defaultSIDKey)
         {
             Dictionary<string, object> result = ExecuteSQL(connectionStringName, "Proc_Select_BS_Verify").FirstOrDefault();
 
             //to build the passphrase, get the user sid, replace hyphen and leading S, then reverse
 
-            //To maintain backwards comptability, this SID has been changed to static
-            //value as opposed to collecting the SID from the logged in user.
-            // string userSID = WindowsIdentity.GetCurrent().User.ToString();
-            string userSID = GetConfigurationKeyValue("UserSID");
+            //to allow development from a remote environment outside of the trusted primary domain,
+            //we have a fallback/static SID defined in the config file
+            string userSID = GetConfigurationKeyValue(defaultSIDKey);
+
+            if (!Debugger.IsAttached)
+            {
+                NTAccount ntaccount = new NTAccount(GetConfigurationKeyValue("Domain"), result["misc_user"].ToString());
+                SecurityIdentifier securityIdentifier = (System.Security.Principal.SecurityIdentifier)ntaccount.Translate(typeof(System.Security.Principal.SecurityIdentifier));
+                userSID = securityIdentifier.ToString();
+            }
 
             char[] passPhraseArray = userSID.Replace("-", "").Replace("S", "").ToCharArray();
             Array.Reverse(passPhraseArray);
