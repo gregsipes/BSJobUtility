@@ -82,6 +82,10 @@
       <Project>{9927a52d-b824-47ec-8653-cf444c79f7d8}</Project>
       <Name>CommissionsCreate</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CopyIfNewer\CopyIfNewer.csproj">
+      <Project>{7a139a42-6071-4c8a-9616-40c9306acf14}</Project>
+      <Name>CopyIfNewer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeleteEmptyTMPFiles\DeleteEmptyTMPFiles.csproj">
       <Project>{1532ee23-f637-40fa-bba8-10b2f7c1a36d}</Project>
       <Name>DeleteEmptyTMPFiles</Name>
