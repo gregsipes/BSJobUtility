@@ -132,8 +132,8 @@ namespace BSJobUtility
                 _managedJob = new TestJob.Job();
             else if (_jobName == "ToSecurity")
                 _managedJob = new ToSecurity.Job();
-            else if (_jobName == "RefreshUsers")
-                _managedJob = new RefreshUsers.Job();
+            //else if (_jobName == "RefreshUsers")
+            //    _managedJob = new RefreshUsers.Job() { Version = _version };
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 
