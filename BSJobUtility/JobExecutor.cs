@@ -135,7 +135,7 @@ namespace BSJobUtility
             //else if (_jobName == "RefreshUsers")
             //    _managedJob = new RefreshUsers.Job() { Version = _version };
             else if (_jobName == "CopyIfNewer")
-                _managedJob = new CopyIfNewer.Job() { Version = _version };
+                _managedJob = new CopyIfNewer.Job();
             else
                 throw new Exception("Job name " + _jobName + " is invalid.");
 
